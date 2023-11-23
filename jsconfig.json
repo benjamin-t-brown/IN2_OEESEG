@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es6",
+    "checkJs": true,
+    "baseUrl": "src-web"
+  },
+  "include": ["src-web/**/*", "src-srv/**/*"]
+}

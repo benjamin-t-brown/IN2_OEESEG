@@ -1,0 +1,11 @@
+{
+  "standaloneCorePath": "src-js-standalone/core.mjs",
+  "mainPath": "src-js-standalone/main.compiled.js",
+  "additionalPaths": [
+    "src-js-standalone/db.mjs",
+    "src-js-standalone/draw.mjs",
+    "src-js-standalone/engine.mjs",
+    "src-js-standalone/sound.mjs"
+  ],
+  "standaloneIndexPath": "src-js-standalone/index.html"
+}

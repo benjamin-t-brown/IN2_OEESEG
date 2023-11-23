@@ -1,0 +1,215 @@
+<html>
+  <head>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <title>IN2: Standalone</title>
+    <style>
+      :root {
+        --default-canvas-width: 514px;
+        --default-canvas-height: 300px;
+        --default-text-zone-width: 475px;
+        --canvas-picture-border-size: 40px;
+        --color-bg-0: #000;
+        --color-bg-1: #212121;
+        --color-bg-2: #494949;
+        --color-bg-3: #8d8d8d;
+        --color-accent-1: #005784;
+        --color-accent-2: #7ed7ff;
+        --color-font-0: #fff;
+        --color-font-1: #ddd;
+      }
+      body {
+        background: var(--color-bg-0);
+        margin: 0;
+      }
+      .center {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+      }
+      .column {
+        max-width: calc(
+          2 * var(--canvas-picture-border-size) + var(--default-canvas-width) + var(--default-text-zone-width)
+        );
+        max-height: 800px;
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      /* @media screen and (max-height: 550px) {
+        .column {
+          margin-top: 0px;
+          height: 100%;
+        }
+      } */
+      #canvas-area {
+        container-type: size;
+        width: calc(2 * var(--canvas-picture-border-size) + var(--default-canvas-width));
+        height: 100%;
+        max-width: calc(2 * var(--canvas-picture-border-size) + var(--default-canvas-width))
+        max-height: calc(2 * var(--canvas-picture-border-size) + var(--default-canvas-height));
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        position: relative;
+      }
+      #interact-area {
+        height: 100%;
+        max-width: var(--default-text-zone-width);
+        /* container-type: size; */
+        /* border: 1px solid red; */
+      }
+      #canv-container {
+        background: black;
+        display: block;
+        width: calc(100cqw - 2 * var(--canvas-picture-border-size));
+        max-height: var(--default-canvas-height);
+        border: var(--canvas-picture-border-size) solid var(--color-bg-0);
+        border-image: url(assets/img/border.png) 13 round;
+      }
+      #canv {
+        width: 100%;
+        height: 100%;
+      }
+      /* This is the odd case, where the screen is taller than it is wide */
+      /* @media (max-aspect-ratio: 9/11) {
+        #canv {
+          display: block;
+          height: 100cqh;
+          max-width: var(--default-canvas-width);
+          width: unset;
+          max-height: unset;
+          border: 1px solid green;
+        }
+        .column {
+          max-width: var(--default-canvas-width);
+          width: 100%;
+          height: calc(100% - 100px);
+          display: flex;
+          justify-content: flex-start;
+          align-items: center;
+          flex-direction: column;
+          margin-top: 100px;
+        }
+      } */
+      #ui-zone {
+        display: flex;
+        justify-content: center;
+      }
+      #text-zone {
+        height: 60%;
+        overflow-y: auto;
+        scroll-behavior: smooth;
+        background-color: var(--color-bg-1);
+        font-size: 1rem;
+      }
+      #buttons-zone {
+        font-size: 1rem;
+        height: 40%;
+        overflow-y: auto;
+        background-color: var(--color-bg-2);
+        /* width: 100%; */
+      }
+      #compass {
+        padding: 40px 32px;
+        position: relative;
+        border-radius: 50%;
+        border: 2px solid var(--color-accent-1);
+        background: var(--color-bg-2);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        transition: transform 200ms ease-in-out;
+        transform: rotate(0deg);
+      }
+      #compass>div {
+        color: white;
+        font-size: 1.5rem;
+        font-family: monospace;
+        display: inline-block;
+        line-height: 0px;
+        transition: transform 200ms ease-in-out;
+      }
+      #compass div:nth-child(1) {
+        transform: translate(0px, -24px) rotate(0deg);
+      }
+      #compass div:nth-child(2) {
+        transform: translate(24px, 0px) rotate(0deg);
+      }
+      #compass div:nth-child(3) {
+        transform: translate(0px, 24px) rotate(0deg);
+      }
+      #compass div:nth-child(4) {
+        transform: translate(-24px, 0px) rotate(0deg);
+      }
+      .line {
+        font-family: monospace;
+        color: var(--color-font-0);;
+        margin: 4px;
+        min-height: 1px;
+      }
+      .line-highlight {
+        color: var(--color-accent-2);
+      }
+      button {
+        font-size: inherit;
+        font-family: monospace;
+        color: var(--color-font-0);
+        background-color: var(--color-bg-1);
+        text-align: left;
+        border: 1px solid var(--color-bg-3);
+        padding: 4px;
+        margin: 4px;
+        display: block;
+        width: calc(100% - 8px);
+      }
+      button.button-highlight {
+        border-color: var(--color-accent-1);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="center">
+      <div class="column">
+        <div id="canvas-area">
+          <div id="canv-container">
+            <canvas id="canv"></canvas>
+          </div>
+          <div id="ui-zone">
+            <div id="compass">
+              <div>N</div>
+              <div>E</div>
+              <div>S</div>
+              <div>W</div>
+            </div>
+          </div>
+        </div>
+        <div id="interact-area">
+          <div id="text-zone"></div>
+          <div id="buttons-zone"></div>
+        </div>
+      </div>
+    </div>
+  </body>
+  <footer>
+    <script src="core.mjs"></script>
+    <script src="db.mjs"></script>
+    <script src="sound.mjs"></script>
+    <script src="draw.mjs"></script>
+    <script src="engine.mjs"></script>
+    <script src="main.compiled.js"></script>
+    <script>
+      // REPLACE_ME
+      window.main();
+    </script>
+  </footer>
+</html>

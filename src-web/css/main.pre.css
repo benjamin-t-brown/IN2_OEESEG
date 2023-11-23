@@ -1,0 +1,581 @@
+body {
+  background: $css.colors.BG;
+  position: absolute;
+  width: 100%;
+  overflow: hidden;
+  margin: 0px;
+  font-size: 14px;
+  font-family: '$css.font.main';
+}
+
+.no-select {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.node {
+  transition: opacity 0.25s linear;
+  z-index: 1;
+}
+
+.no-drag {
+  -webkit-user-drag: none;
+}
+
+.movable {
+  cursor: move;
+}
+
+.player_visible {
+  height: 50%;
+}
+
+.player_invisible {
+  height: 100%;
+}
+
+.linking {
+  cursor: crosshair;
+}
+
+.player-error {
+  color: white;
+  text-decoration: underline red;
+  cursor: default;
+}
+
+.player-error:hover {
+  color: $css.colors.TEXT_LIGHT;
+}
+
+.file {
+  background-color: $css.colors.BG_NEUTRAL;
+}
+
+.file:hover {
+  background-color: $css.colors.FG_NEUTRAL;
+}
+
+.file-delete {
+  background-color: transparent;
+  color: red;
+  font-weight: bold;
+  text-align: center;
+  padding: 5px;
+  cursor: pointer;
+  font-family: monospace;
+}
+
+.file-delete:hover {
+  background-color: #a00;
+}
+
+.context-button {
+  background-color: transparent;
+  color: $css.colors.TEXT_DARK;
+  cursor: pointer;
+}
+
+.context-button:hover {
+  background-color: $css.colors.PRIMARY;
+  color: $css.colors.TEXT_LIGHT;
+}
+
+.item-content {
+  pointer-events: none;
+}
+
+.item-error {
+  outline: 4px solid red;
+}
+
+.item-active {
+  outline: 4px solid green;
+}
+
+.item {
+  font-family: monospace;
+  min-height: 10px;
+}
+
+.item-delete {
+  /* background-color: rgba(255, 255, 255, 0.75); */
+  color: red;
+  cursor: pointer;
+  padding: 5px;
+  position: absolute;
+  font-size: 12px;
+  font-weight: bold;
+  font-family: monospace;
+  right: 0px;
+  top: 0px;
+}
+
+.item-delete: hover {
+  background-color: rgba(255, 255, 255, 1);
+}
+
+.item-root {
+  padding: 5px;
+  cursor: pointer;
+  position: absolute;
+  overflow: hidden;
+  border: 1px solid $css.colors.SECONDARY_ALT;
+  min-width: 50px;
+  min-height: 16px;
+  text-align: center;
+  background-color: $css.colors.SECONDARY;
+  color: $css.colors.TEXT_LIGHT;
+}
+
+.item-text {
+  padding: 8px;
+  cursor: pointer;
+  position: absolute;
+  overflow: hidden;
+  border: 1px solid $css.colors.SECONDARY;
+  width: 250px;
+  background-color: $css.colors.PRIMARY;
+  color: $css.colors.TEXT_LIGHT;
+  word-break: break-word;
+  font-family: Arial;
+}
+
+.item-text:hover {
+  filter: brightness(125%);
+}
+
+.item-choice {
+  padding: 15px;
+  cursor: pointer;
+  position: absolute;
+  border: 1px solid $css.colors.PRIMARY;
+  border-radius: 30px;
+  width: 250px;
+  background-color: $css.colors.SECONDARY;
+  color: $css.colors.TEXT_LIGHT;
+  min-height: 10px;
+  overflow: hidden;
+  word-break: break-word;
+  font-family: Arial;
+  overflow: inherit;
+}
+
+.item-choice:hover {
+  filter: brightness(125%);
+}
+
+.item-choice_text {
+  background-color: $css.colors.CHOICE_TEXT;
+  padding: 8px;
+  cursor: pointer;
+  position: absolute;
+  overflow: hidden;
+  border: 1px solid $css.colors.PRIMARY;
+  width: 250px;
+  color: $css.colors.TEXT_LIGHT;
+  font-family: Arial;
+}
+
+.item-choice_text:hover {
+  filter: brightness(125%);
+}
+
+.item-choice_conditional {
+  border-bottom-left-radius: 25px;
+  border-bottom-right-radius: 25px;
+  background-color: $css.colors.CONDITIONAL;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 8px;
+  padding-bottom: 10px;
+  cursor: pointer;
+  position: absolute;
+  overflow: inherit;
+  border: 1px solid $css.colors.PRIMARY;
+  color: $css.colors.TEXT_LIGHT;
+  white-space: pre;
+}
+
+.item-choice_conditional:hover {
+  filter: brightness(125%);
+}
+
+.item-switch {
+  padding: 15px;
+  cursor: pointer;
+  position: absolute;
+  border: 1px solid #4a4a4a;
+  border-radius: 25px;
+  width: 75px;
+  background-color: #673c92;
+  color: #dedede;
+  min-height: 10px;
+  text-align: center;
+}
+.item-switch:hover {
+  filter: brightness(125%);
+}
+
+.item-switch_conditional {
+  border-bottom-left-radius: 25px;
+  border-bottom-right-radius: 25px;
+  background-color: $css.colors.CONDITIONAL;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 8px;
+  padding-bottom: 10px;
+  cursor: pointer;
+  position: absolute;
+  overflow: inherit;
+  border: 1px solid $css.colors.PRIMARY;
+  color: $css.colors.TEXT_LIGHT;
+}
+.item-switch_conditional:hover {
+  filter: brightness(125%);
+}
+
+.item-switch_default {
+  border-bottom-left-radius: 25px;
+  border-bottom-right-radius: 25px;
+  background-color: $css.colors.TEXT_DARK;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 8px;
+  padding-bottom: 10px;
+  cursor: pointer;
+  position: absolute;
+  overflow: hidden;
+  border: 1px solid $css.colors.PRIMARY;
+  width: 80px;
+  color: $css.colors.TEXT_LIGHT;
+  white-space: pre;
+}
+.item-switch_default:hover {
+  filter: brightness(125%);
+}
+
+.item-pass_fail {
+  background-color: $css.colors.CONDITIONAL;
+  padding: 12px;
+  cursor: pointer;
+  position: absolute;
+  overflow: hidden;
+  border: 1px solid $css.colors.PRIMARY;
+  color: $css.colors.TEXT_LIGHT;
+  white-space: nowrap;
+}
+
+.item-pass_fail:hover {
+  filter: brightness(125%);
+}
+
+.item-pass_text {
+  background-color: $css.colors.CONFIRM;
+  padding: 8px;
+  cursor: pointer;
+  position: absolute;
+  overflow: hidden;
+  border: 1px solid $css.colors.PRIMARY;
+  min-width: 50px;
+  color: $css.colors.TEXT_LIGHT;
+  min-height: 10px;
+}
+
+.item-pass_text:hover {
+  filter: brightness(125%);
+}
+
+.item-fail_text {
+  background-color: $css.colors.CANCEL;
+  padding: 8px;
+  cursor: pointer;
+  position: absolute;
+  overflow: hidden;
+  border: 1px solid $css.colors.PRIMARY;
+  min-width: 50px;
+  color: $css.colors.TEXT_LIGHT;
+  min-height: 10px;
+}
+
+.item-fail_text:hover {
+  filter: brightness(125%);
+}
+
+.item-action {
+  background-color: $css.colors.ACTION;
+  padding: 8px;
+  cursor: pointer;
+  position: absolute;
+  overflow: hidden;
+  border: 1px solid $css.colors.SECONDARY;
+  width: 400px;
+  white-space: pre;
+  color: $css.colors.TEXT_LIGHT;
+}
+
+.item-action:hover {
+  filter: brightness(125%);
+}
+
+.item-chunk {
+  background-color: #5e9871;
+  padding: 8px;
+  cursor: pointer;
+  position: absolute;
+  overflow: hidden;
+  border: 1px solid $css.colors.SECONDARY;
+  width: 400px;
+  white-space: pre;
+  color: $css.colors.TEXT_LIGHT;
+}
+
+.item-chunk:hover {
+  filter: brightness(125%);
+}
+
+.item-trigger {
+  background-color: #967d00;
+  padding: 8px;
+  cursor: pointer;
+  position: absolute;
+  overflow: hidden;
+  border: 1px solid $css.colors.PRIMARY;
+  width: 200px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: $css.colors.TEXT_LIGHT;
+  min-height: 10px;
+}
+
+.item-trigger:hover {
+  filter: brightness(125%);
+}
+
+.item-defer {
+  background-color: #8a3691;
+  text-align: center;
+  padding: 8px;
+  cursor: pointer;
+  position: absolute;
+  overflow: hidden;
+  border: 1px solid $css.colors.SECONDARY;
+  min-width: 200px;
+  max-width: 400px;
+  white-space: pre;
+  color: $css.colors.TEXT_LIGHT;
+  padding: 1rem;
+}
+
+.item-defer:hover {
+  filter: brightness(125%);
+}
+
+.item-declaration {
+  background-color: #967d00;
+  text-align: left;
+  padding: 8px;
+  cursor: pointer;
+  position: absolute;
+  overflow: hidden;
+  border: 1px solid $css.colors.SECONDARY;
+  min-width: 200px;
+  max-width: 800px;
+  white-space: pre;
+  color: $css.colors.TEXT_LIGHT;
+  padding: 1rem;
+}
+
+.item-next_file {
+  background-color: $css.colors.TEXT_LIGHT;
+  padding: 8px;
+  cursor: pointer;
+  position: absolute;
+  overflow: hidden;
+  border: 1px solid $css.colors.PRIMARY_ALT;
+  width: 200px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: $css.colors.TEXT_DARK;
+}
+
+.item-next_file:hover {
+  filter: brightness(125%);
+}
+
+.anchor-to {
+  width: 25px;
+  height: 25px;
+  position: absolute;
+  top: -30px;
+  left: -10px;
+  pointer-events: none;
+}
+
+.anchor-from {
+  width: 25px;
+  height: 25px;
+  position: absolute;
+  bottom: -32px;
+  right: -0px;
+  pointer-events: none;
+}
+
+.jtk-hover {
+  cursor: pointer;
+}
+
+.jtk-drag-selected {
+  border: 1px solid red;
+}
+
+.confirm-button {
+  user-select: none;
+  background-color: $css.colors.CONFIRM;
+  padding: 5px;
+  width: 80px;
+  margin: 5px;
+  text-align: center;
+  cursor: pointer;
+  color: $css.colors.TEXT_LIGHT;
+  border-radius: 5px;
+  border: 1px solid $css.colors.TEXT_LIGHT;
+  line-height: 1.1;
+}
+
+.confirm-button:hover {
+  /* background-color: rgb(50%, 50%, 50%); */
+  filter: brightness(80%);
+}
+
+.confirm-button-secondary {
+  user-select: none;
+  background-color: $css.colors.SECONDARY;
+  padding: 5px;
+  width: 80px;
+  margin: 5px;
+  text-align: center;
+  cursor: pointer;
+  color: $css.colors.TEXT_LIGHT;
+  border-radius: 5px;
+  border: 1px solid $css.colors.TEXT_LIGHT;
+  line-height: 1.1;
+}
+
+.confirm-button-secondary:hover {
+  /* background-color: rgb(50%, 50%, 50%); */
+  filter: brightness(80%);
+}
+
+.confirm-button-secondary:active {
+  /* background-color: rgb(25%, 25%, 25%); */
+  filter: brightness(120%);
+}
+
+.confirm-button-player {
+  user-select: none;
+  background: #967d00;
+  width: 100%;
+}
+.confirm-button-player:hover {
+  /* background-color: rgb(50%, 50%, 50%); */
+  filter: brightness(80%);
+}
+.confirm-button-player:active {
+  /* background-color: rgb(25%, 25%, 25%); */
+  filter: brightness(120%);
+}
+
+.confirm-button-export {
+  user-select: none;
+  background: rgba(0, 122, 150, 0.816);
+  width: 100%;
+}
+.confirm-button-export:hover {
+  filter: brightness(80%);
+  /* background-color: rgb(50%, 50%, 50%); */
+}
+.confirm-button-export:active {
+  filter: brightness(120%);
+  /* background-color: rgb(25%, 25%, 25%); */
+}
+
+.cancel-button {
+  background-color: $css.colors.CANCEL;
+  padding: 5px;
+  width: 80px;
+  margin: 5px;
+  text-align: center;
+  cursor: pointer;
+  color: $css.colors.TEXT_LIGHT;
+  border-radius: 5px;
+  border: 1px solid $css.colors.TEXT_LIGHT;
+  line-height: 1.1;
+}
+
+.cancel-button:hover {
+  /* background-color: rgb(50%, 50%, 50%); */
+  filter: brightness(80%);
+}
+
+@keyframes fade-in {
+  from {
+    color: transparent;
+  }
+  to {
+    color: $css.colors.TEXT_LIGHT;
+  }
+}
+
+.new-player-text {
+  animation-name: fade-in;
+  animation-duration: 0.5s;
+}
+
+.node-id {
+  text-align: left;
+  font-size: 10px;
+  color: #aaa;
+  margin-bottom: 0.5rem;
+}
+
+.node-id-ref {
+  color: black;
+  text-decoration: underline;
+}
+.node-id-ref:hover {
+  color: white;
+}
+
+.choice-in2 {
+  cursor: pointer;
+  color: cyan;
+  line-height: 1.5rem;
+}
+.choice-in2:hover {
+  filter: brightness(80%);
+}
+.choice-in2:active {
+  filter: brightness(120%);
+}
+
+button:disabled {
+  cursor: default;
+  background: gray;
+  pointer-events: none;
+}
+
+.link {
+  cursor: pointer;
+  text-decoration: underline;
+}
+.link:hover {
+  filter: brightness(120%)
+}
+.link:active {
+  color: yellow;
+}

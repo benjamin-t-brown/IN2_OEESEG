@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./src-web/",
+    "target": "ES2017",
+    "outFile": "main.js",
+    "module": "AMD",
+    "allowJs": true,
+    "lib": [
+      "dom",
+      "ES2017"
+    ],
+    "removeComments": true,
+    "sourceMap": true,
+    "forceConsistentCasingInFileNames": true,
+    "strictNullChecks": true,
+    "noImplicitAny": false,
+    "experimentalDecorators": true,
+    "jsx": "react",
+  },
+  "exclude": [
+    "node_modules"
+  ],
+  "include": [
+    "./src-web"
+  ]
+}

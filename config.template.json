@@ -1,0 +1,5 @@
+{
+  "standaloneCorePath": "src-js-standalone/core.js",
+  "additionalPaths": [],
+  "standaloneIndexPath": "src-js-standalone/index.html"
+}

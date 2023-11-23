@@ -1,0 +1,25 @@
+module.exports = {
+  font: {
+    main: 'Lucida Sans',
+    bubble: 'Courier New',
+  },
+  colors: {
+    PRIMARY: '#4A4A4A',
+    PRIMARY_ALT: '#333333',
+    SECONDARY: '#3344AA',
+    SECONDARY_ALT: '#4455BB',
+    TEXT_LIGHT: '#DEDEDE',
+    TEXT_NEUTRAL: '#A5A5A5',
+    TEXT_DARK: '#222222',
+    BG: '#111111',
+    FG: '#333333',
+    BG_NEUTRAL: '#333333',
+    FG_NEUTRAL: '#555555',
+    CHOICE_TEXT: '#4d2600',
+    CONFIRM: '#005500',
+    CANCEL: '#6e1515',
+    CONDITIONAL: '#99004d',
+    ACTION: '#4e8861',
+    SWITCH: '#aa4545',
+  },
+};
