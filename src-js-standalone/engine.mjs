@@ -188,8 +188,8 @@ const createEngine = () => {
         const children = elem.children;
         for (let i = 0; i < children.length; i++) {
           const child = children[i];
-          const x = 24 * Math.round(Math.cos(((i - 1) * Math.PI) / 2));
-          const y = 24 * Math.round(Math.sin(((i - 1) * Math.PI) / 2));
+          const x = 28 * Math.round(Math.cos(((i - 1) * Math.PI) / 2));
+          const y = 28 * Math.round(Math.sin(((i - 1) * Math.PI) / 2));
           const transform = `translate(${x}px, ${y}px) rotate(${-nextRotation}deg)`;
           child.style.transform = transform;
         }
