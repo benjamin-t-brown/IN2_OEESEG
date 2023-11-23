@@ -21,3 +21,4 @@ src-compile/out
 *.zip
 *.log
 dist-standalone/*
+dist/*

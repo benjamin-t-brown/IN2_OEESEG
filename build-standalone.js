@@ -10,7 +10,7 @@ const fs = require('fs');
 const minifyHtml = require('html-minifier').minify;
 const path = require('path');
 
-const outputDirName = 'dist-standalone';
+const outputDirName = 'dist';
 
 let config;
 try {
@@ -64,10 +64,10 @@ const build = async () => {
 
   htmlFile = minifyHtml(htmlFile, {
     removeAttributeQuotes: true,
-    // collapseWhitespace: true,
+    collapseWhitespace: true,
     html5: true,
-    // minifyCSS: true,
-    // minifyJS: true,
+    minifyCSS: true,
+    minifyJS: true,
     removeRedundantAttributes: true,
     removeScriptTypeAttributes: true,
     removeTagWhitespace: true,
@@ -77,6 +77,7 @@ const build = async () => {
 
   await execAsync(`rm -rf ${outputDirName}`);
   await execAsync(`mkdir ${outputDirName}`);
+  await execAsync(`mkdir ${outputDirName}/assets`);
 
   fs.writeFileSync(`${__dirname}/${outputDirName}/index.html`, htmlFile);
   fs.writeFileSync(`${__dirname}/${outputDirName}/main.js`, standalone);
@@ -99,7 +100,7 @@ const build = async () => {
   );
 
   await execAsync(
-    `cp -r src-js-standalone/assets ${__dirname}/${outputDirName}`
+    `cp -r src-js-standalone/assets/ ${__dirname}/${outputDirName}/`
   );
 
   const zipFilePath = path.resolve(`${__dirname}/standalone.zip`);
@@ -107,7 +108,7 @@ const build = async () => {
   console.log('\nZip (command line)...');
   try {
     await execAsync(
-      `cd ${outputDirName} && zip -9 ${zipFilePath} index.html *.js assets/img/*.png assets/snd/*.wav`
+      `cd ${outputDirName} && zip -9 ${zipFilePath} index.html *.js assets/img/*.png assets/snd/*.wav assets/font/*.ttf assets/ascii/*.txt`
     );
     console.log(await execAsync(`stat -c '%n %s' ${zipFilePath}`));
   } catch (e) {
