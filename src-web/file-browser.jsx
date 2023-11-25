@@ -16,6 +16,13 @@ const core = require('./core-in2');
 // 5.) Delete a file by clicking the red 'x' on the right at DEL GET /file/<filename>
 // 6.) Uses LocalStorage to remember the last file you had open
 
+const PRIMARY_FILES = [
+  'Inventory.json',
+  'InventoryExamineEvents.json',
+  'PickUp.json',
+  'PickUpEvents.json',
+];
+
 class FileBrowser extends expose.Component {
   constructor(props) {
     super(props);
@@ -32,6 +39,7 @@ class FileBrowser extends expose.Component {
       filter: filter || '',
       checked_files: {},
       check_all: false,
+      check_primary: false,
     };
 
     this.onFileClick = function (filename) {
@@ -46,21 +54,61 @@ class FileBrowser extends expose.Component {
       ns[filename] = !!ev.target.checked;
       this.setState({
         checked_files: ns,
+        check_all: false,
+        check_primary: false,
       });
     }.bind(this);
 
     this.onCheckAllClick = ev => {
       const ns = {};
-      for (const i in this.state.checked_files) {
-        if (i === this.props.current_file_name) {
-          ns[i] = this.state.checked_files[i];
+      const filteredFiles = this.state.file_list.filter(filename => {
+        let is_valid_regex = true;
+        try {
+          this.regex = new RegExp(this.state.filter);
+        } catch (e) {
+          is_valid_regex = false;
+        }
+        if (this.state.filter) {
+          if (is_valid_regex) {
+            return filename.search(this.state.filter) > -1;
+          } else {
+            return filename.indexOf(this.state.filter) > -1;
+          }
         } else {
-          ns[i] = !!ev.target.checked;
+          return true;
+        }
+      });
+      for (const fileName of filteredFiles) {
+        if (fileName === this.props.current_file_name) {
+          ns[fileName] = true;
+        } else {
+          ns[fileName] = !!ev.target.checked;
         }
       }
       this.setState({
         checked_files: ns,
         check_all: !!ev.target.checked,
+        check_primary: false,
+      });
+    };
+
+    this.onCheckPrimaryClick = () => {
+      const ns = {};
+      const filteredFiles = this.state.file_list;
+      for (const fileName of filteredFiles) {
+        if (
+          fileName === this.props.current_file_name ||
+          PRIMARY_FILES.includes(fileName)
+        ) {
+          ns[fileName] = true;
+        } else if (this.state.checked_files[fileName]) {
+          ns[fileName] = true;
+        }
+      }
+      this.setState({
+        checked_files: ns,
+        check_primary: true,
+        check_all: false,
       });
     };
 
@@ -300,7 +348,7 @@ class FileBrowser extends expose.Component {
           },
           React.createElement('input', {
             type: 'checkbox',
-            checked: this.state.checked_files[filename],
+            checked: this.state.checked_files[filename] ?? false,
             onChange: this.onFileCheckboxClick.bind(this, filename),
             style: {
               marginTop: '6px',
@@ -496,17 +544,17 @@ class FileBrowser extends expose.Component {
             }
             dialog.set_shift_req(true);
             dialog.hide_loading();
-            dialog.show_input(
-              {
+            dialog.showActionNodeInput({
+              node: {
                 content: JSON.stringify(states, null, 2),
               },
-              () => {
+              onConfirm: () => {
                 dialog.set_shift_req(false);
               },
-              () => {
+              onCancel: () => {
                 dialog.set_shift_req(false);
-              }
-            );
+              },
+            });
           }}
         >
           State
@@ -516,19 +564,19 @@ class FileBrowser extends expose.Component {
           onClick={async () => {
             const saveData = core.getSaveData() || {};
             dialog.set_shift_req(true);
-            dialog.show_input(
-              {
+            dialog.showActionNodeInput({
+              node: {
                 content: JSON.stringify(saveData, null, 2),
               },
-              result => {
+              onConfirm: result => {
                 const data = JSON.parse(result);
                 core.setSaveData(data);
                 dialog.set_shift_req(false);
               },
-              () => {
+              onCancel: () => {
                 dialog.set_shift_req(false);
-              }
-            );
+              },
+            });
           }}
         >
           Saved Data
@@ -572,7 +620,7 @@ class FileBrowser extends expose.Component {
                 </>
               );
             } else {
-              console.log('DATA', resp.data);
+              // console.log('DATA', resp.data);
               notify('Export successful!  ' + resp.data.msg, 'confirm');
               // dialog.show_notification(
               //   <>
@@ -591,20 +639,47 @@ class FileBrowser extends expose.Component {
           textAlign: 'center',
           color: css.colors.TEXT_LIGHT,
           textDecoration: 'underline',
+          margin: '10px',
         }}
       >
         {this.props.current_file_name?.slice(0, -5) || '(None Selected)'}
       </div>,
-      <div>
-        {React.createElement('input', {
-          type: 'checkbox',
-          checked: this.state.check_all,
-          onChange: this.onCheckAllClick,
-          style: {
-            marginTop: '6px',
-            padding: '3px',
-          },
-        })}
+      <div
+        style={{
+          color: '#77d8ff',
+          display: 'flex',
+          alignItems: 'center',
+          margin: '8px 0px',
+        }}
+      >
+        <div>
+          {React.createElement('input', {
+            id: 'check_all',
+            name: 'check_all',
+            type: 'checkbox',
+            checked: this.state.check_all ?? false,
+            onChange: this.onCheckAllClick,
+            style: {
+              marginTop: '6px',
+              padding: '3px',
+            },
+          })}
+        </div>
+        <label htmlFor="check_all">All </label>
+        <div>
+          {React.createElement('input', {
+            id: 'check_primary',
+            name: 'check_primary',
+            type: 'checkbox',
+            checked: this.state.check_primary ?? false,
+            onChange: this.onCheckPrimaryClick,
+            style: {
+              marginTop: '6px',
+              padding: '3px',
+            },
+          })}
+        </div>
+        <label htmlFor="check_primary">Primary Items</label>
       </div>,
       React.createElement(
         'div',

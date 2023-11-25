@@ -273,6 +273,8 @@ const createPlayer = () => {
     },
 
     get(path) {
+      // dumb hack
+      path = path.replace(/\.json/g, '');
       return _get(this.state, path, undefined);
     },
 
@@ -283,6 +285,8 @@ const createPlayer = () => {
       if (path === 'curIN2f') {
         this.set('files.' + val.replace('.json', ''), true);
       }
+      // dumb hack
+      path = path.replace(/\.json/g, '');
       return _set(this.state, path, val);
     },
 
@@ -351,6 +355,9 @@ exports.runFile = async function (file) {
   standalone = (await utils.get('/standalone/')).data;
   window._scriptLoading = true;
 
+  const saveData = exports.getSaveData();
+  console.log('save data', saveData);
+
   const evalStr =
     '{' +
     standalone +
@@ -368,6 +375,10 @@ async function main() {
   getSound().init();
   getEngine().init();
   window._scriptLoading = false;
+  const saveData = '${JSON.stringify(saveData)}';
+  // _player is not the right object apparantly...
+  player.state = {..._player.state, ...JSON.parse(saveData)};
+  console.log('save data?', saveData, _player.state);
   // console.log('Run!', core);
   run();
 }

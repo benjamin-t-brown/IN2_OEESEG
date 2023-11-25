@@ -21,6 +21,10 @@ const createDraw = () => {
   const CANVAS_WIDTH = 514;
   const CANVAS_HEIGHT = 300;
 
+  let numChoices = 0;
+  let selectedChoiceIndex = 0;
+  let isSelecting = false;
+
   const getDocument = () => {
     /** @type {any} */
     const globalWindow = window;
@@ -128,6 +132,68 @@ const createDraw = () => {
     }
   };
 
+  /** @type {(KeyboardEvent) => void} */
+  const onChoiceKeyPress = e => {
+    const { key } = e;
+
+    // @ts-ignore
+    const lib = window.getLib();
+
+    if (isSelecting) {
+      return;
+    }
+
+    if (lib?.isUpKey(key) || key === 'ArrowUp') {
+      selectedChoiceIndex--;
+      if (selectedChoiceIndex < 0) {
+        selectedChoiceIndex = lines.length - 1;
+      }
+    } else if (lib?.isDownKey(key) || key === 'ArrowDown') {
+      selectedChoiceIndex++;
+      if (selectedChoiceIndex >= lines.length) {
+        selectedChoiceIndex = 0;
+      }
+    } else if (
+      lib?.isActionKey(key) ||
+      key === 'Enter' ||
+      key === 'x' ||
+      key === ' '
+    ) {
+      isSelecting = true;
+      setTimeout(() => {
+        isSelecting = false;
+        const div = getDocument().getElementById('buttons-zone');
+        if (div) {
+          const button = div.children[selectedChoiceIndex];
+          if (button) {
+            button.click();
+          }
+        }
+      }, 100);
+    }
+    renderButtonHighlight();
+  };
+
+  const renderButtonHighlight = () => {
+    const div = getDocument().getElementById('buttons-zone');
+    if (div) {
+      const children = Array.from(div.children);
+      for (let i = 0; i < numChoices; i++) {
+        const button = children[i];
+        if (button) {
+          button.classList.remove('button-highlight');
+          button.classList.remove('button-selected');
+        }
+      }
+      const button = children[selectedChoiceIndex];
+      if (button) {
+        button.classList.add(
+          isSelecting ? 'button-selected' : 'button-highlight'
+        );
+      }
+    }
+  };
+
   /**
    * @type {Draw}
    */
@@ -230,7 +296,7 @@ const createDraw = () => {
       const div = getDocument().createElement('div');
       div.id = 'pressAnyKey';
       div.innerHTML = 'Press any key';
-      div.className = 'line';
+      div.className = 'line line-press-any-key';
       buttonsArea.appendChild(div);
     },
     hidePressAnyKey() {
@@ -243,21 +309,38 @@ const createDraw = () => {
       /** @type {any} */
       const buttonsArea = getDocument().getElementById('buttons-zone');
 
-      for (const { text, onClick } of choices) {
+      numChoices = choices.length;
+      selectedChoiceIndex = 0;
+
+      const onButtonHover = i => {
+        selectedChoiceIndex = i;
+        renderButtonHighlight();
+      };
+
+      for (let i = 0; i < choices.length; i++) {
+        const { text, onClick } = choices[i];
         const button = getDocument().createElement('button');
         button.innerHTML = text;
         button.className = 'button';
         button.onclick = onClick;
+        button.onmouseover = () => {
+          onButtonHover(i);
+        };
         buttonsArea.appendChild(button);
       }
 
       buttonsArea.style.display = 'block';
+
+      window.addEventListener('keydown', onChoiceKeyPress);
+      renderButtonHighlight();
     },
     hideButtons() {
       /** @type {any} */
       const buttonsArea = getDocument().getElementById('buttons-zone');
 
       buttonsArea.innerHTML = '';
+
+      window.removeEventListener('keydown', onChoiceKeyPress);
     },
   };
   return draw;

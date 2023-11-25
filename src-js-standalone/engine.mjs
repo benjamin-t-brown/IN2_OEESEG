@@ -5,6 +5,8 @@
  * @property {(item: import("./db.mjs").ItemTemplate) => (import("./db.mjs").NodeCall | undefined)} getItemExamineEvent
  * @property {(item: import("./db.mjs").ItemTemplate) => (import("./db.mjs").NodeCall | undefined)} getItemPickUpEvent
  * @property {() => import("./db.mjs").ItemTemplate[]} getInventoryItems
+ * @property {(itemName: string) => void} pickUpRoomItem
+ * @property {(itemName: string) => void} putDownRoomItem
  * @property {(roomName?: string) => import("./db.mjs").ItemTemplate[]} getRoomItems
  * @property {(roomName?: string) => string} getRoomItemsText
  * @property {(itemName: string) => void} addItemToInventory
@@ -13,12 +15,17 @@
  */
 
 const createEngine = () => {
+  let compassOffsetSize = 28;
+
+  const PLAYER_KEY_BACKGROUND = 'background';
+  const PLAYER_KEY_INVENTORY = 'inventory';
+  const PLAYER_KEY_ROOM_ITEMS = 'roomItems';
+
   const getPlayer = () => {
     /** @type {any} */
     const globalWindow = window;
     /** @type {import("./core.mjs").Player} */
     const player = globalWindow.player;
-
     return player;
   };
 
@@ -27,7 +34,6 @@ const createEngine = () => {
     const globalWindow = window;
     /** @type {import("./db.mjs").Db} */
     const db = globalWindow.db;
-
     return db;
   };
 
@@ -36,8 +42,13 @@ const createEngine = () => {
     const globalWindow = window;
     /** @type {import("./draw.mjs").Draw} */
     const draw = globalWindow.draw;
-
     return draw;
+  };
+
+  const getRoomItemKey = roomName => {
+    return (
+      PLAYER_KEY_ROOM_ITEMS + '.' + (roomName ?? getPlayer().get('curIN2f'))
+    );
   };
 
   /**
@@ -46,10 +57,36 @@ const createEngine = () => {
   const engine = {
     init() {
       engine.setHeading('n');
-      getPlayer().set('inventory', ['peculiar_rock', 'candle', 'candle']);
+      getPlayer().set(PLAYER_KEY_INVENTORY, []);
+
+      /** @type {any} */
+      const globalWindow = window;
+
+      if (globalWindow.onResizeHandler) {
+        globalWindow.removeEventListener(
+          'resize',
+          globalWindow.onResizeHandler
+        );
+      }
+      // keep the compass on the screen when the vertical breakpoint is hit
+      globalWindow.onResizeHandler = () => {
+        if (window.innerHeight < 475) {
+          if (compassOffsetSize !== 14) {
+            compassOffsetSize = 14;
+            engine.setHeading(getPlayer().get('heading') ?? 'n');
+          }
+        } else {
+          if (compassOffsetSize !== 28) {
+            compassOffsetSize = 28;
+            engine.setHeading(getPlayer().get('heading') ?? 'n');
+          }
+        }
+      };
+      globalWindow.addEventListener('resize', globalWindow.onResizeHandler);
+      globalWindow.onResizeHandler();
     },
     setBackground(pictureName) {
-      getPlayer().set('background', pictureName);
+      getPlayer().set(PLAYER_KEY_BACKGROUND, pictureName);
 
       const createFadeDiv = (durationMs, opacity) => {
         /** @type {any} */
@@ -79,29 +116,31 @@ const createEngine = () => {
       const nodeCall = itemTemplate?.onPickUp?.(getPlayer());
       return nodeCall;
     },
-    getInventoryItems() {
-      return (
-        getPlayer()
-          .get('inventory')
-          ?.map(name => {
-            const itemTemplate = getDb().items.find(item => item.name === name);
-            if (itemTemplate) {
-              return { ...itemTemplate };
-            } else {
-              throw new Error(
-                'Item not found when trying to get inventory: ' + name
-              );
-            }
-          })
-          .sort((a, b) => {
-            return a.label.localeCompare(b.label);
-          }) ?? []
-      );
+    pickUpRoomItem(itemName, roomName) {
+      /** @type {string[] | undefined} */
+      const roomItems = getPlayer().get(getRoomItemKey(roomName));
+      if (roomItems) {
+        const index = roomItems.findIndex(item => item === itemName);
+        if (index > -1) {
+          roomItems.splice(index, 1);
+          getPlayer().set(getRoomItemKey(roomName), roomItems);
+          engine.addItemToInventory(itemName);
+          return;
+        }
+      }
+    },
+    putDownRoomItem(itemName, roomName) {
+      /** @type {string[] | undefined} */
+      const roomItems = getPlayer().get(getRoomItemKey(roomName)) ?? [];
+      if (getRoomItemKey(roomName)) {
+        roomItems.push(itemName);
+        getPlayer().set(getRoomItemKey(roomName), roomItems);
+      }
     },
     getRoomItems(roomName) {
-      return (
+      const items =
         getPlayer()
-          .get('roomItems.' + (roomName ?? getPlayer().get('curIN2f')))
+          .get(getRoomItemKey(roomName))
           ?.map(name => {
             const itemTemplate = getDb().items.find(item => item.name === name);
             if (itemTemplate) {
@@ -114,11 +153,9 @@ const createEngine = () => {
           })
           .sort((a, b) => {
             return a.label.localeCompare(b.label);
-          }) ?? [
-          getDb().items.find(item => item.name === 'candle'),
-          getDb().items.find(item => item.name === 'peculiar_rock'),
-        ]
-      );
+          }) ?? [];
+
+      return items;
     },
     getRoomItemsText(roomName) {
       /** @type {string[]} */
@@ -142,25 +179,44 @@ const createEngine = () => {
         return '';
       }
     },
+    getInventoryItems() {
+      return (
+        getPlayer()
+          .get(PLAYER_KEY_INVENTORY)
+          ?.map(name => {
+            const itemTemplate = getDb().items.find(item => item.name === name);
+            if (itemTemplate) {
+              return { ...itemTemplate };
+            } else {
+              throw new Error(
+                'Item not found when trying to get inventory: ' + name
+              );
+            }
+          })
+          .sort((a, b) => {
+            return a.label.localeCompare(b.label);
+          }) ?? []
+      );
+    },
     addItemToInventory(itemName) {
       /** @type {string[]} */
-      const inventory = getPlayer().get('inventory') ?? [];
+      const inventory = getPlayer().get(PLAYER_KEY_INVENTORY) ?? [];
       const itemTemplate = getDb().items.find(item => item.name === itemName);
       if (itemTemplate) {
         inventory.push(itemName);
       } else {
         throw new Error('Item not found in db: ' + itemName);
       }
-      getPlayer().set('inventory', inventory);
+      getPlayer().set(PLAYER_KEY_INVENTORY, inventory);
     },
     removeItemFromInventory(itemName) {
       /** @type {string[]} */
-      const inventory = getPlayer().get('inventory') ?? [];
+      const inventory = getPlayer().get(PLAYER_KEY_INVENTORY) ?? [];
       const index = inventory.findIndex(item => item === itemName);
       if (index > -1) {
         inventory.splice(index, 1);
       }
-      getPlayer().set('inventory', inventory);
+      getPlayer().set(PLAYER_KEY_INVENTORY, inventory);
     },
     // set the heading and orient the compass towards it
     setHeading(dir) {
@@ -174,13 +230,13 @@ const createEngine = () => {
             nextRotation = 0;
             break;
           case 'e':
-            nextRotation = 90;
+            nextRotation = -90;
             break;
           case 's':
             nextRotation = 180;
             break;
           case 'w':
-            nextRotation = -90;
+            nextRotation = 90;
             break;
         }
         elem.style.transform = `rotate(${nextRotation}deg)`;
@@ -188,8 +244,11 @@ const createEngine = () => {
         const children = elem.children;
         for (let i = 0; i < children.length; i++) {
           const child = children[i];
-          const x = 28 * Math.round(Math.cos(((i - 1) * Math.PI) / 2));
-          const y = 28 * Math.round(Math.sin(((i - 1) * Math.PI) / 2));
+          // polar coords
+          const x =
+            compassOffsetSize * Math.round(Math.cos(((i - 1) * Math.PI) / 2));
+          const y =
+            compassOffsetSize * Math.round(Math.sin(((i - 1) * Math.PI) / 2));
           const transform = `translate(${x}px, ${y}px) rotate(${-nextRotation}deg)`;
           child.style.transform = transform;
         }

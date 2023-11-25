@@ -91,17 +91,17 @@ class Board extends expose.Component {
         this.plumb.clearDragSelection();
       }
 
-      if (!dialog.is_visible()) {
-        if (String.fromCharCode(ev.which) === 'C' && !utils.is_ctrl()) {
-          if (this.props.file) {
-            expose.get_state('player-area').compile(this.props.file?.name);
-          }
-        } else if (String.fromCharCode(ev.which) === 'A' && !utils.is_ctrl()) {
-          if (this.props.file) {
-            expose.get_state('player-area').compile();
-          }
-        }
-      }
+      // if (!dialog.is_visible()) {
+      //   if (String.fromCharCode(ev.which) === 'C' && !utils.is_ctrl()) {
+      //     if (this.props.file) {
+      //       expose.get_state('player-area').compile(this.props.file?.name);
+      //     }
+      //   } else if (String.fromCharCode(ev.which) === 'A' && !utils.is_ctrl()) {
+      //     if (this.props.file) {
+      //       expose.get_state('player-area').compile();
+      //     }
+      //   }
+      // }
     };
 
     this.onMouseDown = ev => {

@@ -120,6 +120,12 @@ const createDb = () => {
         description:
           "This is a large button that looks like it would fit on a giant's winter coat.",
       },
+      {
+        name: 'rusty_axe',
+        label: 'Rusty Axe',
+        description:
+          'This is an axe the length of your forearm.  It has dull, rusty head.',
+      },
     ],
   };
   return db;

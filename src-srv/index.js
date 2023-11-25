@@ -507,7 +507,6 @@ http_server.post('format', (obj, resp, data) => {
 
 // loads assets from the standalone directory
 http_server.get('assets', (obj, resp) => {
-  console.log('event args', obj.event_args.join('/'));
   const dir = path.resolve(
     __dirname,
     `../src-js-standalone/assets/${obj.event_args.join('/')}`

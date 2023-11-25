@@ -19,6 +19,7 @@ class Context extends expose.Component {
       case 'Link Node': {
         return 'link';
       }
+      case 'Create Text Choice Node':
       case 'Create Text Node': {
         return 'text';
       }

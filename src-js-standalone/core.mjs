@@ -33,6 +33,14 @@ const getEngine = () => {
   return window.engine;
 };
 
+// eslint-disable-next-line no-unused-vars
+const getLib = () => {
+  /** @ts-ignore */
+  return window.Lib;
+};
+/** @ts-ignore */
+window.getLib = getLib;
+
 const addTextLine = args => {
   const { text, paragraph, color } = args;
   if (paragraph) {
@@ -90,10 +98,12 @@ const createCore = () => {
   };
 
   const onKeyOrMouseEvent = ev => {
-    if (isKeypressDisabled) {
+    const lib = getLib();
+    if (isKeypressDisabled || lib?.isSkipKey(ev.key)) {
       return;
     }
     eventCallback(ev);
+    return false;
   };
 
   window.addEventListener('keydown', onKeyOrMouseEvent);
@@ -227,10 +237,13 @@ const createPlayer = () => {
     name: '',
     dontTriggerOnce: false,
     init() {
+      console.log('reset player state?');
       this.state = {};
     },
 
     get(path) {
+      // dumb hack
+      path = path.replace(/\.json/g, '');
       return _get(this.state, path, undefined);
     },
 
@@ -241,6 +254,8 @@ const createPlayer = () => {
       if (path === 'curIN2f') {
         this.set('files.' + val.replace('.json', ''), true);
       }
+      // dumb hack
+      path = path.replace(/\.json/g, '');
       return _set(this.state, path, val);
     },
 
@@ -271,9 +286,11 @@ window.core = _core;
 window.main = async function () {
   _core.init();
   _player.init();
+  // draw inits images and sounds
   await getDraw().init('canv');
   getSound().init();
   getEngine().init();
+  // in2 places the 'run' function on the window object
   /** @ts-ignore */
   run();
 };
