@@ -1,3 +1,10 @@
+/**
+ * @typedef Sound
+ * @property {(cache: Record<string, object>) => Promise<void>} init
+ * @property {(soundObj: Object) => void} playSound
+ * @property {(soundName: string) => (Object | null)} getSound
+ */
+
 const createSound = () => {
   function SoundLib() {
     // @ts-ignore
@@ -105,22 +112,29 @@ const createSound = () => {
     const SOUND_PATH = '';
     const sounds = {};
 
-    this.loadSound = async function (name, url, volume) {
+    this.loadSound = async function (name, url, volume, cache) {
       url = `${SOUND_PATH}${url}`;
-      return new Promise((resolve, reject) => {
-        CtxAudio.loadCtxAudio(url, audioCtx)
-          .then(sound => {
-            sounds[name] = {
-              sound,
-              audio: sound,
-              soundDuration: 5000,
-              volume: volume,
-            };
-            console.log('[IFRAME] sound loaded', name, url);
-            resolve(sound);
-          })
-          .catch(reject);
-      });
+
+      if (cache && cache[url]) {
+        sounds[name] = cache[url];
+        return cache[url];
+      } else {
+        return new Promise((resolve, reject) => {
+          CtxAudio.loadCtxAudio(url, audioCtx)
+            .then(sound => {
+              console.log('sound loaded', url);
+              sounds[name] = {
+                sound,
+                audio: sound,
+                soundDuration: 5000,
+                volume: volume,
+              };
+              cache[url] = sounds[name];
+              resolve(sound);
+            })
+            .catch(reject);
+        });
+      }
     };
 
     this.getSound = function (soundName) {
@@ -130,7 +144,6 @@ const createSound = () => {
           duration: 0,
           ...soundObj,
           //soundDuration merged in from soundObj
-          // audio: soundObj.audio.cloneNode(),
           audio: soundObj.audio,
           soundName,
           lastStartTimestamp: window.performance.now(),
@@ -167,8 +180,24 @@ const createSound = () => {
   }
 
   const soundLib = {
-    init: () => {
-      Object.assign(soundLib, new SoundLib());
+    init: async cache => {
+      const ctx = new SoundLib();
+      Object.assign(soundLib, ctx);
+
+      /** @type {any} */
+      const globalWindow = window;
+      /** @type {import("./db.mjs").Db} */
+      const db = globalWindow.db;
+
+      await Promise.all(
+        db.assets.sounds.map(async sound => {
+          try {
+            await ctx.loadSound(sound.name, sound.url, sound.volume, cache);
+          } catch (e) {
+            console.error('Failed to load sound', sound.url, e);
+          }
+        })
+      );
     },
   };
 

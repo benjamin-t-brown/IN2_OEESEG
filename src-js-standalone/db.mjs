@@ -17,6 +17,7 @@
  * @typedef SoundAsset
  * @property {string} name
  * @property {string} url
+ * @property {number=} volume
  */
 /**
  * @typedef AsciiAsset
@@ -42,6 +43,20 @@
 
 const createDb = () => {
   const ASCII_POSTFIX = '.ascii';
+  const PLAYER_KEY_PICK_UP_EVENT_NAME = 'PICK_UP_EVENT_NAME';
+  const PLAYER_KEY_INVENTORY_EXAMINE_EVENT_NAME =
+    'INVENTORY_EXAMINE_EVENT_NAME';
+
+  const PICK_UP_EVENTS_FILE = 'PickUpEvents.json';
+  const INVENTORY_EXAMINE_EVENTS_FILE = 'InventoryExamineEvents.json';
+
+  const getPickUpEventOnceKey = itemEventName => {
+    return 'vars.events.pickup.' + itemEventName;
+  };
+
+  const getInventoryExamineEventOnceKey = itemEventName => {
+    return 'vars.events.examine.' + itemEventName;
+  };
 
   /**
    * @type {Db}
@@ -71,11 +86,40 @@ const createDb = () => {
         'Caves_Cave1_2',
         'Caves_BelowCellar',
         'Caves_BelowCellar_2',
+        'Caves_SecretCave1',
+        'Caves_SecretCave1_2',
+        'Caves_Cave2',
+        'Caves_ClearLake',
+        'Caves_CaveCliff1_1',
+        'Caves_CollapsedCave1',
       ].map(name => ({
         name,
         url: `assets/ascii/${name}${ASCII_POSTFIX}.txt`,
       })),
-      sounds: [],
+      sounds: [
+        'cave_ambience_1',
+        'cave_drop_1',
+        'cave_drop_2',
+        'cave_drop_3',
+        'cave_drop_4',
+        'cave_drop_5',
+        'clank',
+        'collapse',
+        'get_item',
+        'put_item',
+        'light_fire',
+        'step_1',
+        'step_2',
+        'step_3',
+        'waterfall',
+      ].map(name => {
+        const [name1, volume] = name.split(':');
+        return {
+          name,
+          url: `assets/snd/${name1}.mp3`,
+          volume: volume ? parseFloat(volume) : 0.5,
+        };
+      }),
     },
     items: [
       {
@@ -84,10 +128,12 @@ const createDb = () => {
         description:
           'This palm-sized rock has three perfect holes drilled through it, forming a small triangle.',
         onExamine: player => {
-          const onceKey = 'events.examine.peculiar_rock';
+          const itemEventName = 'peculiar_rock';
+          player.set(PLAYER_KEY_INVENTORY_EXAMINE_EVENT_NAME, itemEventName);
+          const onceKey = getInventoryExamineEventOnceKey(itemEventName);
           if (!player.get(onceKey)) {
             return {
-              file: 'Examine_PeculiarRock.json',
+              file: INVENTORY_EXAMINE_EVENTS_FILE,
               cb: () => {
                 player.set(onceKey);
               },
@@ -101,11 +147,12 @@ const createDb = () => {
         label: 'Candle',
         description: 'Wax melts slowly as the candle flickers.',
         onPickUp: player => {
-          player.set('PICK_UP_EVENT_NAME', 'candle');
-          const onceKey = 'events.pickup.candle';
+          const itemEventName = 'candle';
+          player.set(PLAYER_KEY_PICK_UP_EVENT_NAME, itemEventName);
+          const onceKey = getPickUpEventOnceKey(itemEventName);
           if (!player.get(onceKey)) {
             return {
-              file: 'PickUpEvents.json',
+              file: PICK_UP_EVENTS_FILE,
               cb: () => {
                 player.set(onceKey);
               },
@@ -125,6 +172,28 @@ const createDb = () => {
         label: 'Rusty Axe',
         description:
           'This is an axe the length of your forearm.  It has dull, rusty head.',
+      },
+      {
+        name: 'tinderbox',
+        label: 'Tinderbox',
+        description:
+          'This small box contains all the materials needed to light a well-kindled fire.',
+      },
+      {
+        name: 'canteen_FullWater',
+        label: 'Full Canteen',
+        description:
+          'This gourd-shaped canteen is filled with water.  It is heavy.',
+      },
+      {
+        name: 'note_SecretWaterfall',
+        label: 'Note: Secret Waterfall',
+        description:
+          '"To get to the temple, a good acolyte must gather courage, jump through the waterfall, and head NORTH."',
+        onPickUp: player => {
+          player.set('flags.waterfall_knowledge', true);
+          return undefined;
+        },
       },
     ],
   };

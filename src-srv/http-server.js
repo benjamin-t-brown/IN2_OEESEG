@@ -189,6 +189,7 @@ exp.get_mime_type = function (extension) {
     woff: 'font/woff',
     woff2: 'font/woff2',
     svg: 'image/svg+xml',
+    mp3: 'audio/mpeg',
   };
 
   return mimes[extension] || 'text/plain';

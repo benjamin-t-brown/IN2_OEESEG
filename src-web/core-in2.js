@@ -6,6 +6,7 @@ const { notify } = require('notifications');
 window.IN2 = true;
 
 const LOCAL_STORAGE_SAVE_STATE_KEY = 'in2_save_state';
+const CANVAS_ID = 'player-canvas';
 
 exports.setSaveData = initialState => {
   localStorage.setItem(
@@ -290,6 +291,12 @@ const createPlayer = () => {
       return _set(this.state, path, val);
     },
 
+    setIfUnset(path, val) {
+      if (this.get(path) === undefined) {
+        this.set(path, val);
+      }
+    },
+
     once(arg) {
       const nodeId = arg ?? this.get('curIN2n');
       const key = 'once.' + nodeId;
@@ -336,6 +343,9 @@ function evalInContext(js, context) {
   }.call(context);
 }
 
+window.cachedSounds = {};
+window.cachedImages = {};
+
 const postfix = `
 window.core = window?.core?.origCore || window.core;
 // window._core.origCore = window.core;
@@ -356,7 +366,7 @@ exports.runFile = async function (file) {
   window._scriptLoading = true;
 
   const saveData = exports.getSaveData();
-  console.log('save data', saveData);
+  console.log('Save Data: ', saveData);
 
   const evalStr =
     '{' +
@@ -371,14 +381,13 @@ async function main() {
   console.log('Loading...');
   _core.init();
   _player.init();
-  await getDraw().init('player-canvas');
-  getSound().init();
+  await Promise.all([getDraw().init('${CANVAS_ID}', window.cachedImages), getSound().init(window.cachedSounds)]);
   getEngine().init();
   window._scriptLoading = false;
   const saveData = '${JSON.stringify(saveData)}';
   // _player is not the right object apparantly...
   player.state = {..._player.state, ...JSON.parse(saveData)};
-  console.log('save data?', saveData, _player.state);
+  console.log('player state data', player.state);
   // console.log('Run!', core);
   run();
 }
@@ -402,12 +411,16 @@ alert('There was an error evaluating the script.');
           '#f00'
         );
       }
-    }, 1000);
+    }, 5000);
     const script = document.createElement('script');
     script.type = 'text/javascript';
     // console.log('evalStr', evalStr);
     script.innerHTML = evalStr;
     script.id = 'in2-injection';
+    const existingScriptElem = document.getElementById('in2-injection');
+    if (existingScriptElem) {
+      existingScriptElem.remove();
+    }
     document.body.appendChild(script);
     window.player = exports._player;
   } catch (e) {

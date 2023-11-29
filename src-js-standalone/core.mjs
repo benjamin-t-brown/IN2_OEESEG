@@ -14,6 +14,7 @@ window.IN2 = true;
  * @property {function} init
  * @property {function} get
  * @property {function} set
+ * @property {function} setIfUnset
  * @property {function} once
  * @property {string} name
  * @property {object} state
@@ -237,7 +238,6 @@ const createPlayer = () => {
     name: '',
     dontTriggerOnce: false,
     init() {
-      console.log('reset player state?');
       this.state = {};
     },
 
@@ -257,6 +257,12 @@ const createPlayer = () => {
       // dumb hack
       path = path.replace(/\.json/g, '');
       return _set(this.state, path, val);
+    },
+
+    setIfUnset(path, val) {
+      if (this.get(path) === undefined) {
+        this.set(path, val);
+      }
     },
 
     once(arg) {
@@ -287,9 +293,9 @@ window.main = async function () {
   _core.init();
   _player.init();
   // draw inits images and sounds
-  await getDraw().init('canv');
-  getSound().init();
+  await Promise.all([getDraw().init('canv'), getSound().init()]);
   getEngine().init();
+  console.log('main...');
   // in2 places the 'run' function on the window object
   /** @ts-ignore */
   run();

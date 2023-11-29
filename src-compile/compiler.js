@@ -96,8 +96,8 @@ class File {
         return this.getNode(link.to);
       })
       .sort((a, b) => {
-        const y1 = parseFloat(a.top);
-        const y2 = parseFloat(b.top);
+        const y1 = parseFloat(a.left);
+        const y2 = parseFloat(b.left);
         if (y1 < y2) {
           return -1;
         } else {

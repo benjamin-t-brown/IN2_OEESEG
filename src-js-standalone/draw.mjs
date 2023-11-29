@@ -1,7 +1,7 @@
 /**
  * @typedef Draw
  * @property {HTMLCanvasElement} canvas;
- * @property {(id: string) => Promise<void>} init
+ * @property {(id: string, cache: Record<string, any>) => Promise<void>} init
  * @property {(picName: string) => void} drawBackground
  * @property {(itemName: string, x: number, y: number) => void} drawItem
  * @property {(text: string, color?: string) => void} renderLine
@@ -9,6 +9,7 @@
  * @property {() => void} hidePressAnyKey
  * @property {(choices: DrawLineChoice[]) => void} showButtons
  * @property {() => void} hideButtons
+ * @property {() => Record<string, string>} getColors
  */
 /**
  * @typedef DrawLineChoice
@@ -20,6 +21,8 @@
 const createDraw = () => {
   const CANVAS_WIDTH = 514;
   const CANVAS_HEIGHT = 300;
+  const COLOR_ACCENT_1 = '#7ed7ff';
+  const COLOR_BG_3 = '#8d8d8d';
 
   let numChoices = 0;
   let selectedChoiceIndex = 0;
@@ -59,6 +62,7 @@ const createDraw = () => {
     return new Promise(resolve => {
       const image = new Image();
       image.onload = () => {
+        console.log('loaded picture', url);
         resolve(image);
       };
       image.src = url;
@@ -71,6 +75,7 @@ const createDraw = () => {
    */
   const loadAscii = async url => {
     const text = await fetch(url).then(r => r.text());
+    console.log('loaded ascii', url);
     const canvas = document.createElement('canvas');
     canvas.width = CANVAS_WIDTH;
     canvas.height = CANVAS_HEIGHT;
@@ -116,17 +121,21 @@ const createDraw = () => {
         drawAscii(obj.asciiText ?? '', obj.img);
         obj.drawAscii = false;
       }
-      ctx.drawImage(
-        obj.img,
-        0,
-        0,
-        obj.img.width,
-        obj.img.height,
-        x,
-        y,
-        w ?? obj.img.width,
-        h ?? obj.img.height
-      );
+      if (ctx) {
+        ctx.drawImage(
+          obj.img,
+          0,
+          0,
+          obj.img.width,
+          obj.img.height,
+          x,
+          y,
+          w ?? obj.img.width,
+          h ?? obj.img.height
+        );
+      } else {
+        console.error('The ctx for the canvas could not be found.');
+      }
     } else {
       console.error('No image found named: ' + name, images);
     }
@@ -146,11 +155,11 @@ const createDraw = () => {
     if (lib?.isUpKey(key) || key === 'ArrowUp') {
       selectedChoiceIndex--;
       if (selectedChoiceIndex < 0) {
-        selectedChoiceIndex = lines.length - 1;
+        selectedChoiceIndex = numChoices - 1;
       }
     } else if (lib?.isDownKey(key) || key === 'ArrowDown') {
       selectedChoiceIndex++;
-      if (selectedChoiceIndex >= lines.length) {
+      if (selectedChoiceIndex >= numChoices) {
         selectedChoiceIndex = 0;
       }
     } else if (
@@ -199,7 +208,7 @@ const createDraw = () => {
    */
   const draw = {
     canvas,
-    async init(canvasId) {
+    async init(canvasId, cache) {
       /** @type {any} */
       const c = getDocument().getElementById(canvasId);
       if (c) {
@@ -219,25 +228,41 @@ const createDraw = () => {
 
       await Promise.all(
         db.assets.images.map(async image => {
-          const img = await loadPicture(image.url);
-          images.push({
-            name: image.name,
-            url: image.url,
-            img,
-          });
+          if (cache?.[image.url]) {
+            images.push(cache[image.url]);
+          } else {
+            const img = await loadPicture(image.url);
+            const obj = {
+              name: image.name,
+              url: image.url,
+              img,
+            };
+            images.push(obj);
+            if (cache) {
+              cache[image.url] = obj;
+            }
+          }
         })
       );
 
       await Promise.all(
         db.assets.ascii.map(async ascii => {
-          const { canvas, text } = await loadAscii(ascii.url);
-          images.push({
-            name: ascii.name,
-            url: ascii.url,
-            img: canvas,
-            drawAscii: true,
-            asciiText: text,
-          });
+          if (cache?.[ascii.url]) {
+            images.push(cache[ascii.url]);
+          } else {
+            const { canvas, text } = await loadAscii(ascii.url);
+            const obj = {
+              name: ascii.name,
+              url: ascii.url,
+              img: canvas,
+              drawAscii: true,
+              asciiText: text,
+            };
+            images.push(obj);
+            if (cache) {
+              cache[ascii.url] = obj;
+            }
+          }
         })
       );
 
@@ -279,7 +304,7 @@ const createDraw = () => {
         .trim()
         .replace(
           /([A-Z]{2,})([.,;?!:])*([ .?:])/g,
-          '<span style="color:#7ed7ff">$1</span>$2$3'
+          `<span style="color:${COLOR_ACCENT_1}">$1</span>$2$3`
         )
         .replace(/\n/g, '<br />');
 
@@ -320,7 +345,15 @@ const createDraw = () => {
       for (let i = 0; i < choices.length; i++) {
         const { text, onClick } = choices[i];
         const button = getDocument().createElement('button');
-        button.innerHTML = text;
+
+        const replacedText = text
+          .replaceAll(
+            /(NORTH|EAST|SOUTH|WEST)/g,
+            `<img src="assets/img/ArrowDown.svg" class="inline-arrow inline-arrow-$1" /><span style="color:${COLOR_ACCENT_1}">$1</span>`
+          )
+          .replaceAll(/(\d\.)/g, `<span style="color:${COLOR_BG_3}">$1</span>`);
+
+        button.innerHTML = replacedText;
         button.className = 'button';
         button.onclick = onClick;
         button.onmouseover = () => {
@@ -341,6 +374,12 @@ const createDraw = () => {
       buttonsArea.innerHTML = '';
 
       window.removeEventListener('keydown', onChoiceKeyPress);
+    },
+    getColors() {
+      return {
+        COLOR_ACCENT_1,
+        COLOR_BG_3,
+      };
     },
   };
   return draw;

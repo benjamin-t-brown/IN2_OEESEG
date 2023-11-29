@@ -2,6 +2,8 @@
  * @typedef Engine
  * @property {() => void} init
  * @property {(pictureName: string) => void} setBackground
+ * @property {(soundName: string) => void} playSound
+ * @property {(soundName: string, postfixes: string[]) => void} playOneOfSound
  * @property {(item: import("./db.mjs").ItemTemplate) => (import("./db.mjs").NodeCall | undefined)} getItemExamineEvent
  * @property {(item: import("./db.mjs").ItemTemplate) => (import("./db.mjs").NodeCall | undefined)} getItemPickUpEvent
  * @property {() => import("./db.mjs").ItemTemplate[]} getInventoryItems
@@ -9,6 +11,7 @@
  * @property {(itemName: string) => void} putDownRoomItem
  * @property {(roomName?: string) => import("./db.mjs").ItemTemplate[]} getRoomItems
  * @property {(roomName?: string) => string} getRoomItemsText
+ * @property {(itemName: string) => boolean} hasItemInInventory
  * @property {(itemName: string) => void} addItemToInventory
  * @property {(itemName: string) => void} removeItemFromInventory
  * @property {(dir: 'n' | 'e' | 's' | 'w') => void} setHeading
@@ -43,6 +46,14 @@ const createEngine = () => {
     /** @type {import("./draw.mjs").Draw} */
     const draw = globalWindow.draw;
     return draw;
+  };
+
+  const getSoundPlayer = () => {
+    /** @type {any} */
+    const globalWindow = window;
+    /** @type {import("./sound.mjs").Sound} */
+    const sound = globalWindow.sound;
+    return sound;
   };
 
   const getRoomItemKey = roomName => {
@@ -86,9 +97,14 @@ const createEngine = () => {
       globalWindow.onResizeHandler();
     },
     setBackground(pictureName) {
+      if (getPlayer().get('background') === pictureName) {
+        getDraw().drawBackground(pictureName);
+        return;
+      }
+
       getPlayer().set(PLAYER_KEY_BACKGROUND, pictureName);
 
-      const createFadeDiv = (durationMs, opacity) => {
+      const createFade = (durationMs, opacity) => {
         /** @type {any} */
         const globalWindow = window;
         /** @type {import("./draw.mjs").Draw} */
@@ -102,11 +118,24 @@ const createEngine = () => {
       };
 
       const duration = 200;
-      createFadeDiv(duration / 2, 1);
+      createFade(duration / 2, 1);
       setTimeout(() => {
         getDraw().drawBackground(pictureName);
-        createFadeDiv(duration / 2, 0);
+        createFade(duration / 2, 0);
       }, duration / 2);
+    },
+    playSound(soundName) {
+      const soundObj = getSoundPlayer().getSound(soundName);
+      if (soundObj) {
+        getSoundPlayer().playSound(soundObj);
+      }
+    },
+    playOneOfSound(soundPrefix, postfixes) {
+      const soundName =
+        soundPrefix +
+        '_' +
+        postfixes[Math.floor(Math.random() * postfixes.length)];
+      engine.playSound(soundName);
     },
     getItemExamineEvent(itemTemplate) {
       const nodeCall = itemTemplate?.onExamine?.(getPlayer());
@@ -150,10 +179,10 @@ const createEngine = () => {
                 'Item not found when trying to get room items: ' + name
               );
             }
-          })
-          .sort((a, b) => {
-            return a.label.localeCompare(b.label);
           }) ?? [];
+      // .sort((a, b) => {
+      //   return a.label.localeCompare(b.label);
+      // }) ?? [];
 
       return items;
     },
@@ -161,7 +190,12 @@ const createEngine = () => {
       /** @type {string[]} */
       const items = engine
         .getRoomItems(roomName)
-        .map(item => `<span style="color:#7ed7ff">${item.label}</span>`);
+        .map(
+          item =>
+            `<span style="color:${getDraw().getColors().COLOR_ACCENT_1}">${
+              item.label
+            }</span>`
+        );
       if (items.length) {
         /** @type {string} */
         let result = '';
@@ -197,6 +231,11 @@ const createEngine = () => {
             return a.label.localeCompare(b.label);
           }) ?? []
       );
+    },
+    hasItemInInventory(itemName) {
+      /** @type {string[]} */
+      const inventory = getPlayer().get(PLAYER_KEY_INVENTORY) ?? [];
+      return inventory.includes(itemName);
     },
     addItemToInventory(itemName) {
       /** @type {string[]} */
