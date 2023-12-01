@@ -342,6 +342,7 @@ const createDraw = () => {
         renderButtonHighlight();
       };
 
+      let lastButton = null;
       for (let i = 0; i < choices.length; i++) {
         const { text, onClick } = choices[i];
         const button = getDocument().createElement('button');
@@ -360,9 +361,10 @@ const createDraw = () => {
           onButtonHover(i);
         };
         buttonsArea.appendChild(button);
+        lastButton = button;
       }
 
-      buttonsArea.style.display = 'block';
+      lastButton.style.marginBottom = '32px';
 
       window.addEventListener('keydown', onChoiceKeyPress);
       renderButtonHighlight();

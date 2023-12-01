@@ -256,14 +256,37 @@
         #buttons-zone {
           font-size: 0.8rem;
         }
-        #canv-container {
+        /* #canv-container {
           height: calc(100cqh - 2 * var(--canvas-picture-border-size) - var(--ui-zone-height) / 2);
-          /* width: (100cqw - 2 * var(--canvas-picture-border-size)); */
           max-width: var(--default-canvas-width);
         }
         .column {
           max-width: calc(2 * var(--canvas-picture-border-size) + var(--default-canvas-width) + var(--default-text-zone-width));
           max-height: 100vh;
+        }
+        #canv {
+          width: auto;
+          height: 100%;
+        } */
+        #compass {
+          width: calc((var(--ui-zone-height) - 16px) / 2);
+          height: calc((var(--ui-zone-height) - 16px) / 2);
+          font-size: 0.8rem;
+        }
+        #ui-zone {
+          display: flex;
+          justify-content: center;
+          height: calc(var(--ui-zone-height) / 2);
+        }
+        .inline-arrow {
+          max-width: 0.8rem;
+          margin-left: 0.15rem;
+        }
+      }
+
+      @media (max-aspect-ratio: 9/11) {
+        :root {
+          --top-size: 400px;
         }
         #ui-zone {
           display: flex;
@@ -274,14 +297,48 @@
           width: calc((var(--ui-zone-height) - 16px) / 2);
           height: calc((var(--ui-zone-height) - 16px) / 2);
           font-size: 0.8rem;
-        }
-        #canv {
-          width: auto;
-          height: 100%;
+          margin-top: 7px;
         }
         .inline-arrow {
           max-width: 0.8rem;
           margin-left: 0.15rem;
+        }
+        #text-zone {
+          font-size: 0.8rem;
+        }
+        #buttons-zone {
+          font-size: 0.8rem;
+        }
+        #canvas-area {
+          height: var(--top-size);
+          flex-shrink: 0;
+        }
+        .column {
+          max-width: calc(2 * var(--canvas-picture-border-size) + var(--default-canvas-width) + var(--default-text-zone-width));
+          max-height: unset;
+          width: 100vw;
+          height: calc(100vh - 16px);
+          display: flex;
+          justify-content: center;
+          flex-direction: column;
+          align-items: center;
+          position: relative;
+        }
+        #canv-container {
+          width: calc(100vw - 2 * var(--canvas-picture-border-size));
+          max-width: var(--default-canvas-width);
+          display: block;
+          max-height: unset;
+          /* border: var(--canvas-picture-border-size) solid var(--color-bg-0);
+          border-image: url(assets/img/border3.png) 13 round;
+          display: flex;
+          justify-content: center; */
+        }
+        #interact-area {
+          height: calc(100% - var(--top-size));
+        }
+        .outer-border {
+          display: none;
         }
       }
     </style>

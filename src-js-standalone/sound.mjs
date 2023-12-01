@@ -181,6 +181,7 @@ const createSound = () => {
 
   const soundLib = {
     init: async cache => {
+      cache = cache || {};
       const ctx = new SoundLib();
       Object.assign(soundLib, ctx);
 

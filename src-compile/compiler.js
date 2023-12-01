@@ -199,7 +199,7 @@ function _eval_content(content, params) {
   try {
     evalInContext(evalStr, {});
   } catch (e) {
-    console.log('COULD NOT EVAL', innerContent, e.stack);
+    console.log('COULD NOT EVAL', innerContent, globalDeclarations, e.stack);
     return 'error' + e;
   }
 }

@@ -132,6 +132,16 @@ const createCore = () => {
     eventCallback(ev);
   };
 
+  const globalWindow = window;
+  if (globalWindow.globalOnKeyOrMouseEvent) {
+    window.removeEventListener('keydown', globalWindow.globalOnKeyOrMouseEvent);
+    window.removeEventListener(
+      'mousedown',
+      globalWindow.globalOnKeyOrMouseEvent
+    );
+  }
+  globalWindow.globalOnKeyOrMouseEvent = onKeyOrMouseEvent;
+
   window.addEventListener('keydown', onKeyOrMouseEvent);
   window.addEventListener('mousedown', onKeyOrMouseEvent);
 
@@ -366,7 +376,7 @@ exports.runFile = async function (file) {
   window._scriptLoading = true;
 
   const saveData = exports.getSaveData();
-  console.log('Save Data: ', saveData);
+  console.log('Save Data: ', structuredClone(saveData));
 
   const evalStr =
     '{' +

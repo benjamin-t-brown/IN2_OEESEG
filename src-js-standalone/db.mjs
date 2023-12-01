@@ -92,6 +92,14 @@ const createDb = () => {
         'Caves_ClearLake',
         'Caves_CaveCliff1_1',
         'Caves_CollapsedCave1',
+        'Caves_StoneStairway1',
+        'Caves_StoneTempleEntrance',
+        'Caves_StoneTempleEntrance_2',
+        'Caves_StoneTempleEntrance_3',
+        'Caves_StoneTempleEntrance_4',
+        'Caves_Cave3',
+        'Caves_RuinedElevator',
+        'Caves_CaveChute1',
       ].map(name => ({
         name,
         url: `assets/ascii/${name}${ASCII_POSTFIX}.txt`,
@@ -112,6 +120,8 @@ const createDb = () => {
         'step_2',
         'step_3',
         'waterfall',
+        'grunt',
+        'slide',
       ].map(name => {
         const [name1, volume] = name.split(':');
         return {
