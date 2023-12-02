@@ -100,6 +100,8 @@ const createDb = () => {
         'Caves_Cave3',
         'Caves_RuinedElevator',
         'Caves_CaveChute1',
+        'Caves_NarrowStairway1',
+        'Caves_HotSprings',
       ].map(name => ({
         name,
         url: `assets/ascii/${name}${ASCII_POSTFIX}.txt`,
@@ -182,6 +184,12 @@ const createDb = () => {
         label: 'Rusty Axe',
         description:
           'This is an axe the length of your forearm.  It has dull, rusty head.',
+      },
+      {
+        name: 'shiny_axe',
+        label: 'Shiny Axe',
+        description:
+          'This is an axe the length of your forearm.  It has dull, but shiny head.',
       },
       {
         name: 'tinderbox',
