@@ -102,6 +102,7 @@ const createDb = () => {
         'Caves_CaveChute1',
         'Caves_NarrowStairway1',
         'Caves_HotSprings',
+        'Caves_Lava1',
       ].map(name => ({
         name,
         url: `assets/ascii/${name}${ASCII_POSTFIX}.txt`,
