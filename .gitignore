@@ -1,8 +1,8 @@
 tree-builder/save/*.json
 node_modules
 npm-debug.log
-*.compiled.js
-*.compiled.cpp
+src-compile/out/*.compiled.js
+src-compile/out/*.compiled.cpp
 dist/main.js
 dist/main.min.js
 save/icomic1/
@@ -11,7 +11,6 @@ standalone/main.concat.js
 standalone/main.min.js
 standalone/standalone.zip
 standalone/standalone.adv.zip
-src-js-standalone/main.js
 src-srv/config.js
 scratch/
 out.log
