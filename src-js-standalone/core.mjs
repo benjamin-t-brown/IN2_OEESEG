@@ -288,14 +288,39 @@ const _core = createCore();
 /** @ts-ignore */
 window.core = _core;
 
+let loading = false;
+let loaded = false;
+let loadingPromises = [];
+/** @ts-ignore */
+const load = (window.load = async function () {
+  if (loaded) {
+    return;
+  }
+  if (loading) {
+    const p = new Promise(resolve => {
+      loadingPromises.push(resolve);
+    });
+    await p;
+    return;
+  }
+  loading = true;
+  await Promise.all([getDraw().init('canv'), getSound().init()]);
+  loading = false;
+  loaded = true;
+  for (const resolve of loadingPromises) {
+    resolve();
+  }
+  loadingPromises = [];
+});
+
 /** @ts-ignore */
 window.main = async function () {
   _core.init();
   _player.init();
+  await load();
   // draw inits images and sounds
-  await Promise.all([getDraw().init('canv'), getSound().init()]);
+
   getEngine().init();
-  console.log('main...');
   // in2 places the 'run' function on the window object
   /** @ts-ignore */
   run();
