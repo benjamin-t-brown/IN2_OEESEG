@@ -159,6 +159,9 @@ class Board extends expose.Component {
     };
 
     this.onMouseUp = ev => {
+      if (this.panning) {
+        this.saveLocation();
+      }
       this.panning = false;
       const div = document.getElementById('select-box');
       const rectCollides = (rect1, rect2) => {
@@ -227,6 +230,8 @@ class Board extends expose.Component {
 
       this.renderAtOffset();
       this.getPlumb().setZoom(this.zoom);
+
+      this.saveLocation();
     };
 
     this.onDiagramDblClick = () => {};
@@ -450,6 +455,31 @@ class Board extends expose.Component {
         });
       });
     };
+
+    this.saveLocation = () => {
+      utils.saveLocationToLocalStorage(
+        expose.get_state('main').current_file.name,
+        this.offsetX,
+        this.offsetY,
+        this.zoom
+      );
+    };
+
+    this.loadLocation = () => {
+      const loc = utils.getLocationFromLocalStorage(
+        expose.get_state('main').current_file.name
+      );
+      if (loc) {
+        if (loc.x !== null && loc.y !== null && loc.zoom !== null) {
+          this.offsetX = loc.x;
+          this.offsetY = loc.y;
+          this.zoom = loc.zoom;
+          this.renderAtOffset();
+          this.getPlumb().setZoom(this.zoom);
+        }
+      }
+    };
+    state.loadLocation = this.loadLocation;
 
     this.centerOnNode = async nodeId => {
       const n = this.getNode(nodeId);

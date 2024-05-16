@@ -230,7 +230,7 @@ function _create_text_node(content, id, child_id) {
     `// text\n` +
     `scope.${id} = () => {\n` +
     `    player.set(CURRENT_NODE_VAR, '${id}');\n` +
-    `    let text = ${QUOTE}${escapeQuotes(content)}${QUOTE};\n` +
+    `    var text = ${QUOTE}${escapeQuotes(content)}${QUOTE};\n` +
     `    core.say(text, scope.${child_id}, '${id}', '${child_id}');\n` +
     `};\nscope['${id}'].isText=true;\n`;
   return ret;
@@ -352,7 +352,7 @@ class Compiler {
         // }
         let ret =
           `// ${node.type}\n` +
-          `scope.${node.id} = () => {\n` +
+          `scope.${node.id} = function() {\n` +
           `    player.set(CURRENT_NODE_VAR, '${node.id}' );\n` +
           `    let text = ${QUOTE}${escapeQuotes(node.content)}${QUOTE};\n` +
           `    core.choose(text, '${node.id}', [` +
@@ -544,9 +544,9 @@ class Compiler {
         }
         let ret =
           `// ${node.type}\n` +
-          `scope.${node.id} = () => {\n` +
+          `scope.${node.id} = function() {\n` +
           `    player.set(CURRENT_NODE_VAR, '${node.id}');\n` +
-          `    var condition = (() => { return ${escapeQuotes(
+          `    var condition = (function() { return ${escapeQuotes(
             node.content
           )} })();\n` +
           ``;
@@ -588,14 +588,14 @@ class Compiler {
             ret +=
               `    if(condition){\n` +
               `        player.set(CURRENT_NODE_VAR, '${child.id}');\n` +
-              `        let text = ${QUOTE}${child.content}${QUOTE};\n` +
+              `        var text = ${QUOTE}${child.content}${QUOTE};\n` +
               `        core.say(text, scope.${child2.id});\n` +
               `    }\n`;
           } else if (child.type === 'fail_text') {
             ret +=
               `    if(!condition){\n` +
               `        player.set(CURRENT_NODE_VAR, '${child.id}');\n` +
-              `        let text = ${QUOTE}${child.content}${QUOTE};\n` +
+              `        var text = ${QUOTE}${child.content}${QUOTE};\n` +
               `        core.say(text, scope.${child2.id});\n` +
               `    }\n`;
           }
@@ -861,7 +861,7 @@ class Compiler {
         this.files_to_verify.push(node.content);
         let ret =
           `// ${node.type}\n` +
-          `scope.${node.id} = () => {\n` +
+          `scope.${node.id} = function() {\n` +
           `    var key = ${QUOTE}${escapeQuotes(node.content)}${QUOTE};\n` +
           `    var func = files[key];\n` +
           `    if (!func){ func = files[player.get(key)]; }\n` +
@@ -898,11 +898,11 @@ class Compiler {
     */\n/*eslint-disable-line*/${
       isExport ? 'export' : ''
     } function run(isDryRun){\n/* global player, core, engine */
-const files = {};
-const scope = {};
-const CURRENT_NODE_VAR = '${CURRENT_NODE_VAR}';
-const CURRENT_FILE_VAR = '${CURRENT_FILE_VAR}';
-const LAST_FILE_VAR = '${LAST_FILE_VAR}';
+var files = {};
+var scope = {};
+var CURRENT_NODE_VAR = '${CURRENT_NODE_VAR}';
+var CURRENT_FILE_VAR = '${CURRENT_FILE_VAR}';
+var LAST_FILE_VAR = '${LAST_FILE_VAR}';
 player.set('scope', scope);`;
   }
   //footer for entire file (not individual compiled files)

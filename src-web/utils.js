@@ -289,6 +289,27 @@ module.exports = {
       scale: nextScale,
     };
   },
+
+  saveLocationToLocalStorage: (fileName, x, y, zoom) => {
+    const lsData = localStorage.getItem('FILE_LOCATIONS') || '[]';
+    const data = JSON.parse(lsData);
+    const existingElem = data.find(elem => elem.fileName === fileName);
+    if (existingElem) {
+      existingElem.x = x;
+      existingElem.y = y;
+      existingElem.zoom = zoom;
+    } else {
+      data.push({ fileName, x, y, zoom });
+    }
+    localStorage.setItem('FILE_LOCATIONS', JSON.stringify(data));
+  },
+
+  getLocationFromLocalStorage: fileName => {
+    const lsData = localStorage.getItem('FILE_LOCATIONS') || '[]';
+    const data = JSON.parse(lsData);
+    const existingElem = data.find(elem => elem.fileName === fileName);
+    return existingElem;
+  },
 };
 
 window.utils = module.exports;

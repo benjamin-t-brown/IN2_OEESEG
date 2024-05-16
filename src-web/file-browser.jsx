@@ -264,6 +264,9 @@ class FileBrowser extends expose.Component {
       if (cb) {
         cb();
       }
+      setTimeout(() => {
+        expose.get_state('board').loadLocation();
+      }, 1);
     });
   }
   createFile(name) {
@@ -653,43 +656,32 @@ class FileBrowser extends expose.Component {
         }}
       >
         <div>
-          {React.createElement('input', {
-            id: 'check_all',
-            name: 'check_all',
-            type: 'checkbox',
-            checked: this.state.check_all ?? false,
-            onChange: this.onCheckAllClick,
-            style: {
+          <input
+            id="check_all"
+            name="check_all"
+            type="checkbox"
+            checked={this.state.check_all ?? false}
+            onChange={this.onCheckAllClick}
+            style={{
               marginTop: '6px',
               padding: '3px',
-            },
-          })}
+            }}
+          ></input>
         </div>
         <label htmlFor="check_all">All </label>
         <div>
-          {React.createElement('input', {
-            id: 'check_primary',
-            name: 'check_primary',
-            type: 'checkbox',
-            checked: this.state.check_primary ?? false,
-            onChange: this.onCheckPrimaryClick,
-            style: {
-              marginTop: '6px',
-              padding: '3px',
-            },
-          })}
+          <input
+            id="check_primary"
+            name="check_primary"
+            type="checkbox"
+            checked={this.state.check_primary ?? false}
+            onChange={this.onCheckPrimaryClick}
+            style={{ marginTop: '6px', padding: '3px' }}
+          ></input>
         </div>
         <label htmlFor="check_primary">Primary Items</label>
       </div>,
-      React.createElement(
-        'div',
-        {
-          style: {
-            width: 'calc( 100% - 14px )',
-          },
-        },
-        elems
-      )
+      <div style={{ width: 'calc( 100% - 14px )' }}>{elems}</div>
     );
   }
 }
