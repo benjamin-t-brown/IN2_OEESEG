@@ -1,12 +1,13 @@
-import React, { createRef } from 'react';
+import React, { createRef, useEffect } from 'react';
 import injectSheet from 'react-jss';
 import expose from 'expose';
-import utils from 'utils';
+import utils, { getPlumb } from 'utils';
 import context from 'context';
 import dialog from 'dialog';
 import css from 'css';
+import DiagramNode from 'diagram-node';
+import PlumbDiagram from 'plumb-diagram';
 const $ = (window.$ = require('jquery'));
-const jsPlumb = window.jsPlumb;
 
 const BOARD_SIZE_PIXELS = 6400;
 
@@ -22,6 +23,24 @@ const waitMs = ms => {
   return new Promise(resolve => {
     setTimeout(resolve, ms);
   });
+};
+
+/**
+ * @param {Object} file
+ * @param {String} id
+ * @returns {Object}
+ */
+export const getNode = (file, id) => {
+  if (file) {
+    for (let i in file.nodes) {
+      if (file.nodes[i].id === id) {
+        return file.nodes[i];
+      }
+    }
+    return null;
+  } else {
+    return null;
+  }
 };
 
 window.on_node_click = function (elem) {
@@ -63,9 +82,7 @@ class Board extends expose.Component {
 
     this.diagramContainer = createRef();
     this.diagramParent = createRef();
-    this.diagram = createRef();
 
-    this.plumb = null;
     this.file = props.file;
     this.panning = false;
     this.offsetX = 0;
@@ -83,12 +100,14 @@ class Board extends expose.Component {
     this.isSelectBoxVisible = false;
     this.selectPos = [0, 0];
 
+    this.shouldRebuild = false;
+
     this.onKeydown = ev => {
       if (this.linkNode && ev.keyCode === 27) {
         this.exitLinkMode();
       } else if (this.dragSet.length && ev.keyCode === 27) {
         this.dragSet = [];
-        this.plumb.clearDragSelection();
+        getPlumb()?.clearDragSelection();
       }
 
       // if (!dialog.is_visible()) {
@@ -182,7 +201,7 @@ class Board extends expose.Component {
         console.log('EV MOUSE UP', ev);
         if (!ev.shiftKey) {
           this.dragSet = [];
-          this.plumb.clearDragSelection();
+          getPlumb()?.clearDragSelection();
         }
         this.isSelectBoxVisible = false;
         const div = document.getElementById('select-box');
@@ -194,7 +213,7 @@ class Board extends expose.Component {
           if (rectCollides(selectRect, rect)) {
             let ind = this.dragSet.indexOf(node.id);
             if (ind === -1) {
-              this.plumb.addToDragSelection(node.id);
+              getPlumb()?.addToDragSelection(node.id);
               this.dragSet.push(node.id);
             }
           }
@@ -229,7 +248,7 @@ class Board extends expose.Component {
       this.offsetY = offsetY;
 
       this.renderAtOffset();
-      this.getPlumb().setZoom(this.zoom);
+      getPlumb().setZoom(this.zoom);
 
       this.saveLocation();
     };
@@ -237,7 +256,7 @@ class Board extends expose.Component {
     this.onDiagramDblClick = () => {};
 
     this.onNodeClick = window.on_node_click = elem => {
-      let selectedNode = this.getNode(elem.id);
+      let selectedNode = getNode(this.file, elem.id);
       if (this.linkNode) {
         let err = this.addLink(this.linkNode, selectedNode);
         if (err) {
@@ -251,24 +270,22 @@ class Board extends expose.Component {
           `player.get('nodes.${selectedNode.id}')`
         );
         this.linkNodeRef.rel = selectedNode.id;
-        this.buildDiagram();
-        this.renderAtOffset();
-        this.getPlumb().setZoom(this.zoom);
+        this.scheduleRebuild();
         this.exitLinkMode();
       } else if (utils.is_shift() || utils.is_ctrl()) {
         let ind = this.dragSet.indexOf(selectedNode.id);
         if (ind === -1) {
-          this.plumb.addToDragSelection(selectedNode.id);
+          getPlumb()?.addToDragSelection(selectedNode.id);
           this.dragSet.push(selectedNode.id);
         } else {
-          this.plumb.removeFromDragSelection(selectedNode.id);
+          getPlumb()?.removeFromDragSelection(selectedNode.id);
           this.dragSet.splice(ind, 1);
         }
       }
     };
 
     this.onNodeUnclick = window.on_node_unclick = elem => {
-      let file_node = this.getNode(elem.id);
+      let file_node = getNode(this.file, elem.id);
       //$('#diagram-parent').panzoom('enable');
       file_node.left = elem.style.left;
       file_node.top = elem.style.top;
@@ -281,16 +298,14 @@ class Board extends expose.Component {
     };
 
     this.onNodeDblClick = window.on_node_dblclick = elem => {
-      let file_node = this.getNode(elem.id);
+      let file_node = getNode(this.file, elem.id);
       if (file_node.type === 'next_file') {
         dialog.show_input_with_select(
           expose.get_state('file-browser').file_list,
           file_node.content,
           content => {
             this.setNodeContent(file_node, content);
-            this.buildDiagram();
-            this.renderAtOffset();
-            this.getPlumb().setZoom(this.zoom);
+            this.scheduleRebuild();
             this.saveFile();
           }
         );
@@ -302,9 +317,7 @@ class Board extends expose.Component {
             dialog.set_shift_req(false);
             this.setNodeContent(file_node, content);
             file_node.rel = null;
-            this.buildDiagram();
-            this.renderAtOffset();
-            this.getPlumb().setZoom(this.zoom);
+            this.scheduleRebuild();
             this.saveFile();
           },
           () => {
@@ -319,9 +332,7 @@ class Board extends expose.Component {
             dialog.set_shift_req(false);
             this.setNodeContent(file_node, content);
             file_node.rel = null;
-            this.buildDiagram();
-            this.renderAtOffset();
-            this.getPlumb().setZoom(this.zoom);
+            this.scheduleRebuild();
             this.saveFile();
           },
           onCancel: () => {
@@ -341,9 +352,7 @@ class Board extends expose.Component {
             dialog.set_shift_req(false);
             this.setNodeContent(file_node, content);
             file_node.rel = null;
-            this.buildDiagram();
-            this.renderAtOffset();
-            this.getPlumb().setZoom(this.zoom);
+            this.scheduleRebuild();
             this.saveFile();
           },
           onCancel: () => {
@@ -355,9 +364,7 @@ class Board extends expose.Component {
         dialog.show_input(file_node, content => {
           this.setNodeContent(file_node, content);
           file_node.rel = null;
-          this.buildDiagram();
-          this.renderAtOffset();
-          this.getPlumb().setZoom(this.zoom);
+          this.scheduleRebuild();
           this.saveFile();
         });
       }
@@ -369,7 +376,7 @@ class Board extends expose.Component {
 
     this.onNodeMouseOver = window.on_node_mouseover = elem => {
       // perf issue it think?
-      // const node = this.getNode(elem.id);
+      // const node = getNode(this.file,elem.id);
       // expose.set_state('status-bar', {
       //   hoverText: `Double click to edit '${node.type}' node.`,
       // });
@@ -384,26 +391,27 @@ class Board extends expose.Component {
     this.onConnRClick = (params, ev) => {
       let from_id = params.sourceId.split('_')[0];
       let to_id = params.targetId.split('_')[0];
-      let from = this.getNode(from_id);
-      let to = this.getNode(to_id);
+      let from = getNode(this.file, from_id);
+      let to = getNode(this.file, to_id);
       this.deleteLink(from, to);
       ev.preventDefault();
     };
 
-    this.onDeleteClick = window.on_delete_click = elem => {
+    this.onDeleteClick = window.on_delete_click = elemId => {
+      console.log('delete node', elemId);
       dialog.show_confirm('Are you sure you wish to delete this node?', () => {
-        const nodeList = [this.getNode(elem.id)];
-        if (this.dragSet.includes(elem.id)) {
+        const nodeList = [getNode(this.file, elemId)];
+        if (this.dragSet.includes(elemId)) {
           this.dragSet.forEach(id => {
-            if (id !== elem.id) {
-              const node = this.getNode(id);
+            if (id !== elemId) {
+              const node = getNode(this.file, id);
               if (node.type !== 'root') {
                 nodeList.push(node);
               }
             }
           });
           this.dragSet = [];
-          this.plumb.clearDragSelection();
+          getPlumb()?.clearDragSelection();
         }
         setTimeout(() => {
           this.deleteNode(nodeList);
@@ -421,7 +429,7 @@ class Board extends expose.Component {
     };
 
     this.connectLink = link => {
-      let connection = this.plumb.connect({
+      let connection = getPlumb()?.connect({
         source: link.from + '_from',
         target: link.to + '_to',
         paintStyle: { stroke: 'rgba(255,255,255,0.2)', strokeWidth: 8 },
@@ -475,14 +483,14 @@ class Board extends expose.Component {
           this.offsetY = loc.y;
           this.zoom = loc.zoom;
           this.renderAtOffset();
-          this.getPlumb().setZoom(this.zoom);
+          getPlumb().setZoom(this.zoom);
         }
       }
     };
     state.loadLocation = this.loadLocation;
 
     this.centerOnNode = async nodeId => {
-      const n = this.getNode(nodeId);
+      const n = getNode(this.file, nodeId);
       if (n) {
         if (expose.get_state('player-area').visible) {
           const area = document
@@ -499,7 +507,7 @@ class Board extends expose.Component {
           //const lastZoom = this.zoom;
           this.zoom = 1;
           this.renderAtOffset();
-          this.getPlumb().setZoom(this.zoom);
+          getPlumb().setZoom(this.zoom);
         } else {
           const nodeElem = document.getElementById(nodeId);
           const node = nodeElem.getBoundingClientRect();
@@ -509,7 +517,7 @@ class Board extends expose.Component {
             parseInt(n.top) + node.height / 2 - window.innerHeight / 2;
           this.zoom = 1;
           this.renderAtOffset();
-          this.getPlumb().setZoom(this.zoom);
+          getPlumb().setZoom(this.zoom);
 
           for (let i = 0; i < 3; i++) {
             nodeElem.style.opacity = '0.25';
@@ -518,25 +526,6 @@ class Board extends expose.Component {
             await waitMs(250);
           }
         }
-
-        // TODO add this
-        // const { offsetX, offsetY, scale } = utils.zoomWithFocalAndDelta({
-        //   parentElem: this.diagramContainer.current,
-        //   deltaY: ev.deltaY,
-        //   scale: this.zoom,
-        //   areaWidth: BOARD_SIZE_PIXELS,
-        //   areaHeight: BOARD_SIZE_PIXELS,
-        //   offsetX: this.offsetX,
-        //   offsetY: this.offsetY,
-        //   focalX: ev.clientX,
-        //   focalY: ev.clientY,
-        //   maxZoom: this.maxZoom,
-        //   minZoom: this.minZoom,
-        // });
-
-        // this.zoom = scale;
-        // this.offsetX = offsetX;
-        // this.offsetY = offsetY;
       }
     };
     state.centerOnNode = this.centerOnNode;
@@ -545,14 +534,14 @@ class Board extends expose.Component {
       const node_mapping = {};
       const links = [];
       const nodes = this.dragSet.map(id => {
-        const node = this.getNode(id);
+        const node = getNode(this.file, id);
         const new_node = Object.assign({}, node);
         new_node.id = getNodeId();
         node_mapping[node.id] = new_node.id;
         return new_node;
       });
       this.dragSet.forEach(id => {
-        const children = this.getChildren(this.getNode(id));
+        const children = this.getChildren(getNode(this.file, id));
         children.forEach(child => {
           if (this.dragSet.includes(child.id)) {
             links.push({
@@ -637,18 +626,16 @@ class Board extends expose.Component {
           this.file.links.push(link);
         });
         this.dragSet = [];
-        this.plumb.clearDragSelection();
+        getPlumb()?.clearDragSelection();
 
-        this.buildDiagram();
-        this.renderAtOffset();
-        this.getPlumb().setZoom(this.zoom);
+        this.scheduleRebuild();
         this.saveFile();
 
         // needs a timeout or I think js plumb gets confused about what is selected after
         // rebuilding diagram
         setTimeout(() => {
           newNodes.forEach(node => {
-            this.plumb.addToDragSelection(node.id);
+            getPlumb()?.addToDragSelection(node.id);
             this.dragSet.push(node.id);
           });
         }, 100);
@@ -672,9 +659,8 @@ class Board extends expose.Component {
       this.saveFile();
     };
     state.buildDiagram = () => {
-      this.buildDiagram();
-      this.renderAtOffset();
-      this.getPlumb().setZoom(this.zoom);
+      this.forceUpdate();
+      // this.scheduleRebuild();
     };
 
     utils.set_on_copy(() => {
@@ -696,21 +682,29 @@ class Board extends expose.Component {
     this.expose('board');
   }
 
+  scheduleRebuild() {
+    this.forceUpdate();
+  }
+
   UNSAFE_componentWillReceiveProps(props) {
+    if (this.file && this.file !== props.file) {
+      this.shouldRebuild = true;
+    }
     this.file = props.file;
   }
 
   componentDidMount() {
-    jsPlumb.ready(() => {
-      window.plumb = this.plumb = jsPlumb.getInstance({
-        PaintStyle: { strokeWidth: 1 },
-        Anchors: [['TopRight']],
-        Container: this.diagram.current,
-      });
-      this.buildDiagram();
-      this.renderAtOffset();
-      this.getPlumb().setZoom(this.zoom);
-    });
+    console.log('board mounted');
+    // jsPlumb.ready(() => {
+    //   console.log('jsPlumb ready');
+    //   window.plumb = getPlumb()? = jsPlumb.getInstance({
+    //     PaintStyle: { strokeWidth: 1 },
+    //     Anchors: [['TopRight']],
+    //     Container: this.diagram.current,
+    //   });
+    //   rebuild();
+    //   this.loadLocation();
+    // });
     window.addEventListener('mousemove', this.onMouseMove);
     window.addEventListener('mouseup', this.onMouseUp);
     window.addEventListener('keydown', this.onKeydown);
@@ -726,15 +720,24 @@ class Board extends expose.Component {
     this.exitLinkMode();
   }
   componentDidUpdate() {
-    this.offsetX = 0;
-    this.offsetY = 0;
-    this.zoom = 1;
-    this.plumb.empty(this.diagram.current);
-    jsPlumb.ready(() => {
-      this.buildDiagram();
-      this.renderAtOffset();
-      this.getPlumb().setZoom(this.zoom);
-    });
+    // if (this.shouldRebuild) {
+    //   setTimeout(
+    //     (() => {
+    //       rebuild();
+    //     },
+    //     100)
+    //   );
+    //   this.shouldRebuild = false;
+    // }
+    // this.offsetX = 0;
+    // this.offsetY = 0;
+    // this.zoom = 1;
+    // getPlumb()?.empty(this.diagram.current);
+    // jsPlumb.ready(() => {
+    //   this.buildDiagram();
+    //   this.renderAtOffset();
+    //   getPlumb().setZoom(this.zoom);
+    // });
   }
 
   saveFile() {
@@ -747,44 +750,6 @@ class Board extends expose.Component {
         });
       }
     }, 500);
-  }
-
-  buildDiagram() {
-    const file = this.file;
-    if (file) {
-      const html = file.nodes.reduce((prev, curr) => {
-        return prev + this.getNodeHTML(curr);
-      }, '');
-      this.plumb && this.plumb.reset();
-      // DONT MOVE THIS, IT FIXES THE DRAG OFFSET PROBLEMS
-      window.plumb = this.plumb = jsPlumb.getInstance({
-        PaintStyle: { strokeWidth: 1 },
-        Anchors: [['TopRight']],
-        Container: this.diagram.current,
-      });
-      const diagram = this.diagram.current;
-      // diagram.innerHTML = '';
-      diagram.innerHTML = html;
-      setTimeout(() => {
-        this.plumb.draggable(
-          file.nodes.map(node => {
-            return node.id;
-          }),
-          {
-            containment: true,
-          }
-        );
-        this.plumb.setSuspendDrawing(true);
-        this.plumb.batch(() => {
-          file.links.forEach(this.connectLink);
-        });
-        this.plumb.setSuspendDrawing(false, true);
-      });
-    }
-  }
-
-  getPlumb() {
-    return this.plumb;
   }
 
   enterLinkMode(parent) {
@@ -817,24 +782,11 @@ class Board extends expose.Component {
     });
   }
 
-  getNode(id) {
-    if (this.file) {
-      for (let i in this.file.nodes) {
-        if (this.file.nodes[i].id === id) {
-          return this.file.nodes[i];
-        }
-      }
-      return null;
-    } else {
-      return null;
-    }
-  }
-
   setNodeContent(node, content) {
     node.content = content;
     document.getElementById(node.id).children[1].innerHTML = content;
     this.renderAtOffset();
-    this.getPlumb().setZoom(this.zoom);
+    getPlumb().setZoom(this.zoom);
   }
 
   getChildren(node) {
@@ -843,7 +795,7 @@ class Board extends expose.Component {
         return link.from === node.id;
       })
       .map(link => {
-        return this.getNode(link.to);
+        return getNode(this.file, link.to);
       });
   }
 
@@ -853,7 +805,7 @@ class Board extends expose.Component {
         return link.to === node.id;
       })
       .map(link => {
-        return this.getNode(link.from);
+        return getNode(this.file, link.from);
       });
   }
 
@@ -939,16 +891,14 @@ class Board extends expose.Component {
     };
     this.file.links.push(link);
     this.saveFile();
-    this.buildDiagram();
-    this.renderAtOffset();
-    this.getPlumb().setZoom(this.zoom);
+    this.scheduleRebuild();
   }
 
   addNode(parent, type, defaultText) {
-    let id = getNodeId();
-    let parentElem = document.getElementById(parent.id);
-    let rect = parentElem.getBoundingClientRect();
-    let node = {
+    const id = getNodeId();
+    const parentElem = document.getElementById(parent.id);
+    const rect = parentElem?.getBoundingClientRect() ?? { height: 100 };
+    const node = {
       id: id,
       type: type,
       content:
@@ -959,39 +909,35 @@ class Board extends expose.Component {
       top: parseInt(parent.top) + (rect.height + 30) + 'px',
     };
     this.file.nodes.push(node);
-    let link = {
+    const link = {
       to: id,
       from: parent.id,
     };
     this.file.links.push(link);
     this.saveFile();
-    this.buildDiagram();
-    this.renderAtOffset();
-    this.getPlumb().setZoom(this.zoom);
+    this.scheduleRebuild();
     return node;
   }
 
   addSwitchNode(parent) {
-    let node = this.addNode(parent, 'switch', 'switch');
-    let id_default = getNodeId();
-    let parent_elem = document.getElementById(parent.id);
-    let rect = parent_elem.getBoundingClientRect();
-    let node_default = {
-      id: id_default,
+    const node = this.addNode(parent, 'switch', 'switch');
+    const idDefault = getNodeId();
+    const parent_elem = document.getElementById(parent.id);
+    const rect = parent_elem.getBoundingClientRect();
+    const nodeDefault = {
+      id: idDefault,
       type: 'switch_default',
       content: 'default',
       left: parseInt(node.left),
       top: parseInt(parent.top) + (rect.height + 120) + 'px',
     };
-    this.file.nodes.push(node_default);
+    this.file.nodes.push(nodeDefault);
     this.file.links.push({
-      to: id_default,
+      to: idDefault,
       from: node.id,
     });
     this.saveFile();
-    this.buildDiagram();
-    this.renderAtOffset();
-    this.getPlumb().setZoom(this.zoom);
+    this.scheduleRebuild();
     return node;
   }
 
@@ -1029,9 +975,7 @@ class Board extends expose.Component {
       from: node.id,
     });
     this.saveFile();
-    this.buildDiagram();
-    this.renderAtOffset();
-    this.getPlumb().setZoom(this.zoom);
+    this.scheduleRebuild();
     return node;
   }
 
@@ -1043,11 +987,7 @@ class Board extends expose.Component {
     if (ind > -1) {
       dialog.show_confirm('Are you sure you wish to delete this link?', () => {
         this.file.links.splice(ind, 1);
-        this.buildDiagram();
-        setTimeout(() => {
-          this.renderAtOffset();
-          this.getPlumb().setZoom(this.zoom);
-        });
+        this.scheduleRebuild();
       });
     } else {
       console.error(
@@ -1115,65 +1055,44 @@ class Board extends expose.Component {
     }
 
     this.saveFile();
-    this.buildDiagram();
-    this.renderAtOffset();
-    this.getPlumb().setZoom(this.zoom);
+    this.scheduleRebuild();
   }
 
-  getNodeHTML(node) {
-    let style = {
-      left: node.left || null,
-      top: node.top || null,
-      width: node.width || null,
-      height: node.height || null,
-    };
-    let style_str = '';
-    for (let i in style) {
-      if (style[i]) {
-        style_str += `${i}:${style[i]}; `;
-      }
-    }
-    let content_style = '';
-    if (
-      node.type === 'next_file' ||
-      node.type === 'pass_fail' ||
-      node.type === 'choice_conditional'
-    ) {
-      content_style = 'style="overflow:hidden;text-overflow:ellipsis"';
-    }
-    let className = 'item item-' + node.type;
-    return (
-      `<div class="node ${className}" ` +
-      `style="${style_str}" id="${node.id}" ` +
-      `onmousedown="on_node_click(${node.id})" ` +
-      `onmouseup="on_node_unclick(${node.id})" ` +
-      `ondblclick="on_node_dblclick(${node.id})" ` +
-      `oncontextmenu="on_node_rclick(${node.id})" ` +
-      `onmouseenter="on_node_mouseover(${node.id})" ` +
-      `onmouseout="on_node_mouseout(${node.id})" ` +
-      `>` +
-      `<div class="node-id">${node.id}${
-        node.rel
-          ? ` -> <span class="node-id-ref" onclick="center_on_active_node('${node.rel}')">` +
-            node.rel +
-            '</span>'
-          : ''
-      }</div>` +
-      `<div class="item-content" ${content_style}><span class="no-select">${node.content}</span></div>` +
-      `<div class="anchor-to" id="${node.id}_to"></div>` +
-      `<div class="anchor-from" id="${node.id}_from"></div>` +
-      (node.type === 'root' ||
-      node.type === 'pass_text' ||
-      node.type === 'fail_text'
-        ? ''
-        : `<div onclick="on_delete_click(${node.id})" class="item-delete" id="${
-            node.id
-          }_delete" style="${
-            node.type === 'choice' || node.type === 'switch' ? 'right:10' : ''
-          }"><span class="no-select">X</span></div>`) +
-      `</div>`
-    );
-  }
+  connectLink = link => {
+    const connection = getPlumb().connect({
+      source: link.from + '_from',
+      target: link.to + '_to',
+      paintStyle: { stroke: 'rgba(255,255,255,0.2)', strokeWidth: 8 },
+      endpointStyle: {
+        fill: css.colors.PRIMARY,
+        outlineStroke: css.colors.TEXT_LIGHT,
+        outlineWidth: 5,
+      },
+      connector: [
+        'Flowchart',
+        {
+          midpoint: 0.6,
+          curviness: 30,
+          cornerRadius: 2,
+          stub: 0,
+          alwaysRespectStubs: true,
+        },
+      ],
+      endpoint: ['Dot', { radius: 2 }],
+      overlays: [['Arrow', { location: 0.6, width: 20, length: 20 }]],
+    });
+    connection.bind('contextmenu', this.onConnRClick);
+    connection.bind('mouseover', () => {
+      expose.set_state('status-bar', {
+        hoverText: 'Right click to delete this link.',
+      });
+    });
+    connection.bind('mouseout', () => {
+      expose.set_state('status-bar', {
+        hoverText: '',
+      });
+    });
+  };
 
   renderAtOffset() {
     utils.renderAt({
@@ -1208,10 +1127,13 @@ class Board extends expose.Component {
           ref={this.diagramParent}
           className={classes.diagramParent}
         >
-          <div
-            id="diagram"
-            ref={this.diagram}
-            className={'no-drag ' + classes.diagram}
+          <PlumbDiagram
+            classes={classes}
+            file={this.file}
+            renderAtOffset={this.renderAtOffset}
+            loadLocation={this.loadLocation}
+            connectLink={this.connectLink}
+            zoom={this.zoom}
           />
         </div>
       </div>

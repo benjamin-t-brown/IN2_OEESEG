@@ -310,6 +310,13 @@ module.exports = {
     const existingElem = data.find(elem => elem.fileName === fileName);
     return existingElem;
   },
+
+  setPlumb(plumb) {
+    window.plumb = plumb;
+  },
+  getPlumb() {
+    return window.plumb;
+  },
 };
 
 window.utils = module.exports;

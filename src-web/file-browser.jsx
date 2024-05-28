@@ -264,8 +264,9 @@ class FileBrowser extends expose.Component {
       if (cb) {
         cb();
       }
+
       setTimeout(() => {
-        expose.get_state('board').loadLocation();
+        // expose.get_state('board').scheduleRebuild();
       }, 1);
     });
   }

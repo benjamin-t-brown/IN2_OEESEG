@@ -5,6 +5,7 @@ import css from './css';
 import utils from 'utils';
 import dialog from 'dialog';
 import { notify } from 'notifications';
+import { getNode } from 'board';
 
 const exp = {};
 
@@ -164,7 +165,8 @@ exp.show_context_menu = function (board, elem) {
   board.disable_context = true;
   const { x, y } = utils.get_mouse_pos();
   const cbs = {};
-  const file_node = board.getNode(elem.id);
+  console.log('context', elem);
+  const file_node = getNode(board.file, elem.id);
   if (file_node.type !== 'next_file' && board.nodeCanHaveChild(file_node)) {
     if (file_node.type === 'choice') {
       cbs.linkNode = function (parent) {
@@ -184,6 +186,8 @@ exp.show_context_menu = function (board, elem) {
           'player.once()'
         );
         this.addNode(added_node, 'choice_text');
+        setTimeout(() => {
+        }, 100);
       }.bind(board);
     } else if (file_node.type === 'choice_conditional') {
       cbs.linkNode = function (parent) {
