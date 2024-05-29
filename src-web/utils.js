@@ -4,6 +4,7 @@ let shift = false;
 let ctrl = false;
 let on_copy = function () {};
 let on_paste = function () {};
+let on_delete = function () {};
 
 window.addEventListener('mousemove', ev => {
   mouse_x = ev.clientX;
@@ -19,6 +20,8 @@ window.addEventListener('keydown', ev => {
     on_copy();
   } else if (ev.keyCode === 86 && ctrl) {
     on_paste();
+  } else if (ev.key === 'Delete') {
+    on_delete();
   }
 });
 
@@ -39,6 +42,9 @@ module.exports = {
   },
   set_on_paste: function (cb) {
     on_paste = cb;
+  },
+  set_on_delete: function (cb) {
+    on_delete = cb;
   },
   random_id: function (len) {
     let text = '';

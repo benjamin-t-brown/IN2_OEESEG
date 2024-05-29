@@ -1,7 +1,9 @@
 import { getNode } from 'board';
 import DiagramNode from 'diagram-node';
 import React, { createRef, useEffect, useReducer } from 'react';
-const jsPlumb = window.jsPlumb;
+// const jsPlumb = window.jsPlumb;
+import * as jsPlumb from '@jsplumb/browser-ui';
+import '@jsplumb/browser-ui/css/jsplumbtoolkit.css';
 
 export const getPlumb = () => {
   return window.plumb;
@@ -17,6 +19,7 @@ const PlumbDiagram = ({
   renderAtOffset,
   loadLocation,
   connectLink,
+  onConnRClick,
   zoom,
 }) => {
   const diagram = createRef();
@@ -34,44 +37,38 @@ const PlumbDiagram = ({
   }, [diagram, plumbReady]);
 
   useEffect(() => {
-    if (!drawStuffTrip && drawStuff && plumbReady && diagram && file) {
+    if (!drawStuffTrip && drawStuff && plumbReady && diagram.current && file) {
       console.log('re-instance plumb');
       const plumb = getPlumb();
-      plumb && plumb.reset();
-      window.plumb = jsPlumb.getInstance({
-        PaintStyle: { strokeWidth: 1 },
-        Anchors: [['TopRight']],
-        Container: diagram.current,
+      if (plumb) {
+        for (const node of file.nodes) {
+          window.plumb.unmanage(document.getElementById(node.id), false);
+        }
+        plumb.destroy();
+      }
+      window.plumb = jsPlumb.newInstance({
+        container: diagram.current,
+        connectionsDetachable: false,
+        dragOptions: {
+          containment: 'parentEnclosed',
+        },
       });
 
-      drawStuff = false;
-      forceUpdate();
-      setTimeout(() => {
-        drawStuff = true;
-        drawStuffTrip = true;
-        forceUpdate();
-      }, 1);
+      window.plumb.bind('connection:contextmenu', (...args) => {
+        onConnRClick(...args);
+      });
 
-      setTimeout(() => {
-        console.log('batch connect');
+      for (const node of file.nodes) {
+        window.plumb.manage(document.getElementById(node.id), node.id);
+      }
 
-        window.plumb.setSuspendDrawing(true);
-        window.plumb.batch(() => {
-          for (const link of file.links ?? []) {
-            connectLink(link);
-          }
-        });
-        window.plumb.setSuspendDrawing(false, true);
-
-        window.plumb.draggable(
-          file?.nodes?.map(node => {
-            return node.id;
-          }) || [],
-          {
-            containment: true,
-          }
-        );
-      }, 2);
+      window.plumb.setSuspendDrawing(true);
+      window.plumb.batch(() => {
+        for (const link of file.links ?? []) {
+          connectLink(link);
+        }
+      });
+      window.plumb.setSuspendDrawing(false, true);
       getPlumb().setZoom(zoom);
 
       if (file !== lastFile) {

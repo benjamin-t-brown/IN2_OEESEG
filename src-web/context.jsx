@@ -186,8 +186,6 @@ exp.show_context_menu = function (board, elem) {
           'player.once()'
         );
         this.addNode(added_node, 'choice_text');
-        setTimeout(() => {
-        }, 100);
       }.bind(board);
     } else if (file_node.type === 'choice_conditional') {
       cbs.linkNode = function (parent) {
@@ -268,6 +266,23 @@ exp.show_context_menu = function (board, elem) {
     cbs.copyNodeId = function (parent) {
       navigator.clipboard.writeText(parent.id);
       notify('Copied node ID to clipboard.', 'info');
+    }.bind(board);
+  }
+
+  if (file_node.type === 'root') {
+    cbs.createBasicOeesegRoom = function (parent) {
+      dialog.showTemplateCreateDialog({
+        node: file_node,
+        type: 'BasicOeesegRoom',
+        onConfirm: (content, location) => {
+          console.log('CONFIRM', content, location);
+          expose.get_state('board').pasteSelection(content, location);
+          this.saveFile();
+        },
+        onCancel: () => {
+          // dialog.set_shift_req(false);
+        },
+      });
     }.bind(board);
   }
 

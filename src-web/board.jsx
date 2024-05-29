@@ -7,6 +7,7 @@ import dialog from 'dialog';
 import css from 'css';
 import DiagramNode from 'diagram-node';
 import PlumbDiagram from 'plumb-diagram';
+import * as jsPlumb from '@jsplumb/browser-ui';
 const $ = (window.$ = require('jquery'));
 
 const BOARD_SIZE_PIXELS = 6400;
@@ -213,7 +214,7 @@ class Board extends expose.Component {
           if (rectCollides(selectRect, rect)) {
             let ind = this.dragSet.indexOf(node.id);
             if (ind === -1) {
-              getPlumb()?.addToDragSelection(node.id);
+              getPlumb()?.addToDragSelection(document.getElementById(node.id));
               this.dragSet.push(node.id);
             }
           }
@@ -428,41 +429,41 @@ class Board extends expose.Component {
       }
     };
 
-    this.connectLink = link => {
-      let connection = getPlumb()?.connect({
-        source: link.from + '_from',
-        target: link.to + '_to',
-        paintStyle: { stroke: 'rgba(255,255,255,0.2)', strokeWidth: 8 },
-        endpointStyle: {
-          fill: css.colors.PRIMARY,
-          outlineStroke: css.colors.TEXT_LIGHT,
-          outlineWidth: 5,
-        },
-        connector: [
-          'Flowchart',
-          {
-            midpoint: 0.6,
-            curviness: 30,
-            cornerRadius: 2,
-            stub: 0,
-            alwaysRespectStubs: true,
-          },
-        ],
-        endpoint: ['Dot', { radius: 2 }],
-        overlays: [['Arrow', { location: 0.6, width: 20, length: 20 }]],
-      });
-      connection.bind('contextmenu', this.onConnRClick);
-      connection.bind('mouseover', () => {
-        expose.set_state('status-bar', {
-          hoverText: 'Right click to delete this link.',
-        });
-      });
-      connection.bind('mouseout', () => {
-        expose.set_state('status-bar', {
-          hoverText: '',
-        });
-      });
-    };
+    // this.connectLink = link => {
+    //   let connection = getPlumb()?.connect({
+    //     source: link.from + '_from',
+    //     target: link.to + '_to',
+    //     paintStyle: { stroke: 'rgba(255,255,255,0.2)', strokeWidth: 8 },
+    //     endpointStyle: {
+    //       fill: css.colors.PRIMARY,
+    //       outlineStroke: css.colors.TEXT_LIGHT,
+    //       outlineWidth: 5,
+    //     },
+    //     connector: [
+    //       'Flowchart',
+    //       {
+    //         midpoint: 0.6,
+    //         curviness: 30,
+    //         cornerRadius: 2,
+    //         stub: 0,
+    //         alwaysRespectStubs: true,
+    //       },
+    //     ],
+    //     endpoint: ['Dot', { radius: 2 }],
+    //     overlays: [['Arrow', { location: 0.6, width: 20, length: 20 }]],
+    //   });
+    //   connection.bind('contextmenu', this.onConnRClick);
+    //   connection.bind('mouseover', () => {
+    //     expose.set_state('status-bar', {
+    //       hoverText: 'Right click to delete this link.',
+    //     });
+    //   });
+    //   connection.bind('mouseout', () => {
+    //     expose.set_state('status-bar', {
+    //       hoverText: '',
+    //     });
+    //   });
+    // };
 
     this.saveLocation = () => {
       utils.saveLocationToLocalStorage(
@@ -567,20 +568,23 @@ class Board extends expose.Component {
       anchorNode.top = '0px';
 
       this.copySet = { nodes, links };
+      console.log('copy', this.copySet);
     };
     state.copySelection = this.copySelection;
 
-    this.pasteSelection = () => {
-      if (this.copySet) {
+    this.pasteSelection = (copySet, startingLocation) => {
+      copySet = copySet || this.copySet;
+      if (copySet) {
         let rootInd = -1;
 
         const { top, left } =
+          startingLocation ??
           this.diagramParent.current.getBoundingClientRect();
 
         // eslint-disable-next-line no-undef
-        const newLinks = structuredClone(this.copySet.links);
+        const newLinks = structuredClone(copySet.links);
         //JSON.parse(JSON.stringify(this.copySet.links));
-        const newNodes = this.copySet.nodes.map((node, i) => {
+        const newNodes = copySet.nodes.map((node, i) => {
           const newId = getNodeId();
           const newNode = Object.assign({}, node);
           newLinks.forEach(link => {
@@ -593,7 +597,7 @@ class Board extends expose.Component {
           });
           newNode.id = newId;
 
-          const inverseZoom = 1 / this.zoom;
+          const inverseZoom = startingLocation ? 1 : 1 / this.zoom;
 
           const clientX =
             -left * inverseZoom + (window.innerWidth * inverseZoom) / 2;
@@ -635,7 +639,7 @@ class Board extends expose.Component {
         // rebuilding diagram
         setTimeout(() => {
           newNodes.forEach(node => {
-            getPlumb()?.addToDragSelection(node.id);
+            getPlumb()?.addToDragSelection(document.getElementById(node.id));
             this.dragSet.push(node.id);
           });
         }, 100);
@@ -670,7 +674,28 @@ class Board extends expose.Component {
     });
     utils.set_on_paste(() => {
       if (!dialog.is_visible()) {
-        this.pasteSelection();
+        this.pasteSelection(this.copySet);
+      }
+    });
+    utils.set_on_delete(() => {
+      if (!dialog.is_visible() && this.dragSet.length) {
+        dialog.show_confirm(
+          'Are you sure you wish to delete the selected nodes?',
+          () => {
+            const nodeList = [];
+            this.dragSet.forEach(id => {
+              const node = getNode(this.file, id);
+              if (node.type !== 'root') {
+                nodeList.push(node);
+              }
+            });
+            this.dragSet = [];
+            getPlumb()?.clearDragSelection();
+            setTimeout(() => {
+              this.deleteNode(nodeList);
+            });
+          }
+        );
       }
     });
 
@@ -695,16 +720,6 @@ class Board extends expose.Component {
 
   componentDidMount() {
     console.log('board mounted');
-    // jsPlumb.ready(() => {
-    //   console.log('jsPlumb ready');
-    //   window.plumb = getPlumb()? = jsPlumb.getInstance({
-    //     PaintStyle: { strokeWidth: 1 },
-    //     Anchors: [['TopRight']],
-    //     Container: this.diagram.current,
-    //   });
-    //   rebuild();
-    //   this.loadLocation();
-    // });
     window.addEventListener('mousemove', this.onMouseMove);
     window.addEventListener('mouseup', this.onMouseUp);
     window.addEventListener('keydown', this.onKeydown);
@@ -718,26 +733,6 @@ class Board extends expose.Component {
     window.removeEventListener('mousedown', this.onMouseDown);
     window.removeEventListener('wheel', this.onScroll);
     this.exitLinkMode();
-  }
-  componentDidUpdate() {
-    // if (this.shouldRebuild) {
-    //   setTimeout(
-    //     (() => {
-    //       rebuild();
-    //     },
-    //     100)
-    //   );
-    //   this.shouldRebuild = false;
-    // }
-    // this.offsetX = 0;
-    // this.offsetY = 0;
-    // this.zoom = 1;
-    // getPlumb()?.empty(this.diagram.current);
-    // jsPlumb.ready(() => {
-    //   this.buildDiagram();
-    //   this.renderAtOffset();
-    //   getPlumb().setZoom(this.zoom);
-    // });
   }
 
   saveFile() {
@@ -1060,28 +1055,25 @@ class Board extends expose.Component {
 
   connectLink = link => {
     const connection = getPlumb().connect({
-      source: link.from + '_from',
-      target: link.to + '_to',
+      source: document.getElementById(link.from),
+      target: document.getElementById(link.to),
       paintStyle: { stroke: 'rgba(255,255,255,0.2)', strokeWidth: 8 },
-      endpointStyle: {
-        fill: css.colors.PRIMARY,
-        outlineStroke: css.colors.TEXT_LIGHT,
-        outlineWidth: 5,
-      },
-      connector: [
-        'Flowchart',
-        {
-          midpoint: 0.6,
-          curviness: 30,
-          cornerRadius: 2,
-          stub: 0,
-          alwaysRespectStubs: true,
-        },
+      anchors: ['BottomRight', 'TopLeft'],
+      endpoint: 'Rectangle',
+      connector: 'Flowchart',
+      overlays: [
+        { type: 'Arrow', options: { location: 0.6, width: 20, length: 20 } },
       ],
-      endpoint: ['Dot', { radius: 2 }],
-      overlays: [['Arrow', { location: 0.6, width: 20, length: 20 }]],
+      options: {
+        midpoint: 0.6,
+        curviness: 30,
+        cornerRadius: 2,
+        stub: 0,
+        alwaysRespectStubs: true,
+      },
     });
-    connection.bind('contextmenu', this.onConnRClick);
+    // console.log('conn', link, connection);
+    // connection.bind('contextmenu', this.onConnRClick);
     connection.bind('mouseover', () => {
       expose.set_state('status-bar', {
         hoverText: 'Right click to delete this link.',
@@ -1133,6 +1125,7 @@ class Board extends expose.Component {
             renderAtOffset={this.renderAtOffset}
             loadLocation={this.loadLocation}
             connectLink={this.connectLink}
+            onConnRClick={this.onConnRClick}
             zoom={this.zoom}
           />
         </div>

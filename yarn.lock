@@ -1656,31 +1656,10 @@
     "@jridgewell/resolve-uri" "3.1.0"
     "@jridgewell/sourcemap-codec" "1.4.14"
 
-"@jsplumb/browser-ui@^5.3.9":
-  version "5.3.9"
-  resolved "https://registry.yarnpkg.com/@jsplumb/browser-ui/-/browser-ui-5.3.9.tgz#17675adb31a8bff02580b581a1552b1d7f8bb8dd"
-  integrity sha512-nBdMQHrkJh7DhQtgQF6/uqIiPL4L95e+3jS/UesB8Btvuo4gOrPeODqx1Eq7TYH9HY7b9NFtJLv5f0d/eYbzjQ==
-  dependencies:
-    "@jsplumb/core" "5.3.9"
-
-"@jsplumb/common@5.3.9":
-  version "5.3.9"
-  resolved "https://registry.yarnpkg.com/@jsplumb/common/-/common-5.3.9.tgz#d844b57f1d435783902bcd0b8cc1ee78a8374568"
-  integrity sha512-JBp0JhRJs/2/2bbxZBVwMPfcAqahLp5MghkVYTbG0Ry0UnlGzcbJjOCmZgG4wF0WzlOGkfuQa01ZJXOrLokuzQ==
-  dependencies:
-    "@jsplumb/util" "5.3.9"
-
-"@jsplumb/core@5.3.9":
-  version "5.3.9"
-  resolved "https://registry.yarnpkg.com/@jsplumb/core/-/core-5.3.9.tgz#25421ff9b7c63fd001f32e2c1920f62bad061971"
-  integrity sha512-mxhERVAUFFm3oJIFe/wKBPikUiZlSU3GCgI04oGvKSzMORe4ky5UleRyoRVfWvheNWGgh5XTp6OO1Lq7q3k0FQ==
-  dependencies:
-    "@jsplumb/common" "5.3.9"
-
-"@jsplumb/util@5.3.9":
-  version "5.3.9"
-  resolved "https://registry.yarnpkg.com/@jsplumb/util/-/util-5.3.9.tgz#d5e8dd971430fd2a3306a50a851cf05651c1240b"
-  integrity sha512-yKR7ELfCM+uI5Q8lH8626/mIV8I7WJW+bGFV1bah1ez0LcXF+Yr80dk55XlKf1GV+W/ZgkFQ+m0WOM7FFAY6Mg==
+"@jsplumb/browser-ui@^6.2.10":
+  version "6.2.10"
+  resolved "https://registry.yarnpkg.com/@jsplumb/browser-ui/-/browser-ui-6.2.10.tgz#86b85ed42110563d2816e3712677cdbbbf33366f"
+  integrity sha512-trk++mK5q6hceJL79teemzcilJ+8DrZT/lMK0+B80AtHqZHr0YwMCf+so2JBb2Z/MDZ0fUEU9MbELY6OPhhs5g==
 
 "@nicolo-ribaudo/chokidar-2@2.1.8-no-fsevents.3":
   version "2.1.8-no-fsevents.3"

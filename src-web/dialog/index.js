@@ -1,5 +1,6 @@
 import TextNodeInputDialog from './text-node-input-dialog';
 import ActionNodeInputDialog from './action-node-input-dialog';
+import TemplateCreateDialog from './template-create-dialog';
 
 const React = require('react');
 const ReactDOM = require('react-dom');
@@ -129,6 +130,20 @@ exp.showActionNodeInput = function ({ node, onConfirm, onCancel }) {
       node={node}
       onCancel={onCancel}
       onConfirm={onConfirm}
+      hide={exp.hide}
+    />,
+    document.getElementById('dialog')
+  );
+};
+
+exp.showTemplateCreateDialog = function ({ node, type, onConfirm, onCancel }) {
+  show();
+  ReactDOM.render(
+    <TemplateCreateDialog
+      node={node}
+      type={type}
+      onConfirm={onConfirm}
+      onCancel={onCancel}
       hide={exp.hide}
     />,
     document.getElementById('dialog')
