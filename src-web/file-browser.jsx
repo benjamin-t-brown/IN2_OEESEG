@@ -17,11 +17,51 @@ const core = require('./core-in2');
 // 6.) Uses LocalStorage to remember the last file you had open
 
 const PRIMARY_FILES = [
-  'Inventory.json',
-  'InventoryExamineEvents.json',
-  'PickUp.json',
-  'PickUpEvents.json',
+  // 'Inventory.json',
+  // 'InventoryExamineEvents.json',
+  // 'PickUp.json',
+  // 'PickUpEvents.json',
 ];
+
+let fileHistoryInd = -1;
+let fileHistory = [];
+
+export const pushFileHistory = fileName => {
+  if (fileHistoryInd < fileHistory.length - 1) {
+    fileHistory = fileHistory.slice(0, fileHistoryInd + 1);
+  }
+  if (fileHistory[fileHistory.length - 1] !== fileName) {
+    fileHistory.push(fileName);
+    fileHistoryInd++;
+  }
+};
+export const popFileHistory = () => {
+  fileHistoryInd--;
+  if (fileHistoryInd < -1) {
+    fileHistoryInd = -1;
+  }
+};
+export const forwardFileHistory = () => {
+  fileHistoryInd++;
+  if (fileHistoryInd >= fileHistory.length) {
+    fileHistoryInd = fileHistory.length - 1;
+  }
+};
+export const loadFileFromHistory = () => {
+  console.log(
+    'LOAD FILE FROM HISTORY',
+    fileHistoryInd,
+    fileHistory[fileHistoryInd],
+    fileHistory
+  );
+  const copiedFileHistory = fileHistory.slice();
+  expose
+    .get_state('file-browser')
+    .loadFileExternal(fileHistory[fileHistoryInd], () => {
+      console.log('reset file history', copiedFileHistory);
+      fileHistory = copiedFileHistory;
+    });
+};
 
 class FileBrowser extends expose.Component {
   constructor(props) {
@@ -98,7 +138,8 @@ class FileBrowser extends expose.Component {
       for (const fileName of filteredFiles) {
         if (
           fileName === this.props.current_file_name ||
-          PRIMARY_FILES.includes(fileName)
+          PRIMARY_FILES.includes(fileName) ||
+          fileName.includes('FUNC_')
         ) {
           ns[fileName] = true;
         } else if (this.state.checked_files[fileName]) {
@@ -159,8 +200,28 @@ class FileBrowser extends expose.Component {
       );
     };
 
+    this.onRenameClick = () => {
+      dialog.show_input(
+        this.props.current_file_name,
+        name => {
+          const err = this.renameFile(this.props.current_file_name, name);
+          if (err) {
+            console.error(err);
+            dialog.show_notification(err);
+          }
+        },
+        undefined,
+        false
+      );
+    };
+
     this.onCopyClick = () => {
-      expose.get_state('board').copySelection();
+      try {
+        expose.get_state('board').copySelection();
+        notify('Copied selection to clipboard', 'info');
+      } catch (e) {
+        notify('Select 1 or more nodes to copy!', 'error');
+      }
     };
 
     this.onPasteClick = () => {
@@ -205,7 +266,17 @@ class FileBrowser extends expose.Component {
       });
 
       this.setState({
-        file_list: resp.data,
+        file_list: resp.data.sort((a, b) => {
+          const aIsFunc = a.includes('FUNC_');
+          const bIsFunc = b.includes('FUNC_');
+          if (aIsFunc && !bIsFunc) {
+            return 1;
+          } else if (!aIsFunc && bIsFunc) {
+            return -1;
+          } else {
+            return a.localeCompare(b);
+          }
+        }),
         checked_files: new_checked_files,
       });
       if (cb) {
@@ -217,7 +288,11 @@ class FileBrowser extends expose.Component {
     if (name.length < 2) {
       return 'That name is too short';
     }
-    if (this.state.file_list.indexOf(name) !== -1) {
+    if (
+      this.state.file_list
+        .map(n => n.toLowerCase())
+        .indexOf(name.toLowerCase()) !== -1
+    ) {
       return 'A file with that name already exists.';
     }
     return false;
@@ -233,41 +308,59 @@ class FileBrowser extends expose.Component {
       dialog.show_notification(err);
       return;
     }
+    dialog.show_loading();
     utils.get('/file/' + old_name, resp => {
       resp.data.name = new_name;
       utils.post('/file/' + new_name, resp.data, () => {
         this.deleteFile(old_name, () => {
-          this.loadFile(new_name);
+          utils.post(
+            '/rename-file-contents',
+            {
+              oldName: old_name,
+              newName: new_name,
+            },
+            () => {
+              this.loadFile(new_name);
+              dialog.hide_loading();
+            }
+          );
         });
       });
     });
   }
   loadFile(name, cb) {
-    if (!name) {
-      return;
-    }
-    if (this.props.current_file_name === name) {
-      if (cb) {
-        cb();
+    return new Promise(resolve => {
+      console.log('LOAD FILE', name);
+      if (!name) {
+        resolve();
+        return;
       }
-      return;
-    }
-    utils.get('/file/' + name, resp => {
-      localStorage.setItem('last_file_name', name);
-      const ns = this.state.checked_files;
-      ns[name] = true;
+      if (this.props.current_file_name === name) {
+        pushFileHistory(name);
+        if (cb) {
+          cb();
+        }
+        resolve();
+        return;
+      }
+      utils.get('/file/' + name, resp => {
+        localStorage.setItem('last_file_name', name);
+        const ns = this.state.checked_files;
+        ns[name] = true;
 
-      expose.set_state('main', {
-        current_file: resp.data,
-        checked_files: ns,
+        expose.set_state('main', {
+          current_file: resp.data,
+          checked_files: ns,
+        });
+        pushFileHistory(name);
+        if (cb) {
+          cb();
+        }
+
+        setTimeout(() => {
+          resolve();
+        }, 1);
       });
-      if (cb) {
-        cb();
-      }
-
-      setTimeout(() => {
-        // expose.get_state('board').scheduleRebuild();
-      }, 1);
     });
   }
   createFile(name) {
@@ -340,6 +433,7 @@ class FileBrowser extends expose.Component {
         }
       })
       .map(filename => {
+        const isFunc = filename.includes('FUNC_');
         return React.createElement(
           'div',
           {
@@ -372,7 +466,9 @@ class FileBrowser extends expose.Component {
                     : null,
                 padding: '5px',
                 cursor: 'pointer',
-                color: css.colors.TEXT_LIGHT,
+                color: isFunc
+                  ? css.colors.YELLOW_HIGHLIGHT
+                  : css.colors.TEXT_LIGHT,
                 width: '240px',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'pre',
@@ -411,133 +507,221 @@ class FileBrowser extends expose.Component {
       );
     }
 
-    return React.createElement(
-      'div',
-      {
-        //prevents the board from moving when you click anywhere on the file browser
-        onMouseDown: ev => {
-          ev.stopPropagation();
-          ev.nativeEvent.stopImmediatePropagation();
-        },
-        onWheel: ev => {
-          ev.stopPropagation();
-        },
-        style: {
-          backgroundColor: css.colors.BG_NEUTRAL,
-          overflowY: 'scroll',
-          height: window.innerHeight + 'px',
-        },
-      },
-      React.createElement(
-        'div',
-        {
-          style: {
-            height: '52px',
-            display: 'flex',
-            justifyContent: 'space-around',
-          },
-        },
-        React.createElement(
-          'div',
-          {
-            className: 'confirm-button',
-            onClick: this.onCompileFileClick,
-          },
-          React.createElement(
-            'span',
-            { className: 'no-select' },
-            'Compile File'
-          )
-        ),
-        React.createElement(
-          'div',
-          {
-            className: 'confirm-button',
-            onClick: this.onCompileSelectedClick,
-          },
-          React.createElement(
-            'span',
-            { className: 'no-select' },
-            'Compile Selected'
-          )
-        ),
-        React.createElement(
-          'div',
-          {
-            className: 'confirm-button',
-            onClick: this.onCompileAllClick,
-          },
-          React.createElement('span', { className: 'no-select' }, 'Compile All')
-        )
-      ),
-      React.createElement(
-        'div',
-        {
-          style: {
-            height: '30px',
-            display: 'flex',
-            justifyContent: 'space-around',
-          },
-        },
-        React.createElement('input', {
-          placeholder: 'Filter...',
-          value: this.state.filter,
-          onChange: this.handleFilterChange,
-          style: {
-            width: 'calc( 100% - 10px )',
-            padding: '3px',
-          },
-        })
-      ),
-      React.createElement(
-        'div',
-        {
-          style: {
-            display: 'flex',
-            justifyContent: 'flex-start',
-          },
-        },
-        React.createElement(
-          'div',
-          {
-            className: 'confirm-button-secondary',
-            onClick: this.onCreateClick,
-          },
-          React.createElement('span', { className: 'no-select' }, 'New File')
-        ),
-        React.createElement(
-          'div',
-          {
-            className: 'confirm-button-secondary',
-            onClick: this.onCopyClick,
-          },
-          React.createElement('span', { className: 'no-select' }, 'Copy')
-        ),
-        React.createElement(
-          'div',
-          {
-            className: 'confirm-button-secondary',
-            onClick: this.onPasteClick,
-          },
-          React.createElement('span', { className: 'no-select' }, 'Paste')
-        )
-      ),
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-        }}
-      >
+    return (
+      <>
         <div
+          style={{
+            position: 'fixed',
+            top: '0',
+            right: '300px',
+            width: '125px',
+            display: 'flex',
+            justifyContent: 'space-between',
+          }}
+        >
+          <div
+            className={
+              'confirm-button confirm-button-player' +
+              (fileHistoryInd < 0 ? ' disabled' : '')
+            }
+            onClick={() => {
+              popFileHistory();
+              loadFileFromHistory();
+            }}
+          >
+            ◄
+          </div>
+          <div
+            className={
+              'confirm-button confirm-button-player' +
+              (fileHistoryInd >= fileHistory.length - 1 ? ' disabled' : '')
+            }
+            onClick={() => {
+              forwardFileHistory();
+              loadFileFromHistory();
+            }}
+          >
+            ►
+          </div>
+        </div>
+        {React.createElement(
+          'div',
+          {
+            //prevents the board from moving when you click anywhere on the file browser
+            onMouseDown: ev => {
+              ev.stopPropagation();
+              ev.nativeEvent.stopImmediatePropagation();
+            },
+            onWheel: ev => {
+              ev.stopPropagation();
+            },
+            style: {
+              backgroundColor: css.colors.BG_NEUTRAL,
+              overflowY: 'scroll',
+              height: window.innerHeight + 'px',
+            },
+          },
+          React.createElement(
+            'div',
+            {
+              style: {
+                height: '52px',
+                display: 'flex',
+                justifyContent: 'space-around',
+              },
+            },
+            React.createElement(
+              'div',
+              {
+                className: 'confirm-button',
+                onClick: this.onCompileFileClick,
+              },
+              React.createElement(
+                'span',
+                { className: 'no-select' },
+                'Compile File'
+              )
+            ),
+            React.createElement(
+              'div',
+              {
+                className: 'confirm-button',
+                onClick: this.onCompileSelectedClick,
+              },
+              React.createElement(
+                'span',
+                { className: 'no-select' },
+                'Compile Selected'
+              )
+            ),
+            React.createElement(
+              'div',
+              {
+                className: 'confirm-button',
+                onClick: this.onCompileAllClick,
+              },
+              React.createElement(
+                'span',
+                { className: 'no-select' },
+                'Compile All'
+              )
+            )
+          ),
+          React.createElement(
+            'div',
+            {
+              style: {
+                display: 'flex',
+                justifyContent: 'flex-start',
+              },
+            },
+            <div
+              className="confirm-button-secondary"
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+              onClick={this.onCreateClick}
+            >
+              <span className="no-select">New</span>
+            </div>,
+            <div
+              className="confirm-button-secondary"
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+              onClick={this.onRenameClick}
+            >
+              <span className="no-select">Rename</span>
+            </div>,
+            <div
+              className="confirm-button-secondary"
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                width: '25px',
+              }}
+              onClick={this.onCopyClick}
+            >
+              <span className="no-select">
+                <img
+                  src={`resources/img/copy.svg`}
+                  style={{
+                    width: '20px',
+                  }}
+                  alt="copy"
+                ></img>
+              </span>
+            </div>,
+            <div
+              className="confirm-button-secondary"
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                width: '25px',
+              }}
+              onClick={this.onPasteClick}
+            >
+              <span className="no-select">
+                <img
+                  src={`resources/img/paste.svg`}
+                  style={{
+                    width: '20px',
+                  }}
+                  alt="copy"
+                ></img>
+              </span>
+            </div>
+          ),
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+            }}
+          >
+            <div
+              className="confirm-button confirm-button-player"
+              onClick={() => {
+                dialog.show_input(
+                  null,
+                  async nodeId => {
+                    dialog.show_loading();
+                    const resp = await new Promise(resolve => {
+                      utils.get('/find-node/' + nodeId, resolve);
+                    });
+                    dialog.hide_loading();
+                    if (resp.error) {
+                      console.error(resp.error);
+                      dialog.show_notification('Node not found: ' + nodeId);
+                    } else {
+                      await this.loadFile(
+                        resp.file.slice(resp.file.lastIndexOf('/save/') + 6)
+                      );
+                      await new Promise(resolve => {
+                        setTimeout(resolve, 1);
+                      });
+                      expose.get_state('board').centerOnNode(nodeId);
+                    }
+                  },
+                  undefined,
+                  false
+                );
+              }}
+            >
+              Find Node
+            </div>
+            {/* <div
           className="confirm-button confirm-button-player"
           onClick={async () => {
             dialog.show_loading();
             const resp = await new Promise(resolve => {
               utils.get('/compile', resolve);
             });
-            /**
-             * @type {any}
-             */
             let states = {};
             if (resp.error) {
               states.error = resp.error;
@@ -562,127 +746,142 @@ class FileBrowser extends expose.Component {
           }}
         >
           State
-        </div>
-        <div
-          className="confirm-button confirm-button-player"
-          onClick={async () => {
-            const saveData = core.getSaveData() || {};
-            dialog.set_shift_req(true);
-            dialog.showActionNodeInput({
-              node: {
-                content: JSON.stringify(saveData, null, 2),
-              },
-              onConfirm: result => {
-                const data = JSON.parse(result);
-                core.setSaveData(data);
-                dialog.set_shift_req(false);
-              },
-              onCancel: () => {
-                dialog.set_shift_req(false);
-              },
-            });
-          }}
-        >
-          Saved Data
-        </div>
-      </div>,
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-        }}
-      >
-        <div
-          className="confirm-button confirm-button-export"
-          onClick={async () => {
-            dialog.show_loading();
-            const resp = await new Promise(resolve => {
-              utils.post('/export', {}, resolve);
-            });
-            dialog.hide_loading();
-            if (resp.data.err) {
-              dialog.show_notification(
-                <>
-                  <div>Export Failure</div>
-                  <div>
-                    {resp.data.err
-                      .filter((_, i) => i < 10)
-                      .map(({ text, node_id, filename }) => (
-                        <div
-                          key={node_id}
-                          style={{
-                            margin: '8px',
-                          }}
-                        >
-                          <span style={{ color: '#ff6565' }}>
-                            {node_id}:{filename}
-                          </span>{' '}
-                          <span>{text}</span>
-                        </div>
-                      ))}
-                  </div>
-                </>
-              );
-            } else {
-              // console.log('DATA', resp.data);
-              notify('Export successful!  ' + resp.data.msg, 'confirm');
-              // dialog.show_notification(
-              //   <>
-              //     <div>Export successful!</div>
-              //     <div style={{ marginTop: '0.5rem' }}>{resp.data.msg}</div>
-              //   </>
-              // );
-            }
-          }}
-        >
-          EXPORT
-        </div>
-      </div>,
-      <div
-        style={{
-          textAlign: 'center',
-          color: css.colors.TEXT_LIGHT,
-          textDecoration: 'underline',
-          margin: '10px',
-        }}
-      >
-        {this.props.current_file_name?.slice(0, -5) || '(None Selected)'}
-      </div>,
-      <div
-        style={{
-          color: '#77d8ff',
-          display: 'flex',
-          alignItems: 'center',
-          margin: '8px 0px',
-        }}
-      >
-        <div>
-          <input
-            id="check_all"
-            name="check_all"
-            type="checkbox"
-            checked={this.state.check_all ?? false}
-            onChange={this.onCheckAllClick}
+        </div> */}
+            <div
+              className="confirm-button confirm-button-player"
+              onClick={async () => {
+                const saveData = core.getSaveData() || {};
+                dialog.set_shift_req(true);
+                dialog.showActionNodeInput({
+                  node: {
+                    content: JSON.stringify(saveData, null, 2),
+                  },
+                  onConfirm: result => {
+                    const data = JSON.parse(result);
+                    core.setSaveData(data);
+                    dialog.set_shift_req(false);
+                  },
+                  onCancel: () => {
+                    dialog.set_shift_req(false);
+                  },
+                });
+              }}
+            >
+              Saved Data
+            </div>
+          </div>,
+          <div
             style={{
-              marginTop: '6px',
-              padding: '3px',
+              display: 'flex',
+              justifyContent: 'center',
             }}
-          ></input>
-        </div>
-        <label htmlFor="check_all">All </label>
-        <div>
-          <input
-            id="check_primary"
-            name="check_primary"
-            type="checkbox"
-            checked={this.state.check_primary ?? false}
-            onChange={this.onCheckPrimaryClick}
-            style={{ marginTop: '6px', padding: '3px' }}
-          ></input>
-        </div>
-        <label htmlFor="check_primary">Primary Items</label>
-      </div>,
-      <div style={{ width: 'calc( 100% - 14px )' }}>{elems}</div>
+          >
+            <div
+              className="confirm-button confirm-button-export"
+              onClick={async () => {
+                dialog.show_loading();
+                const resp = await new Promise(resolve => {
+                  utils.post('/export', {}, resolve);
+                });
+                dialog.hide_loading();
+                if (resp.data.err) {
+                  dialog.show_notification(
+                    <>
+                      <div>Export Failure</div>
+                      <div>
+                        {resp.data.err
+                          .filter((_, i) => i < 10)
+                          .map(({ text, node_id, filename }) => (
+                            <div
+                              key={node_id}
+                              style={{
+                                margin: '8px',
+                              }}
+                            >
+                              <span style={{ color: '#ff6565' }}>
+                                {node_id}:{filename}
+                              </span>{' '}
+                              <span>{text}</span>
+                            </div>
+                          ))}
+                      </div>
+                    </>
+                  );
+                } else {
+                  notify('Export successful!  ' + resp.data.msg, 'confirm');
+                }
+              }}
+            >
+              EXPORT
+            </div>
+          </div>,
+          <div
+            style={{
+              style: {
+                height: '30px',
+                display: 'flex',
+                justifyContent: 'space-around',
+              },
+            }}
+          >
+            <input
+              placeholder="Filter..."
+              value={this.state.filter}
+              onChange={this.handleFilterChange}
+              style={{
+                width: 'calc(100% - 10px)',
+                padding: '3px',
+                margin: '5px',
+              }}
+            />
+          </div>,
+          <div
+            style={{
+              textAlign: 'center',
+              color: css.colors.TEXT_LIGHT,
+              textDecoration: 'underline',
+              margin: '10px',
+            }}
+          >
+            {this.props.current_file_name?.slice(0, -5) || '(None Selected)'}
+          </div>,
+          <div
+            style={{
+              color: '#77d8ff',
+              display: 'flex',
+              alignItems: 'center',
+              margin: '8px 0px',
+            }}
+          >
+            <div>
+              <input
+                id="check_all"
+                name="check_all"
+                type="checkbox"
+                checked={this.state.check_all ?? false}
+                onChange={this.onCheckAllClick}
+                style={{
+                  marginTop: '6px',
+                  padding: '3px',
+                }}
+              ></input>
+            </div>
+            <label htmlFor="check_all">All </label>
+            <div>
+              <input
+                id="check_primary"
+                name="check_primary"
+                type="checkbox"
+                checked={this.state.check_primary ?? false}
+                onChange={this.onCheckPrimaryClick}
+                style={{ marginTop: '6px', padding: '3px' }}
+              ></input>
+            </div>
+            <label htmlFor="check_primary">Lib Items</label>
+          </div>,
+          <div style={{ width: 'calc( 100% - 14px )' }}>{elems}</div>
+        )}
+      </>
     );
   }
 }

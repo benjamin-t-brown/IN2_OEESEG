@@ -78,6 +78,12 @@ class File {
     return null;
   }
 
+  getSubRoots() {
+    return this.json.nodes.filter(node => {
+      return node.type === 'sub_root';
+    });
+  }
+
   getNode(id) {
     for (let i in this.json.nodes) {
       if (this.json.nodes[i].id === id) {
@@ -289,6 +295,32 @@ class Compiler {
             'return player.state' +
             `};\n`
           );
+        }
+      },
+      sub_root: (node, file) => {
+        const children = file.getChildren(node);
+        if (children.length === 0) {
+          this.error(file.name, node.id, 'Sub Root node has no child.');
+          return null;
+        } else if (children.length > 1) {
+          this.error(
+            file.name,
+            node.id,
+            'Sub Root node has multiple children.'
+          );
+          return null;
+        } else {
+          const child = children[0];
+          let innerContent = this.compileNode(child, file);
+          const ret =
+            `// sub_root\n` +
+            `scope.${node.id} = () => {\n` +
+            `    player.set(CURRENT_NODE_VAR, '${node.id}');\n` +
+            `    scope.${child.id}();\n` +
+            `};\n\n` +
+            innerContent;
+
+          return ret;
         }
       },
       text: (node, file) => {
@@ -827,6 +859,9 @@ class Compiler {
           const lines = node.content.split('\n');
           for (let i = 0; i < lines.length; i++) {
             const line = lines[i];
+            if (!line.trim()) {
+              continue;
+            }
             const [first, second] = line.split('=');
             if (!first) {
               continue;
@@ -957,7 +992,20 @@ player.set('scope', scope);`;
       this.error(file.name, null, 'File has no root!');
       return null;
     }
-    return this.compileNode(root, file);
+
+    let text = this.compileNode(root, file);
+
+    const roots = file.getSubRoots();
+    let subText = '';
+    if (roots.length) {
+      for (let i in roots) {
+        subText += this.compileNode(roots[i], file);
+      }
+      subText += '\n';
+    }
+    const { innerContent: innerInnerContent, declContent: innerDeclContent } =
+      _replace_declarations(text + '\n' + subText, globalDeclarations);
+    return innerInnerContent;
   }
 
   compileNode(node, file) {

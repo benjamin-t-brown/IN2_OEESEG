@@ -18,6 +18,24 @@ const execAsync = async command => {
   });
 };
 
+const findAllJsonFilesRecursive = async startDir => {
+  const files = [];
+  const readDir = async dir => {
+    const items = await fs.promises.readdir(dir, { withFileTypes: true });
+    for (const item of items) {
+      if (item.isDirectory()) {
+        await readDir(path.join(dir, item.name));
+      } else {
+        if (item.name.endsWith('.json')) {
+          files.push(path.join(dir, item.name));
+        }
+      }
+    }
+  };
+  await readDir(startDir);
+  return files;
+};
+
 const fixUrl = url => {
   return url.replace(/\\/g, '/').replace(/\/mnt\/$(\w)/, '$1:');
 };
@@ -533,4 +551,67 @@ http_server.get('assets', (obj, resp) => {
   //   text: 'something',
   //   err: '',
   // });
+});
+
+http_server.post('rename-file-contents', (obj, resp, data) => {
+  const { oldName, newName } = data;
+  findAllJsonFilesRecursive(SAVE_DIR)
+    .then(files => {
+      for (const file of files) {
+        const data = fs
+          .readFileSync(file)
+          .toString()
+          .replace(new RegExp('"' + oldName + '"', 'g'), '"' + newName + '"');
+        fs.writeFileSync(file, data);
+      }
+      http_server.reply(resp, {});
+    })
+    .catch(e => {
+      console.error('Failed to rename-file-contents', e);
+      http_server.reply(resp, {
+        error: 'not found',
+      });
+    });
+});
+
+http_server.get('find-node', (obj, resp) => {
+  const nodeId = obj.event_args[0];
+
+  if (!nodeId) {
+    // resp.statusCode = 404;
+    http_server.reply(resp, {
+      error: 'not found',
+    });
+    return;
+  }
+
+  findAllJsonFilesRecursive(SAVE_DIR)
+    .then(files => {
+      let found = null;
+      for (const file of files) {
+        const data = JSON.parse(fs.readFileSync(file).toString());
+        const node = data.nodes.find(node => node.id === nodeId);
+        if (node) {
+          found = {
+            file: file,
+            node: node,
+          };
+          break;
+        }
+      }
+      if (found) {
+        http_server.reply(resp, found);
+      } else {
+        console.error('Failed to find node ' + nodeId);
+        http_server.reply(resp, {
+          error: 'not found',
+        });
+      }
+    })
+    .catch(e => {
+      console.error('Failed to read dir for finding node', e);
+      http_server.reply(resp, {
+        error: 'not found',
+      });
+    });
 });

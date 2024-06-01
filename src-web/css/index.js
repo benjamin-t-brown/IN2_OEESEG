@@ -21,5 +21,7 @@ module.exports = {
     CONDITIONAL: '#99004d',
     ACTION: '#4e8861',
     SWITCH: '#aa4545',
+    YELLOW_HIGHLIGHT: '#ffcc00',
+    HIGHLIGHT_TEXT_DARK: 'rgb(193 38 38)',
   },
 };

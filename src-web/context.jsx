@@ -54,6 +54,18 @@ class Context extends expose.Component {
       case 'Create Next File Node': {
         return 'nextfile';
       }
+      case 'Create Sub Root': {
+        return 'root';
+      }
+      case 'Create Basic Oeeseg Room': {
+        return 'template';
+      }
+      case 'Create Decl Node': {
+        return 'decl2';
+      }
+      case 'Create Comment': {
+        return 'comment';
+      }
       default: {
         return 'decl';
       }
@@ -85,7 +97,14 @@ class Context extends expose.Component {
             alt={name}
           ></img>
         </div>
-        <div className="no-select">
+        <div
+          className="no-select"
+          style={{
+            color: name.includes('Create Basic')
+              ? css.colors.HIGHLIGHT_TEXT_DARK
+              : css.colors.TEXT,
+          }}
+        >
           {name.includes('Chunk') ? 'Create Script Node' : name}
         </div>
       </div>
@@ -166,7 +185,7 @@ exp.show_context_menu = function (board, elem) {
   const { x, y } = utils.get_mouse_pos();
   const cbs = {};
   console.log('context', elem);
-  const file_node = getNode(board.file, elem.id);
+  const file_node = getNode(board.file, elem?.id) ?? {};
   if (file_node.type !== 'next_file' && board.nodeCanHaveChild(file_node)) {
     if (file_node.type === 'choice') {
       cbs.linkNode = function (parent) {
@@ -212,7 +231,7 @@ exp.show_context_menu = function (board, elem) {
       cbs.createSwitchConditionalNode = function (parent) {
         this.addNode(parent, 'switch_conditional', `player.once()`);
       }.bind(board);
-    } else {
+    } else if (elem) {
       cbs.linkNode = function (parent) {
         this.enterLinkMode(parent);
       }.bind(board);
@@ -262,21 +281,28 @@ exp.show_context_menu = function (board, elem) {
     cbs.setNodeCondition = function (parent) {
       this.enterLinkModeRef(parent);
     }.bind(board);
-  } else {
+  } else if (elem) {
     cbs.copyNodeId = function (parent) {
       navigator.clipboard.writeText(parent.id);
       notify('Copied node ID to clipboard.', 'info');
     }.bind(board);
   }
 
-  if (file_node.type === 'root') {
-    cbs.createBasicOeesegRoom = function (parent) {
+  if (!elem) {
+    cbs.createComment = function () {
+      this.addNode(null, 'text', 'COMMENT: ');
+    }.bind(board);
+    cbs.createSubRoot = function () {
+      this.addNode(null, 'sub_root', 'sub_root');
+    }.bind(board);
+    cbs.createBasicOeesegRoom = function () {
       dialog.showTemplateCreateDialog({
-        node: file_node,
+        node: null,
         type: 'BasicOeesegRoom',
-        onConfirm: (content, location) => {
-          console.log('CONFIRM', content, location);
-          expose.get_state('board').pasteSelection(content, location);
+        onConfirm: (content, location, replaceNodeIds) => {
+          expose
+            .get_state('board')
+            .pasteSelection(content, location, replaceNodeIds);
           this.saveFile();
         },
         onCancel: () => {

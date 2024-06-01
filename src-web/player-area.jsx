@@ -5,6 +5,19 @@ const utils = require('utils');
 const core = require('core-in2');
 const $ = require('jquery');
 
+function escapeHtml(unsafe) {
+  // lol
+  if (unsafe.includes('span')) {
+    return unsafe;
+  }
+  return unsafe
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 const canvasCoordsToWorldCoords = (x, y) => {
   return {
     x: (x / 514) * 100,
@@ -86,19 +99,19 @@ module.exports = class PlayerArea extends expose.Component {
         const localId = id || utils.random_id(10);
         this.choiceClicks[localId] = onClick;
         arr.push({
-          text: line,
+          text: escapeHtml(line),
           id: localId,
           color,
           isChoice: true,
         });
       } else if (color) {
         arr.push({
-          text: line,
+          text: escapeHtml(line),
           color,
           id,
         });
       } else {
-        arr.push({ text: line, id });
+        arr.push({ text: escapeHtml(line), id });
       }
       if (this.timeout !== null) {
         clearTimeout(this.timeout);
@@ -367,7 +380,7 @@ module.exports = class PlayerArea extends expose.Component {
                   }
                   return prev + html;
                 }
-              }, '') + '<br/> &nbsp <br/><br/><br/><br/><br/><br/>',
+              }, '') + '<br/>       <br/><br/><br/><br/><br/><br/>',
           },
           style: {
             width: '90%',

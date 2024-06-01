@@ -57,6 +57,8 @@ module.exports = {
       '/voice': 'http://localhost:8899',
       '/open': 'http://localhost:8899',
       '/assets': 'http://localhost:8899',
+      '/find-node': 'http://localhost:8899',
+      '/rename-file-contents': 'http://localhost:8899',
     },
   },
 };

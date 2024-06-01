@@ -49,10 +49,11 @@ const DiagramNode = ({ node }) => {
       onDoubleClick={() =>
         window.on_node_dblclick(document.getElementById(node.id))
       }
-      onContextMenu={ev =>
-        ev.preventDefault() ||
-        window.on_node_rclick(document.getElementById(node.id))
-      }
+      onContextMenu={ev => {
+        ev.preventDefault();
+        ev.stopPropagation();
+        window.on_node_rclick(document.getElementById(node.id));
+      }}
       onMouseEnter={() =>
         window.on_node_mouseover(document.getElementById(node.id))
       }

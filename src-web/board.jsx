@@ -44,6 +44,46 @@ export const getNode = (file, id) => {
   }
 };
 
+/**
+ * @param {Object} file
+ * @param {String} id
+ * @returns {Object}
+ */
+export const getChildren = (file, id) => {
+  if (file) {
+    return file.links
+      .filter(link => {
+        return link.from === id;
+      })
+      .map(link => {
+        return getNode(file, link.to);
+      });
+  } else {
+    return [];
+  }
+};
+
+/**
+ * @param {Object} file
+ * @param {String} id
+ * @returns {Object}
+ */
+export const getParents = (file, id) => {
+  if (file) {
+    return file.links
+      .filter(link => {
+        return link.to === id;
+      })
+      .map(link => {
+        return getNode(file, link.from);
+      });
+  } else {
+    return [];
+  }
+};
+
+// export const findNodeInAllFiles = (id) => {
+
 window.on_node_click = function (elem) {
   console.log('Click Event Not Overwritten!', elem);
 };
@@ -276,22 +316,25 @@ class Board extends expose.Component {
       } else if (utils.is_shift() || utils.is_ctrl()) {
         let ind = this.dragSet.indexOf(selectedNode.id);
         if (ind === -1) {
-          getPlumb()?.addToDragSelection(selectedNode.id);
+          getPlumb()?.addToDragSelection(
+            document.getElementById(selectedNode.id)
+          );
           this.dragSet.push(selectedNode.id);
         } else {
-          getPlumb()?.removeFromDragSelection(selectedNode.id);
+          getPlumb()?.removeFromDragSelection(
+            document.getElementById(selectedNode.id)
+          );
           this.dragSet.splice(ind, 1);
         }
       }
     };
 
     this.onNodeUnclick = window.on_node_unclick = elem => {
-      let file_node = getNode(this.file, elem.id);
-      //$('#diagram-parent').panzoom('enable');
+      const file_node = getNode(this.file, elem.id);
       file_node.left = elem.style.left;
       file_node.top = elem.style.top;
       this.file.nodes.forEach(node_file => {
-        let node = document.getElementById(node_file.id);
+        const node = document.getElementById(node_file.id);
         node_file.left = node.style.left;
         node_file.top = node.style.top;
       });
@@ -299,7 +342,7 @@ class Board extends expose.Component {
     };
 
     this.onNodeDblClick = window.on_node_dblclick = elem => {
-      let file_node = getNode(this.file, elem.id);
+      const file_node = getNode(this.file, elem.id);
       if (file_node.type === 'next_file') {
         dialog.show_input_with_select(
           expose.get_state('file-browser').file_list,
@@ -376,17 +419,36 @@ class Board extends expose.Component {
     };
 
     this.onNodeMouseOver = window.on_node_mouseover = elem => {
-      // perf issue it think?
-      // const node = getNode(this.file,elem.id);
-      // expose.set_state('status-bar', {
-      //   hoverText: `Double click to edit '${node.type}' node.`,
-      // });
+      const parents = (this.parents = getParents(this.file, elem.id));
+      const children = (this.children = getChildren(this.file, elem.id));
+
+      for (const parent of parents) {
+        document
+          .getElementById(parent.id)
+          .classList.add('node-highlight-parent');
+      }
+      for (const child of children) {
+        document.getElementById(child.id).classList.add('node-highlight-child');
+      }
     };
 
     this.onNodeMouseOut = window.on_node_mouseout = () => {
       expose.set_state('status-bar', {
         hoverText: '',
       });
+      const parents = this.parents || [];
+      const children = this.children || [];
+
+      for (const parent of parents) {
+        document
+          .getElementById(parent.id)
+          .classList.remove('node-highlight-parent');
+      }
+      for (const child of children) {
+        document
+          .getElementById(child.id)
+          .classList.remove('node-highlight-child');
+      }
     };
 
     this.onConnRClick = (params, ev) => {
@@ -396,6 +458,7 @@ class Board extends expose.Component {
       let to = getNode(this.file, to_id);
       this.deleteLink(from, to);
       ev.preventDefault();
+      ev.stopPropagation();
     };
 
     this.onDeleteClick = window.on_delete_click = elemId => {
@@ -420,6 +483,13 @@ class Board extends expose.Component {
       });
     };
 
+    this.onBoardRClick = ev => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      context.show_context_menu(this, null);
+      console.log('BOARD CONTEXT');
+    };
+
     document.oncontextmenu = () => {
       if (this.disable_context) {
         this.disable_context = false;
@@ -428,42 +498,6 @@ class Board extends expose.Component {
         return true;
       }
     };
-
-    // this.connectLink = link => {
-    //   let connection = getPlumb()?.connect({
-    //     source: link.from + '_from',
-    //     target: link.to + '_to',
-    //     paintStyle: { stroke: 'rgba(255,255,255,0.2)', strokeWidth: 8 },
-    //     endpointStyle: {
-    //       fill: css.colors.PRIMARY,
-    //       outlineStroke: css.colors.TEXT_LIGHT,
-    //       outlineWidth: 5,
-    //     },
-    //     connector: [
-    //       'Flowchart',
-    //       {
-    //         midpoint: 0.6,
-    //         curviness: 30,
-    //         cornerRadius: 2,
-    //         stub: 0,
-    //         alwaysRespectStubs: true,
-    //       },
-    //     ],
-    //     endpoint: ['Dot', { radius: 2 }],
-    //     overlays: [['Arrow', { location: 0.6, width: 20, length: 20 }]],
-    //   });
-    //   connection.bind('contextmenu', this.onConnRClick);
-    //   connection.bind('mouseover', () => {
-    //     expose.set_state('status-bar', {
-    //       hoverText: 'Right click to delete this link.',
-    //     });
-    //   });
-    //   connection.bind('mouseout', () => {
-    //     expose.set_state('status-bar', {
-    //       hoverText: '',
-    //     });
-    //   });
-    // };
 
     this.saveLocation = () => {
       utils.saveLocationToLocalStorage(
@@ -537,7 +571,7 @@ class Board extends expose.Component {
       const nodes = this.dragSet.map(id => {
         const node = getNode(this.file, id);
         const new_node = Object.assign({}, node);
-        new_node.id = getNodeId();
+        // new_node.id = getNodeId();
         node_mapping[node.id] = new_node.id;
         return new_node;
       });
@@ -546,8 +580,10 @@ class Board extends expose.Component {
         children.forEach(child => {
           if (this.dragSet.includes(child.id)) {
             links.push({
-              from: node_mapping[id],
-              to: node_mapping[child.id],
+              from: id,
+              to: child.id,
+              // from: node_mapping[id],
+              // to: node_mapping[child.id],
             });
           }
         });
@@ -572,7 +608,11 @@ class Board extends expose.Component {
     };
     state.copySelection = this.copySelection;
 
-    this.pasteSelection = (copySet, startingLocation) => {
+    this.pasteSelection = (
+      copySet,
+      startingLocation,
+      nodeIdContentReplaceRefs
+    ) => {
       copySet = copySet || this.copySet;
       if (copySet) {
         let rootInd = -1;
@@ -583,10 +623,13 @@ class Board extends expose.Component {
 
         // eslint-disable-next-line no-undef
         const newLinks = structuredClone(copySet.links);
-        //JSON.parse(JSON.stringify(this.copySet.links));
+        const idRefObj = {};
         const newNodes = copySet.nodes.map((node, i) => {
           const newId = getNodeId();
           const newNode = Object.assign({}, node);
+          if (nodeIdContentReplaceRefs?.includes(node.id)) {
+            idRefObj[node.id] = newId;
+          }
           newLinks.forEach(link => {
             if (link.to === node.id) {
               link.to = newId;
@@ -624,6 +667,10 @@ class Board extends expose.Component {
         }
 
         newNodes.forEach(node => {
+          for (const [key, value] of Object.entries(idRefObj)) {
+            node.content = node.content.replaceAll(key, value);
+          }
+
           this.file.nodes.push(node);
         });
         newLinks.forEach(link => {
@@ -649,7 +696,7 @@ class Board extends expose.Component {
 
     //remove (item-error, item-active) from nodes
     this.removeAllExtraClasses = () => {
-      $('.jtk-draggable')
+      $('.jtk-connected')
         .removeClass('item-active')
         .removeClass('item-error')
         .css('outline', '');
@@ -891,8 +938,23 @@ class Board extends expose.Component {
 
   addNode(parent, type, defaultText) {
     const id = getNodeId();
-    const parentElem = document.getElementById(parent.id);
-    const rect = parentElem?.getBoundingClientRect() ?? { height: 100 };
+    let rect = { height: 100 };
+    if (parent) {
+      const parentElem = document.getElementById(parent.id);
+      rect = parentElem?.getBoundingClientRect() ?? { height: 100 };
+    }
+    const mouseCoords = utils.get_mouse_pos_rel_diagram();
+
+    let x = 0;
+    let y = 0;
+    if (parent) {
+      x = parseInt(parent.left);
+      y = parseInt(parent.top) + rect.height + 30;
+    } else {
+      x = mouseCoords.x;
+      y = mouseCoords.y;
+    }
+
     const node = {
       id: id,
       type: type,
@@ -900,15 +962,17 @@ class Board extends expose.Component {
         defaultText === undefined
           ? 'This node currently has no actual content.'
           : defaultText,
-      left: parent.left,
-      top: parseInt(parent.top) + (rect.height + 30) + 'px',
+      left: x + 'px',
+      top: y + 'px',
     };
     this.file.nodes.push(node);
-    const link = {
-      to: id,
-      from: parent.id,
-    };
-    this.file.links.push(link);
+    if (parent) {
+      const link = {
+        to: id,
+        from: parent.id,
+      };
+      this.file.links.push(link);
+    }
     this.saveFile();
     this.scheduleRebuild();
     return node;
@@ -1036,8 +1100,6 @@ class Board extends expose.Component {
       }
     };
 
-    console.log('DELETE NODE?', nodes);
-
     if (Array.isArray(nodes)) {
       nodesToDelete = nodes;
     } else {
@@ -1054,9 +1116,20 @@ class Board extends expose.Component {
   }
 
   connectLink = link => {
+    const source = document.getElementById(link.from);
+    const target = document.getElementById(link.to);
+    if (!source || !target) {
+      console.error(
+        'Cannot find source or target node for link',
+        link,
+        'source: ' + source,
+        'target: ' + target
+      );
+      return;
+    }
     const connection = getPlumb().connect({
-      source: document.getElementById(link.from),
-      target: document.getElementById(link.to),
+      source,
+      target,
       paintStyle: { stroke: 'rgba(255,255,255,0.2)', strokeWidth: 8 },
       anchors: ['BottomRight', 'TopLeft'],
       endpoint: 'Rectangle',
@@ -1118,6 +1191,7 @@ class Board extends expose.Component {
           id="diagram-parent"
           ref={this.diagramParent}
           className={classes.diagramParent}
+          onContextMenu={this.onBoardRClick}
         >
           <PlumbDiagram
             classes={classes}

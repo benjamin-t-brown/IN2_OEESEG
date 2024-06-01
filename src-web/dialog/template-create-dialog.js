@@ -8,12 +8,8 @@ const TemplateCreateDialog = ({ node, type, onConfirm, onCancel, hide }) => {
     hide();
   });
 
-  const handleSubmit = newSet => {
-    const location = {
-      left: -600,
-      top: 111,
-    };
-    onConfirm(newSet, location);
+  const handleSubmit = (newSet, location, replaceNodeIds) => {
+    onConfirm(newSet, location, replaceNodeIds);
     hide();
   };
 

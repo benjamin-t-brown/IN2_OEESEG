@@ -195,9 +195,16 @@ exp.is_visible = function () {
 
 exp.show_loading = function () {
   show();
-  ReactDOM.render(<LoadingDialog />, document.getElementById('dialog'));
+  ReactDOM.render(<LoadingDialog />, document.getElementById('dialog-loading'));
 };
 
-exp.hide_loading = exp.hide;
+exp.hide_loading = () => {
+  is_visible = false;
+  window.removeEventListener('keydown', on_key_down);
+  ReactDOM.unmountComponentAtNode(document.getElementById('dialog-loading'));
+  window.enable();
+};
+
+window.dialog = exp;
 
 export default exp;

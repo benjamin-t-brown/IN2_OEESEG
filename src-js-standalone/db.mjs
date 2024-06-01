@@ -80,6 +80,7 @@ const createDb = () => {
       ascii: [
         'Caves_CaveBelowDungeon',
         'Caves_CaveBelowDungeon_2',
+        'Caves_CaveBelowDungeon_3',
         'Caves_Waterfall',
         'Caves_Waterfall_2',
         'Caves_Cave1',
@@ -179,6 +180,12 @@ const createDb = () => {
         label: 'Button',
         description:
           "This is a large button that looks like it would fit on a giant's winter coat.",
+      },
+      {
+        name: 'holy_symbol_of_the_temple',
+        label: 'Holy Symbol',
+        description:
+          'This appears to be some kind of holy necklace or amulet.  It is made of silver and is shaped in a complex pattern that is hard to follow.',
       },
       {
         name: 'rusty_axe',

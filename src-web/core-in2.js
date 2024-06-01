@@ -30,13 +30,25 @@ const centerAtActiveNode = () => {
   const active_node_id = exports.player().get('curIN2n');
   const active_file_name = exports.player().get('curIN2f');
   if (active_node_id) {
-    expose.get_state('file-browser').loadFileExternal(active_file_name, () => {
-      const elem = document.getElementById(active_node_id);
-      if (elem) {
-        board.centerOnNode(active_node_id);
-        $('#' + active_node_id).css('outline', '4px solid green');
-      }
-    });
+    const elem = document.getElementById(active_node_id);
+    if (elem) {
+      board.removeAllExtraClasses();
+      $('#' + active_node_id).css('outline', '4px solid green');
+      board.centerOnNode(active_node_id);
+    } else {
+      expose
+        .get_state('file-browser')
+        .loadFileExternal(active_file_name, () => {
+          const elem = document.getElementById(active_node_id);
+          if (elem) {
+            board.removeAllExtraClasses();
+            $('#' + active_node_id).css('outline', '4px solid green');
+            setTimeout(() => {
+              board.centerOnNode(active_node_id);
+            }, 33);
+          }
+        });
+    }
   }
 };
 
@@ -58,7 +70,7 @@ const getDraw = () => {
     hideButtons: () => {},
     showPressAnyKey: () => {
       _console_log(
-        '&nbsp&nbsp&nbsp&nbsp&nbspPress any key to continue...',
+        '     Press any key to continue...',
         null,
         '#DDD',
         'press-any-key'
@@ -80,6 +92,7 @@ const addTextLine = args => {
   getDraw().renderLine(text, color);
   if (paragraph) {
     // console.log();
+    getDraw().renderLine('', color);
     getDraw().renderLine('', color);
   }
 };
@@ -178,7 +191,7 @@ const createCore = () => {
         });
         if (text) {
           addTextLine({
-            text,
+            text: text,
             paragraph: true,
             color: '',
           });
@@ -317,6 +330,11 @@ const createPlayer = () => {
         return true;
       }
       return false;
+    },
+
+    // custom functions
+    clearArgs() {
+      this.set('args', {});
     },
   };
 };

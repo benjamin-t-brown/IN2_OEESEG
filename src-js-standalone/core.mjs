@@ -16,6 +16,7 @@ window.IN2 = true;
  * @property {function} set
  * @property {function} setIfUnset
  * @property {function} once
+ * @property {function} clearArgs
  * @property {string} name
  * @property {object} state
  * @property {boolean} dontTriggerOnce
@@ -275,6 +276,11 @@ const createPlayer = () => {
         return true;
       }
       return false;
+    },
+
+    // custom functions
+    clearArgs() {
+      this.set('args', {});
     },
   };
   return player;

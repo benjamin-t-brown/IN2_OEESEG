@@ -9,6 +9,19 @@ export const getPlumb = () => {
   return window.plumb;
 };
 
+const verifyAndFixDiagram = file => {
+  file.links = file.links.filter(link => {
+    if (!link.to && !link.from) {
+      return false;
+    }
+    return (
+      file.nodes.find(node => node.id === link.to) &&
+      file.nodes.find(node => node.id === link.from)
+    );
+  });
+  return file;
+};
+
 let lastFile = null;
 let drawStuff = true;
 let drawStuffTrip = false;
@@ -63,6 +76,7 @@ const PlumbDiagram = ({
       }
 
       window.plumb.setSuspendDrawing(true);
+      verifyAndFixDiagram(file);
       window.plumb.batch(() => {
         for (const link of file.links ?? []) {
           connectLink(link);

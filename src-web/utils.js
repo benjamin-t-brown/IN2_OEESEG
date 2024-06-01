@@ -9,6 +9,10 @@ let on_delete = function () {};
 window.addEventListener('mousemove', ev => {
   mouse_x = ev.clientX;
   mouse_y = ev.clientY;
+  // console.log(
+  //   'MOUSE POS REL BOARD',
+  //   module.exports.get_mouse_pos_rel_diagram()
+  // );
 });
 
 window.addEventListener('keydown', ev => {
@@ -146,6 +150,16 @@ module.exports = {
     return {
       x: mouse_x,
       y: mouse_y,
+    };
+  },
+  get_mouse_pos_rel_diagram() {
+    return {
+      x:
+        mouse_x -
+        document.getElementById('diagram').getBoundingClientRect().left,
+      y:
+        mouse_y -
+        document.getElementById('diagram').getBoundingClientRect().top,
     };
   },
   is_shift() {

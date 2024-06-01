@@ -71,16 +71,16 @@ const BasicOEESEGRoom = ({ rootNode, handleSubmit, handleCancelClick }) => {
     const nodes = templateToSubmit.nodes;
     const links = templateToSubmit.links;
 
-    nodes.find(({ id }) => id === 'a16zgg7gs').content =
-      state.examineSurroundings;
-    nodes.find(({ id }) => id === 'tkouu5dgg').content =
-      state.examineSurroundings2;
-    nodes.find(({ id }) => id === 'lmrkynfi0').content =
-      "player.set('itemsText', engine.getRoomItemsText());\nplayer.set('exitText', '" +
-      exitListToString(state.exits) +
-      "');";
-    nodes.find(({ id }) => id === 'eace68zi5').content = state.title;
-    nodes.find(({ id }) => id === 'e9z3pyfig').content =
+    const ROOM_PRIMARY_SWITCH_NODE = 'ee4s4acfi';
+    const ROOM_INIT_NODE = 'puefyqexe';
+    const BASIC_ROOM_ARGS_NODE = 'etwo71fmw';
+    const BASIC_ROOM_RET_SUB_ROOT_NODE = 'm1rg8itpw';
+    const PRIMARY_DESCRIPTION_ACTION_NODE = 'xz70trakb';
+    const PRIMARY_DESCRIPTION_NODE = 'g9aqn6gaa';
+    const SUCCINCT_DESCRIPTION_NODE = 'ndy6qieya';
+    const SUB_ROOT_EXAMINE_SURROUNDINGS_RETURN_NODE = 'fo0imirfg';
+
+    nodes.find(({ id }) => id === ROOM_INIT_NODE).content =
       "engine.setBackground('" +
       state.backgroundImage +
       "');\nengine.setHeading('" +
@@ -88,48 +88,51 @@ const BasicOEESEGRoom = ({ rootNode, handleSubmit, handleCancelClick }) => {
       "');\n\nif (player.get('lasIN2f') !== 'Inventory.json') {\n  " +
       state.playSoundText +
       '\n}\n';
+    const basicRoomArgsNode = nodes.find(
+      ({ id }) => id === BASIC_ROOM_ARGS_NODE
+    );
+    basicRoomArgsNode.content = `
+  player.set('args.roomTitle', '${state.title}')
+  player.set('args.nextNodeId', '${BASIC_ROOM_RET_SUB_ROOT_NODE}')
+  player.set('args.nextFileId', player.get('curIN2f'))
+  player.set('args.customExit1', false)
+  player.set('args.northExit', ${
+    state.exits.includes('NORTH') ? '"Caves_Cave1.json"' : 'false'
+  })
+  player.set('args.eastExit', ${
+    state.exits.includes('EAST') ? '"Caves_Cave1.json"' : 'false'
+  })
+  player.set('args.southExit', ${
+    state.exits.includes('SOUTH') ? '"Caves_Cave1.json"' : 'false'
+  })
+  player.set('args.westExit', ${
+    state.exits.includes('WEST') ? '"Caves_Cave1.json"' : 'false'
+  })
+    `;
 
-    for (let i = 0; i < state.exits.length; i++) {
-      const exitText = state.exits[i];
-      const x = 1835 + i * 400;
-      const y = 896 + i * 24;
-      nodes.push(
-        {
-          id: random_id(9),
-          type: 'choice_text',
-          content: `Go ${exitText}.`,
-          left: x + 'px',
-          top: y + 'px',
-          rel: null,
-          voice: false,
-        },
-        {
-          id: random_id(9),
-          type: 'next_file',
-          content: 'Caves_SecretCave1.json',
-          left: x + 'px',
-          top: y + 200 + 'px',
-          voice: false,
-        }
-      );
-      links.push(
-        {
-          from: 'ffbfqathh',
-          to: nodes[nodes.length - 2].id,
-        },
-        {
-          from: nodes[nodes.length - 2].id,
-          to: nodes[nodes.length - 1].id,
-        }
-      );
-    }
+    nodes.find(({ id }) => id === PRIMARY_DESCRIPTION_NODE).content =
+      state.examineSurroundings;
+    nodes.find(({ id }) => id === SUCCINCT_DESCRIPTION_NODE).content =
+      state.examineSurroundings2;
+    nodes.find(({ id }) => id === PRIMARY_DESCRIPTION_ACTION_NODE).content =
+      "player.set('itemsText', engine.getRoomItemsText());\nplayer.set('exitText', '" +
+      exitListToString(state.exits) +
+      "');";
 
-    links.push({
-      from: rootNode.id,
-      to: 'h4epzxxet',
-    });
-
-    handleSubmit(templateToSubmit);
+    // root to top level switch node
+    // links.push({
+    //   from: rootNode.id,
+    //   to: 'h4epzxxet',
+    // });
+    const location = {
+      left: -600,
+      top: 111,
+    };
+    handleSubmit(templateToSubmit, location, [
+      ROOM_PRIMARY_SWITCH_NODE,
+      BASIC_ROOM_RET_SUB_ROOT_NODE,
+      SUB_ROOT_EXAMINE_SURROUNDINGS_RETURN_NODE,
+    ]);
   });
 
   const handleExitCheckboxClick = direction => ev => {
@@ -308,7 +311,7 @@ export default BasicOEESEGRoom;
 const template = {
   nodes: [
     {
-      id: 'h4epzxxet',
+      id: 'ee4s4acfi',
       type: 'switch',
       content: 'switch',
       left: '0px',
@@ -316,7 +319,7 @@ const template = {
       voice: false,
     },
     {
-      id: 'osg8aepnn',
+      id: 'ypueuxtun',
       type: 'switch_default',
       content: 'default',
       left: '556px',
@@ -324,26 +327,17 @@ const template = {
       voice: false,
     },
     {
-      id: 'e9z3pyfig',
+      id: 'puefyqexe',
       type: 'action',
       content:
-        "engine.setBackground('Caves_CaveChute1');\nengine.setHeading('s');\n\nif (player.get('lasIN2f') !== 'Inventory.json') {\n  engine.playOneOfSound('step', [1, 2, 3]);\n}\n",
-      left: '1096px',
-      top: '74px',
+        "engine.setBackground('Caves_Cave1');\nengine.setHeading('n');\n\nif (player.get('lasIN2f') !== 'Inventory.json') {\n  engine.playOneOfSound('step', [1, 2, 3]);\n}\n",
+      left: '1104px',
+      top: '17px',
       rel: null,
       voice: false,
     },
     {
-      id: 'zinzr8q3z',
-      type: 'choice_text',
-      content: 'Examine surroundings.',
-      left: '1055px',
-      top: '747px',
-      rel: null,
-      voice: false,
-    },
-    {
-      id: 'nwlun10mi',
+      id: 'gcpidxufb',
       type: 'choice',
       content: '',
       left: '-44px',
@@ -351,17 +345,17 @@ const template = {
       voice: false,
     },
     {
-      id: 'lmrkynfi0',
+      id: 'xz70trakb',
       type: 'action',
       content:
-        "player.set('itemsText', engine.getRoomItemsText());\r\nplayer.set('exitText', 'There are exits to the NORTH and SOUTH.');",
+        "player.set('itemsText', engine.getRoomItemsText());\nplayer.set('exitText', 'There are exits to the NORTH.');",
       left: '336px',
       top: '627px',
       rel: null,
       voice: false,
     },
     {
-      id: 'oyol70w30',
+      id: 'bc4m43i1r',
       type: 'choice_conditional',
       content: 'engine.getRoomItems().length > 0',
       left: '-802px',
@@ -370,7 +364,7 @@ const template = {
       voice: false,
     },
     {
-      id: 'pn6fn2skc',
+      id: 'okdqg5g5u',
       type: 'choice_text',
       content: 'Pick up items.',
       left: '-894px',
@@ -379,89 +373,45 @@ const template = {
       voice: false,
     },
     {
-      id: 'p17r2e1ri',
+      id: 'xud3lcg3s',
       type: 'action',
       content:
-        "player.set('PICKUP_NEXT_FILE_ID', player.get('curIN2f'));\r\nplayer.set('PICKUP_NEXT_NODE_ID', 'si1q1rpai');",
-      left: '-971px',
+        "player.set('PICKUP_NEXT_FILE_ID', player.get('curIN2f'));\r\nplayer.set('PICKUP_NEXT_NODE_ID', 'fo0imirfg');",
+      left: '-970px',
       top: '704px',
       voice: false,
       rel: null,
     },
     {
-      id: 'rh1627bf5',
+      id: 'l3rkquuof',
       type: 'next_file',
-      content: 'PickUp.json',
+      content: 'FUNC_PickUp.json',
       left: '-874px',
       top: '829px',
       voice: false,
     },
     {
-      id: 'a16zgg7gs',
+      id: 'g9aqn6gaa',
       type: 'text',
       content:
-        "The cave sharply drops off of a cliff here, however there is a smooth chute that seems to have been carved out of the stone.\n\n${player.get('exitText')}\n\n${player.get('itemsText')}",
+        "<Primary Description>.\n\n${player.get('exitText')}\n\n${player.get('itemsText')}",
       left: '-2px',
       top: '394px',
       rel: null,
       voice: false,
     },
     {
-      id: 'ffbfqathh',
-      type: 'choice',
-      content: '',
-      left: '1583px',
-      top: '430px',
-      voice: false,
-    },
-    {
-      id: 'eace68zi5',
-      type: 'text',
-      content: 'Chute.',
-      left: '1185px',
-      top: '260px',
-      rel: null,
-      voice: false,
-    },
-    {
-      id: 'n07ydpg93',
-      type: 'next_file',
-      content: 'Inventory.json',
-      left: '1396px',
-      top: '996px',
-      voice: false,
-    },
-    {
-      id: 'kted7oh6w',
-      type: 'action',
-      content:
-        "player.set('INVENTORY_NEXT_NODE_ID', 'p1rd41fiq');\r\nplayer.set('INVENTORY_NEXT_FILE_ID', player.get(CURRENT_FILE_VAR));",
-      left: '1300px',
-      top: '870px',
-      rel: null,
-      voice: false,
-    },
-    {
-      id: 'h34orx0wr',
-      type: 'choice_text',
-      content: 'Inventory.',
-      left: '1411px',
-      top: '768px',
-      rel: null,
-      voice: false,
-    },
-    {
-      id: 'tkouu5dgg',
+      id: 'ndy6qieya',
       type: 'text',
       content:
-        "You are standing in a cave with a chute that leads down.\n\n${player.get('exitText')}\n\n${player.get('itemsText')}",
-      left: '-373px',
-      top: '513px',
+        "<Succinct Description>.\n\n${player.get('exitText')}\n\n${player.get('itemsText')}",
+      left: '-359px',
+      top: '685px',
       rel: null,
       voice: false,
     },
     {
-      id: 'hd8xpplcy',
+      id: 'gam26tnhh',
       type: 'action',
       content: "player.set('itemsText', engine.getRoomItemsText());",
       left: '-476px',
@@ -470,26 +420,7 @@ const template = {
       voice: false,
     },
     {
-      id: 'zkynpketc',
-      type: 'switch_conditional',
-      content: 'false',
-      left: '-426px',
-      top: '226px',
-      rel: null,
-      voice: false,
-    },
-    {
-      id: 'kok3agmlx',
-      type: 'text',
-      content:
-        'COMMENT: Every node needs a parent or it will be auto-removed during compilation.',
-      left: '-698px',
-      top: '196px',
-      rel: null,
-      voice: false,
-    },
-    {
-      id: 'qrl2f2cyc',
+      id: 'xqmzbgt8u',
       type: 'choice_text',
       content: 'Back.',
       left: '342px',
@@ -497,91 +428,160 @@ const template = {
       rel: null,
       voice: false,
     },
+    {
+      id: 'fo0imirfg',
+      type: 'sub_root',
+      content: 'sub_root',
+      left: '-817px',
+      top: '892px',
+      voice: false,
+    },
+    {
+      id: 'etwo71fmw',
+      type: 'action',
+      content:
+        "player.set('args.roomTitle', 'Title')\r\nplayer.set('args.nextNodeId', 'm1rg8itpw')\r\nplayer.set('args.nextFileId', player.get('curIN2f'))\r\nplayer.set('args.customExit1', false)\r\nplayer.set('args.northExit', 'Caves_Cave1.json')\r\nplayer.set('args.eastExit', false)\r\nplayer.set('args.southExit', false)\r\nplayer.set('args.westExit', false)",
+      left: '1105px',
+      top: '218px',
+      voice: false,
+      rel: null,
+    },
+    {
+      id: 'm1rg8itpw',
+      type: 'sub_root',
+      content: 'output',
+      left: '1273px',
+      top: '694px',
+      voice: false,
+      rel: null,
+    },
+    {
+      id: 'm9q4pc0yx',
+      type: 'next_file',
+      content: 'FUNC_BasicRoom.json',
+      left: '1212px',
+      top: '617px',
+      voice: false,
+    },
+    {
+      id: 'g6wgwtfwr',
+      type: 'switch',
+      content: 'switch',
+      left: '1258px',
+      top: '933px',
+      voice: false,
+    },
+    {
+      id: 'i0ip9882z',
+      type: 'switch_default',
+      content: 'default',
+      left: '1833px',
+      top: '897px',
+      voice: false,
+    },
+    {
+      id: 'u8u49dw54',
+      type: 'switch_conditional',
+      content: "$VAR_basicRoomOutput === 'examine-surroundings'",
+      left: '890px',
+      top: '1110px',
+      voice: false,
+      rel: null,
+    },
+    {
+      id: 'lg1ncogp3',
+      type: 'declaration',
+      content: "VAR_basicRoomOutput = player.get('output.roomChoice')",
+      left: '1068px',
+      top: '784px',
+      rel: null,
+      voice: false,
+    },
   ],
   links: [
     {
-      from: 'h4epzxxet',
-      to: 'osg8aepnn',
+      from: 'ee4s4acfi',
+      to: 'ypueuxtun',
     },
     {
-      from: 'h4epzxxet',
-      to: 'zkynpketc',
+      from: 'ypueuxtun',
+      to: 'puefyqexe',
     },
     {
-      from: 'osg8aepnn',
-      to: 'e9z3pyfig',
+      from: 'puefyqexe',
+      to: 'etwo71fmw',
     },
     {
-      from: 'e9z3pyfig',
-      to: 'eace68zi5',
+      from: 'gcpidxufb',
+      to: 'bc4m43i1r',
     },
     {
-      from: 'zinzr8q3z',
-      to: 'lmrkynfi0',
+      from: 'gcpidxufb',
+      to: 'xqmzbgt8u',
     },
     {
-      from: 'nwlun10mi',
-      to: 'oyol70w30',
+      from: 'xz70trakb',
+      to: 'g9aqn6gaa',
     },
     {
-      from: 'nwlun10mi',
-      to: 'qrl2f2cyc',
+      from: 'bc4m43i1r',
+      to: 'okdqg5g5u',
     },
     {
-      from: 'lmrkynfi0',
-      to: 'a16zgg7gs',
+      from: 'okdqg5g5u',
+      to: 'xud3lcg3s',
     },
     {
-      from: 'oyol70w30',
-      to: 'pn6fn2skc',
+      from: 'xud3lcg3s',
+      to: 'l3rkquuof',
     },
     {
-      from: 'pn6fn2skc',
-      to: 'p17r2e1ri',
+      from: 'g9aqn6gaa',
+      to: 'gcpidxufb',
     },
     {
-      from: 'p17r2e1ri',
-      to: 'rh1627bf5',
+      from: 'ndy6qieya',
+      to: 'gcpidxufb',
     },
     {
-      from: 'a16zgg7gs',
-      to: 'nwlun10mi',
+      from: 'gam26tnhh',
+      to: 'ndy6qieya',
     },
     {
-      from: 'ffbfqathh',
-      to: 'zinzr8q3z',
+      from: 'xqmzbgt8u',
+      to: 'puefyqexe',
     },
     {
-      from: 'ffbfqathh',
-      to: 'h34orx0wr',
+      from: 'fo0imirfg',
+      to: 'gam26tnhh',
     },
     {
-      from: 'eace68zi5',
-      to: 'ffbfqathh',
+      from: 'etwo71fmw',
+      to: 'm9q4pc0yx',
     },
     {
-      from: 'kted7oh6w',
-      to: 'n07ydpg93',
+      from: 'm1rg8itpw',
+      to: 'lg1ncogp3',
     },
     {
-      from: 'h34orx0wr',
-      to: 'kted7oh6w',
+      from: 'g6wgwtfwr',
+      to: 'i0ip9882z',
     },
     {
-      from: 'tkouu5dgg',
-      to: 'nwlun10mi',
+      from: 'g6wgwtfwr',
+      to: 'u8u49dw54',
     },
     {
-      from: 'hd8xpplcy',
-      to: 'tkouu5dgg',
+      from: 'i0ip9882z',
+      to: 'puefyqexe',
     },
     {
-      from: 'zkynpketc',
-      to: 'hd8xpplcy',
+      from: 'u8u49dw54',
+      to: 'xz70trakb',
     },
     {
-      from: 'qrl2f2cyc',
-      to: 'e9z3pyfig',
+      from: 'lg1ncogp3',
+      to: 'g6wgwtfwr',
     },
   ],
 };
