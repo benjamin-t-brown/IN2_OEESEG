@@ -193,6 +193,7 @@ class Board extends expose.Component {
 
     this.onMouseMove = ev => {
       if (this.panning) {
+        this.state.didPan = true;
         this.offsetX =
           this.lastOffsetX + (this.lastMouseX - ev.clientX) * (1 / this.zoom);
         this.offsetY =
@@ -220,6 +221,9 @@ class Board extends expose.Component {
 
     this.onMouseUp = ev => {
       if (this.panning) {
+        setTimeout(() => {
+          this.state.didPan = false;
+        });
         this.saveLocation();
       }
       this.panning = false;

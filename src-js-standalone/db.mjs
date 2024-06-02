@@ -98,6 +98,7 @@ const createDb = () => {
         'Caves_StoneTempleEntrance_2',
         'Caves_StoneTempleEntrance_3',
         'Caves_StoneTempleEntrance_4',
+        'Caves_StoneTempleChapel',
         'Caves_Cave3',
         'Caves_RuinedElevator',
         'Caves_CaveChute1',
@@ -116,6 +117,7 @@ const createDb = () => {
         'cave_drop_4',
         'cave_drop_5',
         'clank',
+        'chime_solve:0.1',
         'collapse',
         'get_item',
         'put_item',
@@ -126,10 +128,11 @@ const createDb = () => {
         'waterfall',
         'grunt',
         'slide',
+        'stone_doors',
       ].map(name => {
         const [name1, volume] = name.split(':');
         return {
-          name,
+          name: name1,
           url: `assets/snd/${name1}.mp3`,
           volume: volume ? parseFloat(volume) : 0.5,
         };

@@ -3,3 +3,5 @@ clang, https://freesound.org/people/morganpurkis/sounds/370245/
 steps, https://freesound.org/people/Nox_Sound/sounds/530589/
 fire_strike, https://freesound.org/people/EminYILDIRIM/sounds/555519/
 slide, https://freesound.org/people/Sethroph/sounds/323418/
+stone_doors, https://freesound.org/people/greyfeather/sounds/712918/
+chime_solve, fl stuido sytrus -> pad -> above clouds

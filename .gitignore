@@ -21,3 +21,4 @@ src-compile/out
 *.log
 dist-standalone/*
 dist/*
+desktop.ini

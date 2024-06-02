@@ -4,6 +4,8 @@ import React, { createRef, useEffect, useReducer } from 'react';
 // const jsPlumb = window.jsPlumb;
 import * as jsPlumb from '@jsplumb/browser-ui';
 import '@jsplumb/browser-ui/css/jsplumbtoolkit.css';
+import expose from './expose';
+import utils from './utils';
 
 export const getPlumb = () => {
   return window.plumb;
@@ -69,6 +71,19 @@ const PlumbDiagram = ({
 
       window.plumb.bind('connection:contextmenu', (...args) => {
         onConnRClick(...args);
+      });
+      window.plumb.bind('connection:click', (...args) => {
+        const conn = args[0];
+        const board = expose.get_state('board');
+        console.log('click conn');
+        if (!board.didPan) {
+          if (utils.is_ctrl()) {
+            board.centerOnNode(conn.sourceId);
+          } else {
+            board.centerOnNode(conn.targetId);
+          }
+        }
+        // onConnRClick(...args);
       });
 
       for (const node of file.nodes) {
