@@ -4,7 +4,7 @@ import { random_id } from 'utils';
 
 const exitListToString = strings => {
   if (strings.length < 2) {
-    return 'There are exits to the ' + strings[0] + '.';
+    return 'There is an exit to the  ' + strings[0] + '.';
   }
   if (strings.length === 2) {
     return 'There are exits to the ' + strings[0] + ' and ' + strings[1] + '.';

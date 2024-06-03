@@ -15,6 +15,7 @@
  * @property {(itemName: string) => void} addItemToInventory
  * @property {(itemName: string) => void} removeItemFromInventory
  * @property {(dir: 'n' | 'e' | 's' | 'w') => void} setHeading
+ * @property {(itemName: string) => string} getItemLabel
  */
 
 const createEngine = () => {
@@ -159,6 +160,10 @@ const createEngine = () => {
       }
     },
     putDownRoomItem(itemName, roomName) {
+      if (!roomName) {
+        roomName = getPlayer().get('curIN2f');
+      }
+
       /** @type {string[] | undefined} */
       const roomItems = getPlayer().get(getRoomItemKey(roomName)) ?? [];
       if (getRoomItemKey(roomName)) {
@@ -167,6 +172,10 @@ const createEngine = () => {
       }
     },
     getRoomItems(roomName) {
+      if (!roomName) {
+        roomName = getPlayer().get('curIN2f');
+      }
+
       const items =
         getPlayer()
           .get(getRoomItemKey(roomName))
@@ -187,6 +196,10 @@ const createEngine = () => {
       return items;
     },
     getRoomItemsText(roomName) {
+      if (!roomName) {
+        roomName = getPlayer().get('curIN2f');
+      }
+
       /** @type {string[]} */
       const items = engine
         .getRoomItems(roomName)
@@ -208,7 +221,7 @@ const createEngine = () => {
         } else {
           result = items[0];
         }
-        return `You see these items on the ground: ${result}.`;
+        return `You see these items: ${result}.`;
       } else {
         return '';
       }
@@ -292,6 +305,10 @@ const createEngine = () => {
           child.style.transform = transform;
         }
       }
+    },
+    getItemLabel(itemName) {
+      const itemTemplate = getDb().items.find(item => item.name === itemName);
+      return itemTemplate?.label ?? '';
     },
   };
   return engine;

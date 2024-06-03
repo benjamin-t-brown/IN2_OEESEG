@@ -99,6 +99,11 @@ const createDb = () => {
         'Caves_StoneTempleEntrance_3',
         'Caves_StoneTempleEntrance_4',
         'Caves_StoneTempleChapel',
+        'Caves_StoneTempleChambers1',
+        'Caves_StoneTempleDorms1',
+        'Caves_StoneTempleMeditation',
+        'Caves_StoneTempleMeditation_2',
+        'Caves_StoneTempleMeditation_3',
         'Caves_Cave3',
         'Caves_RuinedElevator',
         'Caves_CaveChute1',
@@ -125,6 +130,7 @@ const createDb = () => {
         'step_1',
         'step_2',
         'step_3',
+        'step_floor_1',
         'waterfall',
         'grunt',
         'slide',
@@ -207,6 +213,11 @@ const createDb = () => {
         label: 'Tinderbox',
         description:
           'This small box contains all the materials needed to light a well-kindled fire.',
+      },
+      {
+        name: 'chapel_robes',
+        label: 'Chapel Robes',
+        description: 'A clean set of white chapel robes.',
       },
       {
         name: 'canteen_FullWater',
