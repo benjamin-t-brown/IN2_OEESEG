@@ -4,7 +4,7 @@ import { random_id } from 'utils';
 
 const exitListToString = strings => {
   if (strings.length < 2) {
-    return 'There is an exit to the  ' + strings[0] + '.';
+    return 'There is an exit to the ' + strings[0] + '.';
   }
   if (strings.length === 2) {
     return 'There are exits to the ' + strings[0] + ' and ' + strings[1] + '.';
@@ -92,23 +92,23 @@ const BasicOEESEGRoom = ({ rootNode, handleSubmit, handleCancelClick }) => {
       ({ id }) => id === BASIC_ROOM_ARGS_NODE
     );
     basicRoomArgsNode.content = `
-  player.set('args.roomTitle', '${state.title}')
-  player.set('args.nextNodeId', '${BASIC_ROOM_RET_SUB_ROOT_NODE}')
-  player.set('args.nextFileId', player.get('curIN2f'))
-  player.set('args.customExit1', false)
-  player.set('args.northExit', ${
-    state.exits.includes('NORTH') ? '"Caves_Cave1.json"' : 'false'
-  })
-  player.set('args.eastExit', ${
-    state.exits.includes('EAST') ? '"Caves_Cave1.json"' : 'false'
-  })
-  player.set('args.southExit', ${
-    state.exits.includes('SOUTH') ? '"Caves_Cave1.json"' : 'false'
-  })
-  player.set('args.westExit', ${
-    state.exits.includes('WEST') ? '"Caves_Cave1.json"' : 'false'
-  })
-    `;
+player.set('args.roomTitle', '${state.title}');
+player.set('args.nextNodeId', '${BASIC_ROOM_RET_SUB_ROOT_NODE}');
+player.set('args.nextFileId', player.get('curIN2f'));
+player.set('args.customExit1', false);
+player.set('args.northExit', ${
+      state.exits.includes('NORTH') ? '"Caves_Cave1.json"' : 'false'
+    });
+player.set('args.eastExit', ${
+      state.exits.includes('EAST') ? '"Caves_Cave1.json"' : 'false'
+    });
+player.set('args.southExit', ${
+      state.exits.includes('SOUTH') ? '"Caves_Cave1.json"' : 'false'
+    });
+player.set('args.westExit', ${
+      state.exits.includes('WEST') ? '"Caves_Cave1.json"' : 'false'
+    });
+    `.trim();
 
     nodes.find(({ id }) => id === PRIMARY_DESCRIPTION_NODE).content =
       state.examineSurroundings;

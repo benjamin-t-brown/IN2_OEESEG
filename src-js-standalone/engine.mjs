@@ -16,6 +16,9 @@
  * @property {(itemName: string) => void} removeItemFromInventory
  * @property {(dir: 'n' | 'e' | 's' | 'w') => void} setHeading
  * @property {(itemName: string) => string} getItemLabel
+ * @property {() => string} getClass
+ * @property {(className: string) => boolean} isClass
+ * @property {() => void} saveClassLocation
  */
 
 const createEngine = () => {
@@ -309,6 +312,22 @@ const createEngine = () => {
     getItemLabel(itemName) {
       const itemTemplate = getDb().items.find(item => item.name === itemName);
       return itemTemplate?.label ?? '';
+    },
+    getClass() {
+      return getPlayer().get('vars.class');
+    },
+    isClass(className) {
+      /** @type {any} */
+      const globalWindow = window;
+      return (
+        globalWindow.player.get('vars.class').toLowerCase() ===
+        className.toLowerCase()
+      );
+    },
+    saveClassLocation() {
+      const classLocation = getPlayer().get('curIN2f');
+      const className = this.getClass();
+      getPlayer().set('classLocations.' + className, classLocation);
     },
   };
   return engine;

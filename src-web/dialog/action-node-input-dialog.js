@@ -7,12 +7,19 @@ import MonacoEditor from 'react-monaco-editor';
 import { useKeyboardEventListener } from 'hooks';
 import utils from 'utils';
 
-const ActionNodeInputDialog = ({ node, onConfirm, onCancel, hide }) => {
+const ActionNodeInputDialog = ({
+  node,
+  onConfirm,
+  onCancel,
+  declarations,
+  hide,
+}) => {
   const [value, setValue] = React.useState(node.content);
   const [keyboardShortcutsEnabled, setKeyboardShortcutsEnabled] =
     React.useState(false);
   const [confirmLeave, setConfirmLeave] = React.useState(false);
   const [disableLeave, setDisableLeave] = React.useState(false);
+  const [declValue, setDeclValue] = React.useState(declarations?.[0]);
 
   const handleInputChange = value => {
     setValue(value);
@@ -58,6 +65,11 @@ const ActionNodeInputDialog = ({ node, onConfirm, onCancel, hide }) => {
       _cancel();
     }
   }, [hide, onCancel, confirmLeave, disableLeave]);
+
+  const handleDeclClick = ({ variable, value }) => {
+    notify(`Copied '$${variable}'`);
+    navigator.clipboard.writeText(`$${variable}`);
+  };
 
   useEffect(() => {
     window.current_confirm = handleConfirmClick;
@@ -132,6 +144,51 @@ const ActionNodeInputDialog = ({ node, onConfirm, onCancel, hide }) => {
             {expose.get_state('main').current_file.name.slice(0, -5)}/{node.id}
           </span>
         </div>
+        {declarations?.length ? (
+          <div>
+            <div
+              style={{
+                margin: '6px 0',
+                background: 'rgba(0, 0, 0, 0.5)',
+              }}
+            >
+              Decl: <span>{declValue?.variable}</span> ={' '}
+              <span>{declValue?.value}</span>
+            </div>
+            <div
+              style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                margin: '6px 0',
+              }}
+            >
+              {declarations
+                .sort((a, b) => {
+                  return a.variable.localeCompare(b.variable);
+                })
+                .map(({ variable, value }) => {
+                  return (
+                    <div
+                      key={variable}
+                      style={{
+                        background: 'rgb(131 108 40)',
+                        cursor: 'pointer',
+                        padding: '6px',
+                        borderRadius: '32px',
+                        margin: '2px',
+                      }}
+                      onClick={() => handleDeclClick({ variable, value })}
+                      onMouseOver={() => setDeclValue({ variable, value })}
+                    >
+                      <span style={{ color: 'white', userSelect: 'none' }}>
+                        {variable}
+                      </span>
+                    </div>
+                  );
+                })}
+            </div>
+          </div>
+        ) : null}
         <div
           style={{
             display: 'flex',
@@ -139,7 +196,7 @@ const ActionNodeInputDialog = ({ node, onConfirm, onCancel, hide }) => {
         >
           <MonacoEditor
             width="800"
-            height="600"
+            height="400"
             language="javascript"
             theme="vs-dark"
             value={value}

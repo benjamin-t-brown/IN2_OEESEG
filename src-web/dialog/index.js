@@ -123,13 +123,19 @@ exp.showTextNodeInput = function ({ node, onConfirm, onCancel }) {
   );
 };
 
-exp.showActionNodeInput = function ({ node, onConfirm, onCancel }) {
+exp.showActionNodeInput = function ({
+  node,
+  declarations,
+  onConfirm,
+  onCancel,
+}) {
   show();
   ReactDOM.render(
     <ActionNodeInputDialog
       node={node}
       onCancel={onCancel}
       onConfirm={onConfirm}
+      declarations={declarations}
       hide={exp.hide}
     />,
     document.getElementById('dialog')

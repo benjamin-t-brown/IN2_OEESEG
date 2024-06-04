@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import css from 'css';
 import BasicOEESEGRoom from 'templates/BasicOEESEGRoom';
+import FUNCSelectItem from 'templates/FUNCSelectItem';
 
 const TemplateCreateDialog = ({ node, type, onConfirm, onCancel, hide }) => {
   const handleCancelClick = (window.current_cancel = () => {
@@ -11,6 +12,29 @@ const TemplateCreateDialog = ({ node, type, onConfirm, onCancel, hide }) => {
   const handleSubmit = (newSet, location, replaceNodeIds) => {
     onConfirm(newSet, location, replaceNodeIds);
     hide();
+  };
+
+  const getBody = () => {
+    switch (type) {
+      case 'BasicOEESEGRoom': {
+        return (
+          <BasicOEESEGRoom
+            handleSubmit={handleSubmit}
+            handleCancelClick={handleCancelClick}
+            rootNode={node}
+          />
+        );
+      }
+      case 'FUNCSelectItem': {
+        return (
+          <FUNCSelectItem
+            handleSubmit={handleSubmit}
+            handleCancelClick={handleCancelClick}
+            rootNode={node}
+          />
+        );
+      }
+    }
   };
 
   return (
@@ -39,11 +63,7 @@ const TemplateCreateDialog = ({ node, type, onConfirm, onCancel, hide }) => {
           color: css.colors.TEXT_LIGHT,
         }}
       >
-        <BasicOEESEGRoom
-          handleSubmit={handleSubmit}
-          handleCancelClick={handleCancelClick}
-          rootNode={node}
-        />
+        {getBody()}
       </div>
     </div>
   );

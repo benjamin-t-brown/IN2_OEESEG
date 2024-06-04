@@ -337,6 +337,25 @@ module.exports = {
   getPlumb() {
     return window.plumb;
   },
+
+  getDeclsForFile(file) {
+    return file.nodes
+      .filter(node => {
+        return node.type === 'declaration';
+      })
+      .reduce((agg, node) => {
+        for (const line of node.content.split('\n')) {
+          const match = line.match(/VAR_([\w\d]*)\s*=\s*(.*)/);
+          if (match) {
+            agg.push({
+              variable: 'VAR_' + match[1],
+              value: match[2],
+            });
+          }
+        }
+        return agg;
+      }, []);
+  },
 };
 
 window.utils = module.exports;

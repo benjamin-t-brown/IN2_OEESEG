@@ -6,8 +6,15 @@ import utils from 'utils';
 import dialog from 'dialog';
 import { notify } from 'notifications';
 import { getNode } from 'board';
+import { getClassCheckForkTemplate } from 'templates/ClassCheckFork';
 
 const exp = {};
+
+const templates = [
+  'createBasicOeesegRoom',
+  'createFuncSelectItem',
+  'createClassPassFail',
+];
 
 class Context extends expose.Component {
   constructor(props) {
@@ -57,6 +64,8 @@ class Context extends expose.Component {
       case 'Create Sub Root': {
         return 'root';
       }
+      case 'Create Func Select Item':
+      case 'Create Class Pass Fail':
       case 'Create Basic Oeeseg Room': {
         return 'template';
       }
@@ -72,7 +81,7 @@ class Context extends expose.Component {
     }
   }
 
-  renderItem(name, cb) {
+  renderItem(identifier, name, cb) {
     return (
       <div
         key={name}
@@ -100,7 +109,7 @@ class Context extends expose.Component {
         <div
           className="no-select"
           style={{
-            color: name.includes('Create Basic')
+            color: templates.includes(identifier)
               ? css.colors.HIGHLIGHT_TEXT_DARK
               : css.colors.TEXT,
           }}
@@ -122,7 +131,7 @@ class Context extends expose.Component {
       let name = i.split(/(?=[A-Z])/).join(' ');
       name = name.slice(0, 1).toUpperCase() + name.slice(1);
       elems.push(
-        this.renderItem(name, this.props.cbs[i].bind(null, this.props.node))
+        this.renderItem(i, name, this.props.cbs[i].bind(null, this.props.node))
       );
     }
 
@@ -177,14 +186,25 @@ exp.hide = function () {
   );
 };
 
+let lastMousePosDiagram = null;
+export const getMouseDiagramPosContext = () => {
+  return lastMousePosDiagram;
+};
+
 exp.show_context_menu = function (board, elem) {
   if (utils.is_ctrl()) {
     return;
   }
   board.disable_context = true;
   const { x, y } = utils.get_mouse_pos();
+  lastMousePosDiagram = utils.get_mouse_pos_rel_diagram();
   const cbs = {};
-  console.log('context', elem);
+  console.log(
+    'context',
+    lastMousePosDiagram,
+    elem,
+    utils.getDeclsForFile(board.file)
+  );
   const file_node = getNode(board.file, elem?.id) ?? {};
   if (file_node.type !== 'next_file' && board.nodeCanHaveChild(file_node)) {
     if (file_node.type === 'choice') {
@@ -298,17 +318,36 @@ exp.show_context_menu = function (board, elem) {
     cbs.createBasicOeesegRoom = function () {
       dialog.showTemplateCreateDialog({
         node: null,
-        type: 'BasicOeesegRoom',
+        type: 'BasicOEESEGRoom',
         onConfirm: (content, location, replaceNodeIds) => {
           expose
             .get_state('board')
             .pasteSelection(content, location, replaceNodeIds);
           this.saveFile();
         },
-        onCancel: () => {
-          // dialog.set_shift_req(false);
-        },
+        onCancel: () => {},
       });
+    }.bind(board);
+    cbs.createFuncSelectItem = function () {
+      dialog.showTemplateCreateDialog({
+        node: null,
+        type: 'FUNCSelectItem',
+        onConfirm: (content, location, replaceNodeIds) => {
+          expose
+            .get_state('board')
+            .pasteSelection(content, location, replaceNodeIds);
+          this.saveFile();
+        },
+        onCancel: () => {},
+      });
+    }.bind(board);
+    cbs.createClassPassFail = function () {
+      const { template, location, replaceNodeIds } =
+        getClassCheckForkTemplate();
+      expose
+        .get_state('board')
+        .pasteSelection(template, location, replaceNodeIds);
+      this.saveFile();
     }.bind(board);
   }
 

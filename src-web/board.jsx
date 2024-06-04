@@ -2,7 +2,7 @@ import React, { createRef, useEffect } from 'react';
 import injectSheet from 'react-jss';
 import expose from 'expose';
 import utils, { getPlumb } from 'utils';
-import context from 'context';
+import context, { getMouseDiagramPosContext } from 'context';
 import dialog from 'dialog';
 import css from 'css';
 import DiagramNode from 'diagram-node';
@@ -396,6 +396,9 @@ class Board extends expose.Component {
         dialog.set_shift_req(true);
         dialog.showActionNodeInput({
           node: file_node,
+          declarations: !['declaration'].includes(file_node.type)
+            ? utils.getDeclsForFile(this.file)
+            : [],
           onConfirm: content => {
             dialog.set_shift_req(false);
             this.setNodeContent(file_node, content);
@@ -444,14 +447,18 @@ class Board extends expose.Component {
       const children = this.children || [];
 
       for (const parent of parents) {
-        document
-          .getElementById(parent.id)
-          .classList.remove('node-highlight-parent');
+        if (parent?.id) {
+          document
+            .getElementById(parent.id)
+            ?.classList.remove('node-highlight-parent');
+        }
       }
       for (const child of children) {
-        document
-          .getElementById(child.id)
-          .classList.remove('node-highlight-child');
+        if (child?.id) {
+          document
+            .getElementById(child.id)
+            ?.classList.remove('node-highlight-child');
+        }
       }
     };
 
@@ -718,6 +725,10 @@ class Board extends expose.Component {
       // this.scheduleRebuild();
     };
 
+    state.getScale = () => {
+      return 1 / this.zoom;
+    };
+
     utils.set_on_copy(() => {
       if (!dialog.is_visible()) {
         this.copySelection();
@@ -947,7 +958,7 @@ class Board extends expose.Component {
       const parentElem = document.getElementById(parent.id);
       rect = parentElem?.getBoundingClientRect() ?? { height: 100 };
     }
-    const mouseCoords = utils.get_mouse_pos_rel_diagram();
+    const mouseCoords = getMouseDiagramPosContext();
 
     let x = 0;
     let y = 0;
@@ -955,8 +966,8 @@ class Board extends expose.Component {
       x = parseInt(parent.left);
       y = parseInt(parent.top) + rect.height + 30;
     } else {
-      x = mouseCoords.x;
-      y = mouseCoords.y;
+      x = mouseCoords.x * this.state.getScale();
+      y = mouseCoords.y * this.state.getScale();
     }
 
     const node = {
