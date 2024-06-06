@@ -304,6 +304,10 @@ const createPlayer = () => {
 
     set(path, val) {
       if (path === 'curIN2n') {
+        const existingNode = this.get('curIN2n');
+        if (existingNode) {
+          this.set('lasIN2n', existingNode);
+        }
         this.set('nodes.' + val, true);
       }
       if (path === 'curIN2f') {

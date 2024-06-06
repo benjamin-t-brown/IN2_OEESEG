@@ -7,3 +7,5 @@ stone_doors, https://freesound.org/people/greyfeather/sounds/712918/
 chime_solve, fl stuido sytrus -> pad -> above clouds
 stone_lid_fall, https://freesound.org/people/Thalamus_Lab/sounds/232102/ + https://freesound.org/people/Breviceps/sounds/457531/
 glow, https://freesound.org/people/Burning_Cicada_Ltd./sounds/497415/
+portal, descent 1 sound door4 open and close on top of each other
+portal_buzz, vr_portal_buzz from regem ludos sounds

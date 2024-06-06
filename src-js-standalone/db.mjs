@@ -47,8 +47,8 @@ const createDb = () => {
   const PLAYER_KEY_INVENTORY_EXAMINE_EVENT_NAME =
     'INVENTORY_EXAMINE_EVENT_NAME';
 
-  const PICK_UP_EVENTS_FILE = 'PickUpEvents.json';
-  const INVENTORY_EXAMINE_EVENTS_FILE = 'InventoryExamineEvents.json';
+  const PICK_UP_EVENTS_FILE = 'FUNC_PickUpEvents.json';
+  const INVENTORY_EXAMINE_EVENTS_FILE = 'FUNC_InventoryExamineEvents.json';
 
   const getPickUpEventOnceKey = itemEventName => {
     return 'vars.events.pickup.' + itemEventName;
@@ -144,6 +144,8 @@ const createDb = () => {
         'stone_doors',
         'stone_lid_fall',
         'glow',
+        'portal',
+        'portal_buzz',
       ].map(name => {
         const [name1, volume] = name.split(':');
         return {
@@ -238,7 +240,28 @@ const createDb = () => {
       {
         name: 'chapel_robes',
         label: 'Chapel Robes',
-        description: 'A clean set of white chapel robes.',
+        description: 'Simple and unadorned.',
+        onPickUp: player => {
+          console.log('PICK UP CHAPEL ROBES');
+          const itemEventName = 'chapel_robes';
+          player.set(PLAYER_KEY_PICK_UP_EVENT_NAME, itemEventName);
+          const onceKey = getPickUpEventOnceKey(itemEventName);
+          if (!player.get(onceKey)) {
+            return {
+              file: PICK_UP_EVENTS_FILE,
+              cb: () => {
+                player.set(onceKey);
+              },
+            };
+          }
+          return undefined;
+        },
+      },
+      {
+        name: 'cleric_chains_key',
+        label: 'Small Key',
+        description:
+          "Too small to lock a door; maybe it's for a chest or padlock....",
       },
       {
         name: 'canteen_FullWater',
@@ -255,6 +278,12 @@ const createDb = () => {
           player.set('flags.waterfall_knowledge', true);
           return undefined;
         },
+      },
+      {
+        name: 'charge_crystal_powered',
+        label: 'Charge Crystal',
+        description:
+          'A diamond-shaped crystal that fits in the palm of your hand.  It glows a soft blue.',
       },
     ],
   };

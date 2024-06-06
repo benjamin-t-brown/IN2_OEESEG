@@ -37,6 +37,7 @@ if (!strProto.replaceAll) {
 const CURRENT_NODE_VAR = 'curIN2n';
 const CURRENT_FILE_VAR = 'curIN2f';
 const LAST_FILE_VAR = 'lasIN2f';
+const LAST_NODE_VAR = 'lasIN2n';
 let includeDebugStatements = true;
 let globalDeclarations = {};
 
@@ -102,6 +103,13 @@ class File {
         return this.getNode(link.to);
       })
       .sort((a, b) => {
+        if (a.type === 'switch_default') {
+          return 1;
+        }
+        if (b.type === 'switch_default') {
+          return -1;
+        }
+
         const y1 = parseFloat(a.left);
         const y2 = parseFloat(b.left);
         if (y1 < y2) {
@@ -507,6 +515,7 @@ class Compiler {
         let ret = `// ${node.type}\n`;
         ret += `scope.${node.id} = () => {\n`;
         ret += `    player.set(CURRENT_NODE_VAR, '${node.id}' );\n`;
+
         for (let i in children) {
           const child = children[i];
           if (
@@ -620,15 +629,17 @@ class Compiler {
             ret +=
               `    if(condition){\n` +
               `        player.set(CURRENT_NODE_VAR, '${child.id}');\n` +
-              `        var text = ${QUOTE}${child.content}${QUOTE};\n` +
-              `        core.say(text, scope.${child2.id});\n` +
+              `        scope.${child2.id}()` +
+              // `        var text = ${QUOTE}${child.content}${QUOTE};\n` +
+              // `        core.say(text, scope.${child2.id});\n` +
               `    }\n`;
           } else if (child.type === 'fail_text') {
             ret +=
               `    if(!condition){\n` +
               `        player.set(CURRENT_NODE_VAR, '${child.id}');\n` +
-              `        var text = ${QUOTE}${child.content}${QUOTE};\n` +
-              `        core.say(text, scope.${child2.id});\n` +
+              `        scope.${child2.id}()` +
+              // `        var text = ${QUOTE}${child.content}${QUOTE};\n` +
+              // `        core.say(text, scope.${child2.id});\n` +
               `    }\n`;
           }
         }

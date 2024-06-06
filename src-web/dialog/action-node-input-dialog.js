@@ -201,7 +201,6 @@ const ActionNodeInputDialog = ({
             theme="vs-dark"
             value={value}
             editorDidMount={(editor, monaco) => {
-              console.log('editorDidMount', editor);
               editor.focus();
               // editor.updateOptions({ autoClosingBrackets: false });
             }}
@@ -216,7 +215,6 @@ const ActionNodeInputDialog = ({
               wordWrap: true,
             }}
             onChange={handleInputChange}
-            // editorDidMount={::this.editorDidMount}
           />
         </div>
         <div
