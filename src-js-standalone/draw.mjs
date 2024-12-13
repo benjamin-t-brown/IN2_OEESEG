@@ -1,7 +1,7 @@
 /**
  * @typedef Draw
  * @property {HTMLCanvasElement} canvas;
- * @property {(id: string, cache: Record<string, any>) => Promise<void>} init
+ * @property {(id: string, cache: Record<string, any> | undefined) => Promise<void>} init
  * @property {(picName: string) => void} drawBackground
  * @property {(itemName: string, x: number, y: number) => void} drawItem
  * @property {(text: string, color?: string) => void} renderLine
@@ -10,12 +10,20 @@
  * @property {(choices: DrawLineChoice[]) => void} showButtons
  * @property {() => void} hideButtons
  * @property {() => Record<string, string>} getColors
+ * @property {(args: ConfirmArgs) => void} showConfirm
+ * @property {() => void} hideConfirm
+ * @property {() => boolean} isConfirmVisible
  */
 /**
  * @typedef DrawLineChoice
  * @property {string} text
- * @property {string} color
+ * @property {string} [color]
  * @property {() => void} onClick
+ */
+/**
+ * @typedef ConfirmArgs
+ * @property {string} text
+ * @property {() => void} onConfirm
  */
 
 const createDraw = () => {
@@ -27,6 +35,12 @@ const createDraw = () => {
   let numChoices = 0;
   let selectedChoiceIndex = 0;
   let isSelecting = false;
+  let isKeypressDisabledFromConfirmWindow = false;
+
+  const localGetLabels = () => {
+    //@ts-ignore
+    return window.getLabels();
+  };
 
   const getDocument = () => {
     /** @type {any} */
@@ -53,6 +67,8 @@ const createDraw = () => {
 
   /** @type {string[]} */
   let lines = [];
+
+  let confirmKeyListener = ev => {};
 
   /**
    * @param {string} url
@@ -148,7 +164,7 @@ const createDraw = () => {
     // @ts-ignore
     const lib = window.getLib();
 
-    if (isSelecting) {
+    if (isSelecting || isKeypressDisabledFromConfirmWindow) {
       return;
     }
 
@@ -218,7 +234,7 @@ const createDraw = () => {
         /** @type {any} */
         const localCtx = canvas.getContext('2d');
         ctx = localCtx;
-        ctx.imageSmoothingEnabled = false;
+        ctx.imageSmoothingEnabled = true;
       }
 
       /** @type {any} */
@@ -382,6 +398,72 @@ const createDraw = () => {
         COLOR_ACCENT_1,
         COLOR_BG_3,
       };
+    },
+    showConfirm({ text, onConfirm }) {
+      if (draw.isConfirmVisible()) {
+        return;
+      }
+
+      // @ts-ignore
+      const lib = window.getLib();
+
+      const confirmWindow = document.getElementById('confirm-window');
+      const confirmWindowText = document.getElementById('confirm-window-text');
+      const confirmWindowButtons = document.getElementById(
+        'confirm-window-buttons'
+      );
+      if (confirmWindow && confirmWindowText && confirmWindowButtons) {
+        confirmWindowText.innerHTML = text;
+
+        const cancelButton = document.createElement('button');
+        cancelButton.innerText =
+          localGetLabels().Button.CANCEL +
+          ' ' +
+          (lib?.getCancelKey().label ?? '');
+        cancelButton.onclick = () => {
+          draw.hideConfirm();
+        };
+
+        const confirmButton = document.createElement('button');
+        confirmButton.innerText =
+          localGetLabels().Button.CONFIRM +
+          ' ' +
+          (lib?.getConfirmKey().label ?? '');
+        confirmButton.onclick = () => {
+          draw.hideConfirm();
+          onConfirm();
+        };
+
+        confirmKeyListener = ev => {
+          if (
+            lib?.isEscapeKey(ev.key) ||
+            lib?.isCancelKey() ||
+            ev.key === 'Escape'
+          ) {
+            cancelButton.click();
+          } else if (lib?.isConfirmKey() || ev.key === 'x') {
+            confirmButton.click();
+          }
+        };
+        window.addEventListener('keydown', confirmKeyListener);
+
+        confirmWindowButtons.innerHTML = '';
+        confirmWindowButtons.appendChild(cancelButton);
+        confirmWindowButtons.appendChild(confirmButton);
+        confirmWindow.style.display = 'flex';
+        isKeypressDisabledFromConfirmWindow = true;
+      }
+    },
+    hideConfirm() {
+      const confirmWindow = document.getElementById('confirm-window');
+      if (confirmWindow) {
+        confirmWindow.style.display = 'none';
+        isKeypressDisabledFromConfirmWindow = false;
+        window.removeEventListener('keydown', confirmKeyListener);
+      }
+    },
+    isConfirmVisible() {
+      return isKeypressDisabledFromConfirmWindow;
     },
   };
   return draw;

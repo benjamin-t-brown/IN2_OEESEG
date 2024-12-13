@@ -1,0 +1,129 @@
+.root {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  font-size: 1rem;
+}
+
+.sub-root {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: calc(100% - 24px);
+  width: calc(100% - 24px);
+  max-height: 800px;
+  position: relative;
+}
+
+.left-zone {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 514px;
+  height: 100%;
+}
+.right-zone {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: calc(100% - 514px);
+  max-width: 514px;
+  height: 100%;
+}
+
+canvas {
+  border: 1px solid var(--color-bg-1);
+}
+
+.canvas-area {
+  width: 100%;
+  height: 65%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+.ui-area {
+  width: 100%;
+  height: 35%;
+  display: flex;
+  justify-content: center;
+}
+.text-area {
+  width: 100%;
+  height: 65%;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  background-color: var(--color-bg-1);
+  scrollbar-color: var(--color-bg-1) var(--color-bg-2);
+}
+.buttons-area {
+  width: 100%;
+  height: 35%;
+  background-color: var(--color-bg-2);
+}
+
+.confirm-window-root {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  font-size: 1rem;
+  font-family: var(--default-font);
+  color: var(--color-font-0);
+}
+.confirm-window-sub-root {
+  width: 50%;
+  height: 25%;
+  background-color: var(--color-bg-2);
+}
+.confirm-window-content {
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  align-items: center;
+  height: calc(100% - 32px);
+}
+.confirm-window-text {
+  width: 100%;
+}
+.confirm-window-buttons {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  margin-top: 16px;
+  width: 100%;
+}
+@media (min-width: 1475px) {
+  .confirm-window-root {
+    font-size: 1.3rem;
+  }
+}
+
+@media (min-width: 1475px) {
+  .root {
+    font-size: 1.3rem;
+  }
+  .left-zone {
+    width: calc(514px * 2);
+  }
+  .right-zone {
+    width: calc(100% - 514px * 2);
+  }
+  .sub-root {
+    max-height: 1200px;
+  }
+}

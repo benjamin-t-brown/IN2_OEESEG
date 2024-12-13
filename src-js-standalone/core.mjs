@@ -22,6 +22,7 @@ window.IN2 = true;
  * @property {boolean} dontTriggerOnce
  */
 
+/** @type {() => import("./draw.mjs").Draw} */
 const getDraw = () => {
   /** @ts-ignore */
   return window.draw;
@@ -73,7 +74,7 @@ const addChoiceLines = (choices, eventCallback) => {
   getDraw().showButtons(
     choices.map((c, i) => {
       return {
-        text: i + 1 + '. ' + c.t,
+        text: '<div class="line-number">' + (i + 1) + '.</div> ' + c.t,
         onClick: () => {
           eventCallback({
             which: `${i + 1}`.charCodeAt(0),
@@ -99,9 +100,30 @@ const createCore = () => {
     eventCallback = cb;
   };
 
+  const localGetLabels = () => {
+    //@ts-ignore
+    return window.getLabels();
+  };
+
   const onKeyOrMouseEvent = ev => {
     const lib = getLib();
-    if (isKeypressDisabled || lib?.isSkipKey(ev.key)) {
+    if (lib?.isEscapeKey(ev.key) || ev.key === 'Escape') {
+      getDraw().showConfirm({
+        text: localGetLabels().CONFIRM_LEAVE,
+        onConfirm: () => {
+          if (lib) {
+            lib.notifyGameCancelled();
+          } else {
+            window.location.reload();
+          }
+        },
+      });
+    }
+    if (
+      isKeypressDisabled ||
+      getDraw().isConfirmVisible() ||
+      lib?.isSkipKey(ev.key)
+    ) {
       return;
     }
     eventCallback(ev);
@@ -310,7 +332,7 @@ const load = (window.load = async function () {
     return;
   }
   loading = true;
-  await Promise.all([getDraw().init('canv'), getSound().init()]);
+  await Promise.all([getDraw().init('canv', undefined), getSound().init()]);
   loading = false;
   loaded = true;
   for (const resolve of loadingPromises) {
@@ -324,9 +346,8 @@ window.main = async function () {
   _core.init();
   _player.init();
   await load();
-  // draw inits images and sounds
-
   getEngine().init();
+
   // in2 places the 'run' function on the window object
   /** @ts-ignore */
   run();

@@ -1,383 +1,244 @@
 <html>
-  <head>
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
-    />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <link rel="icon" type="image/png" href="assets/favicon.png" />
-    <title>OEESEG: IN2 Standalone</title>
-    <style>
-      @font-face {
-        font-family: Chicago;
-        src: url(assets/font/Chicago.ttf);
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
+  <link rel="stylesheet" href="style.css" />
+  <title>OEESEG: IN2 Standalone</title>
+  <style>
+    @font-face {
+      font-family: MainFont;
+      src: url(assets/font/Jura-Regular.ttf);
+    }
+
+    :root {
+      --default-canvas-width: 514px;
+      --default-canvas-height: 300px;
+      --default-text-zone-width: 600px;
+      --canvas-picture-border-size: 40px;
+      --color-bg-0: #000;
+      --color-bg-1: #212121;
+      --color-bg-2: #494949;
+      --color-bg-3: #8d8d8d;
+      --color-accent-1: #005784;
+      --color-accent-2: #7ed7ff;
+      --color-accent2-1: #A46422;
+      --color-accent2-2: #FAB40B;
+      --color-font-0: #fff;
+      --color-font-1: #ddd;
+      --default-font: MainFont, monospace;
+      --ui-zone-height: 100px;
+    }
+
+    body {
+      background: var(--color-bg-0);
+      margin: 0;
+      overflow: hidden;
+      image-rendering: auto;
+      image-rendering: crisp-edges;
+      image-rendering: pixelated;
+    }
+
+    .outer-border {
+      --border-offset: 16px;
+      --border-offset-half: -8px;
+      box-sizing: border-box;
+      border: 40px solid black;
+      border-image: url(assets/img/border2.png) 40 round;
+      position: absolute;
+      left: 0;
+      top: 0;
+      transform: translate(var(--border-offset-half), var(--border-offset-half));
+      width: calc(100% + var(--border-offset));
+      height: calc(100% + var(--border-offset));
+      flex: 0 0 100%;
+      pointer-events: none;
+      touch-action: none;
+    }
+
+    #compass {
+      position: relative;
+      border-radius: 50%;
+      border: 4px inset var(--color-accent2-1);
+      background: transparent;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      transition: transform 200ms ease-in-out;
+      transform: rotate(0deg);
+      width: calc((var(--ui-zone-height) - 16px));
+      height: calc((var(--ui-zone-height) - 16px));
+      font-size: 1.5rem;
+    }
+
+    #compass>div {
+      color: white;
+      font-family: 'Courier New', Courier, monospace;
+      display: inline-block;
+      line-height: 0px;
+      transition: transform 200ms ease-in-out;
+    }
+
+    #compass div:nth-child(1) {
+      transform: translate(0px, -28px) rotate(0deg);
+      color: var(--color-accent-2);
+    }
+
+    #compass div:nth-child(2) {
+      transform: translate(28px, 0px) rotate(0deg);
+    }
+
+    #compass div:nth-child(3) {
+      transform: translate(0px, 28px) rotate(0deg);
+    }
+
+    #compass div:nth-child(4) {
+      transform: translate(-28px, 0px) rotate(0deg);
+    }
+
+    .line {
+      font-family: var(--default-font);
+      color: var(--color-font-0);
+      margin: 4px;
+      min-height: 1px;
+    }
+
+    .line-highlight {
+      color: var(--color-accent-2);
+    }
+
+    .line-press-any-key {
+      color: var(--color-accent2-2);
+      cursor: default;
+      user-select: none;
+    }
+
+    .line-number {
+      display: inline-block;
+      width: 32px;
+    }
+
+    .inline-arrow {
+      max-width: 1rem;
+      margin-left: 0.25rem;
+      vertical-align: text-top;
+    }
+
+    img.inline-arrow-NORTH {
+      transform: rotate(180deg);
+    }
+
+    img.inline-arrow-EAST {
+      transform: rotate(270deg);
+    }
+
+    img.inline-arrow-SOUTH {
+      transform: rotate(0deg);
+    }
+
+    img.inline-arrow-WEST {
+      transform: rotate(90deg);
+    }
+
+    @media (min-width: 1475px) {
+      .inline-arrow {
+        max-width: 1.3rem;
+        margin-left: 0.25rem;
+        margin-right: 0.2rem;
+        vertical-align: text-top;
+      }
+    }
+
+    button {
+      font-size: inherit;
+      font-family: var(--default-font);
+      color: var(--color-font-0);
+      background-color: var(--color-bg-1);
+      text-align: left;
+      border: 1px solid var(--color-bg-3);
+      padding: 4px;
+      margin: 4px;
+      display: block;
+      width: calc(100% - 8px);
+      cursor: pointer;
+    }
+
+    button.button-highlight {
+      border-color: var(--color-accent2-2);
+    }
+
+    button.button-selected {
+      border-color: var(--color-accent2-1);
+      filter: brightness(0.8);
+    }
+
+    @media screen and (max-height: 475px) {
+      #compass {
+        width: calc((var(--ui-zone-height) - 16px) / 2);
+        height: calc((var(--ui-zone-height) - 16px) / 2);
+        font-size: 0.8rem;
       }
 
-      :root {
-        --default-canvas-width: 514px;
-        --default-canvas-height: 300px;
-        --default-text-zone-width: 475px;
-        --canvas-picture-border-size: 40px;
-        --color-bg-0: #000;
-        --color-bg-1: #212121;
-        --color-bg-2: #494949;
-        --color-bg-3: #8d8d8d;
-        --color-accent-1: #005784;
-        --color-accent-2: #7ed7ff;
-        --color-accent2-1: #A46422;
-        --color-accent2-2: #FAB40B;
-        --color-font-0: #fff;
-        --color-font-1: #ddd;
-        --default-font: Chicago, monospace;
-        --ui-zone-height: 100px;
-      }
-
-      body {
-        background: var(--color-bg-0);
-        margin: 0;
-        overflow: hidden;
-        image-rendering: auto;
-        image-rendering: crisp-edges;
-        image-rendering: pixelated;
-      }
-
-      .center {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-        height: 100%;
-      }
-
-      .column {
-        max-width: calc(2 * var(--canvas-picture-border-size) + var(--default-canvas-width) + var(--default-text-zone-width));
-        max-height: 900px;
-        width: 100vw;
-        height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        position: relative;
-      }
-
-      .outer-border {
-        --border-offset: 16px;
-        --border-offset-half: -8px;
-        box-sizing: border-box;
-        border: 40px solid black;
-        border-image: url(assets/img/border2.png) 40 round;
-        position: absolute;
-        left: 0;
-        top: 0;
-        transform: translate(var(--border-offset-half), var(--border-offset-half));
-        width: calc(100% + var(--border-offset));
-        height: calc(100% + var(--border-offset));
-        flex: 0 0 100%;
-        pointer-events: none;
-        touch-action: none;
-      }
-
-      #canvas-area {
-        container-type: size;
-        width: calc(2 * var(--canvas-picture-border-size) + var(--default-canvas-width));
-        height: 100%;
-        max-width: calc(2 * var(--canvas-picture-border-size) + var(--default-canvas-width)) max-height: calc(2 * var(--canvas-picture-border-size) + var(--default-canvas-height));
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-        position: relative;
-      }
-
-      #interact-area {
-        height: 100%;
-        max-width: var(--default-text-zone-width);
-      }
-
-      #canv-container {
-        background: black;
-        display: block;
-        width: calc(100cqw - 2 * var(--canvas-picture-border-size));
-        max-height: var(--default-canvas-height);
-        border: var(--canvas-picture-border-size) solid var(--color-bg-0);
-        border-image: url(assets/img/border3.png) 13 round;
-        display: flex;
-        justify-content: center;
-      }
-
-      #canv {
-        width: 100%;
-        height: 100%;
-      }
-
-      /* This is the odd case, where the screen is taller than it is wide */
-      /* @media (max-aspect-ratio: 9/11) {
-          #canv {
-            display: block;
-            height: 100cqh;
-            max-width: var(--default-canvas-width);
-            width: unset;
-            max-height: unset;
-            border: 1px solid green;
-          }
-          .column {
-            max-width: var(--default-canvas-width);
-            width: 100%;
-            height: calc(100% - 100px);
-            display: flex;
-            justify-content: flex-start;
-            align-items: center;
-            flex-direction: column;
-            margin-top: 100px;
-          }
-        } */
       #ui-zone {
         display: flex;
         justify-content: center;
-        height: var(--ui-zone-height);
-      }
-
-      #text-zone {
-        height: 60%;
-        overflow-y: auto;
-        scroll-behavior: smooth;
-        background-color: var(--color-bg-1);
-        font-size: 1rem;
-      }
-
-      #buttons-zone {
-        font-size: 1rem;
-        height: 40%;
-        overflow-y: auto;
-        background-color: var(--color-bg-2);
-      }
-
-      #compass {
-        position: relative;
-        border-radius: 50%;
-        border: 4px solid var(--color-accent2-1);
-        background: transparent;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-        transition: transform 200ms ease-in-out;
-        transform: rotate(0deg);
-        width: calc((var(--ui-zone-height) - 16px));
-          height: calc((var(--ui-zone-height) - 16px));
-        font-size: 1.5rem;
-      }
-
-      #compass>div {
-        color: white;
-        font-family: 'Courier New', Courier, monospace;
-        display: inline-block;
-        line-height: 0px;
-        transition: transform 200ms ease-in-out;
-      }
-
-      #compass div:nth-child(1) {
-        transform: translate(0px, -28px) rotate(0deg);
-        color: var(--color-accent-2);
-      }
-
-      #compass div:nth-child(2) {
-        transform: translate(28px, 0px) rotate(0deg);
-      }
-
-      #compass div:nth-child(3) {
-        transform: translate(0px, 28px) rotate(0deg);
-      }
-
-      #compass div:nth-child(4) {
-        transform: translate(-28px, 0px) rotate(0deg);
-      }
-
-      .line {
-        font-family: var(--default-font);
-        color: var(--color-font-0);
-        margin: 4px;
-        min-height: 1px;
-      }
-
-      .line-highlight {
-        color: var(--color-accent-2);
-      }
-      .line-press-any-key {
-        color: var(--color-accent2-2);
-        cursor: default;
-        user-select: none;
+        height: calc(var(--ui-zone-height) / 2);
       }
 
       .inline-arrow {
-        max-width: 1rem;
-        margin-left: 0.25rem;
-        vertical-align: text-top;
+        max-width: 0.8rem;
+        margin-left: 0.15rem;
       }
-      img.inline-arrow-NORTH {
-        transform: rotate(180deg);
-      }
-      img.inline-arrow-EAST {
-        transform: rotate(270deg);
-      }
-      img.inline-arrow-SOUTH {
-        transform: rotate(0deg);
-      }
-      img.inline-arrow-WEST {
-        transform: rotate(90deg);
-      }
+    }
+  </style>
+</head>
 
-      button {
-        font-size: inherit;
-        font-family: var(--default-font);
-        color: var(--color-font-0);
-        background-color: var(--color-bg-1);
-        text-align: left;
-        border: 1px solid var(--color-bg-3);
-        padding: 4px;
-        margin: 4px;
-        display: block;
-        width: calc(100% - 8px);
-        cursor: pointer;
-      }
-
-      button.button-highlight {
-        border-color: var(--color-accent2-2);
-      }
-      button.button-selected {
-        border-color: var(--color-accent2-1);
-        filter: brightness(0.8);
-      }
-
-      @media screen and (max-height: 475px) {
-        #text-zone {
-          font-size: 0.8rem;
-        }
-        #buttons-zone {
-          font-size: 0.8rem;
-        }
-        /* #canv-container {
-          height: calc(100cqh - 2 * var(--canvas-picture-border-size) - var(--ui-zone-height) / 2);
-          max-width: var(--default-canvas-width);
-        }
-        .column {
-          max-width: calc(2 * var(--canvas-picture-border-size) + var(--default-canvas-width) + var(--default-text-zone-width));
-          max-height: 100vh;
-        }
-        #canv {
-          width: auto;
-          height: 100%;
-        } */
-        #compass {
-          width: calc((var(--ui-zone-height) - 16px) / 2);
-          height: calc((var(--ui-zone-height) - 16px) / 2);
-          font-size: 0.8rem;
-        }
-        #ui-zone {
-          display: flex;
-          justify-content: center;
-          height: calc(var(--ui-zone-height) / 2);
-        }
-        .inline-arrow {
-          max-width: 0.8rem;
-          margin-left: 0.15rem;
-        }
-      }
-
-      @media (max-aspect-ratio: 9/11) {
-        :root {
-          --top-size: 400px;
-        }
-        #ui-zone {
-          display: flex;
-          justify-content: center;
-          height: calc(var(--ui-zone-height) / 2);
-        }
-        #compass {
-          width: calc((var(--ui-zone-height) - 16px) / 2);
-          height: calc((var(--ui-zone-height) - 16px) / 2);
-          font-size: 0.8rem;
-          margin-top: 7px;
-        }
-        .inline-arrow {
-          max-width: 0.8rem;
-          margin-left: 0.15rem;
-        }
-        #text-zone {
-          font-size: 0.8rem;
-        }
-        #buttons-zone {
-          font-size: 0.8rem;
-        }
-        #canvas-area {
-          height: var(--top-size);
-          flex-shrink: 0;
-        }
-        .column {
-          max-width: calc(2 * var(--canvas-picture-border-size) + var(--default-canvas-width) + var(--default-text-zone-width));
-          max-height: unset;
-          width: 100vw;
-          height: calc(100vh - 16px);
-          display: flex;
-          justify-content: center;
-          flex-direction: column;
-          align-items: center;
-          position: relative;
-        }
-        #canv-container {
-          width: calc(100vw - 2 * var(--canvas-picture-border-size));
-          max-width: var(--default-canvas-width);
-          display: block;
-          max-height: unset;
-          /* border: var(--canvas-picture-border-size) solid var(--color-bg-0);
-          border-image: url(assets/img/border3.png) 13 round;
-          display: flex;
-          justify-content: center; */
-        }
-        #interact-area {
-          height: calc(100% - var(--top-size));
-        }
-        .outer-border {
-          display: none;
-        }
-      }
-    </style>
-  </head>
-
-  <body>
-    <div class="center">
-      <div class="column">
-        <div id="canvas-area">
-          <div id="canv-container">
-            <canvas id="canv"></canvas>
-          </div>
-          <div id="ui-zone">
-            <div id="compass">
-              <div style="text-decoration: underline">N</div>
-              <div>E</div>
-              <div>S</div>
-              <div>W</div>
-            </div>
+<body>
+  <div class="root">
+    <div class="sub-root">
+      <div class="left-zone">
+        <div class="canvas-area">
+          <canvas id="canv"></canvas>
+        </div>
+        <div class="ui-area">
+          <div id="compass">
+            <div style="text-decoration: underline">N</div>
+            <div>E</div>
+            <div>S</div>
+            <div>W</div>
           </div>
         </div>
-        <div id="interact-area">
-          <div id="text-zone"></div>
-          <div id="buttons-zone"></div>
+      </div>
+      <div class="right-zone">
+        <div class="text-area" id="text-zone"></div>
+        <div class="buttons-area" id="buttons-zone"></div>
+      </div>
+      <div class="outer-border"></div>
+    </div>
+    <div class="confirm-window-root" id="confirm-window">
+      <div class="confirm-window-sub-root">
+        <div class="confirm-window-content">
+          <div class="confirm-window-text" id="confirm-window-text"></div>
+          <div class="confirm-window-buttons" id="confirm-window-buttons"></div>
         </div>
-        <div class="outer-border"></div>
       </div>
     </div>
-  </body>
-  <footer>
-    <script src="core.mjs"></script>
-    <script src="db.mjs"></script>
-    <script src="sound.mjs"></script>
-    <script src="draw.mjs"></script>
-    <script src="engine.mjs"></script>
-    <script src="main.compiled.js"></script>
-    <script>
-      // REPLACE_ME
-      window.main();
-    </script>
-  </footer>
+  </div>
+</body>
+<footer>
+  <script src="core.mjs"></script>
+  <script src="db.mjs"></script>
+  <script src="sound.mjs"></script>
+  <script src="draw.mjs"></script>
+  <script src="engine.mjs"></script>
+  <script src="labels.mjs"></script>
+  <script src="main.compiled.js"></script>
+  <script>
+    // REPLACE_ME
+    window.main();
+  </script>
+</footer>
+
 </html>

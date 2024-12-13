@@ -73,6 +73,9 @@ const createEngine = () => {
     init() {
       engine.setHeading('n');
       getPlayer().set(PLAYER_KEY_INVENTORY, []);
+      if (!getPlayer().get('vars.class')) {
+        getPlayer().set('vars.class', 'Peasant');
+      }
 
       /** @type {any} */
       const globalWindow = window;

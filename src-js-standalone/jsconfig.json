@@ -5,5 +5,5 @@
     "checkJs": true,
     "baseUrl": "."
   },
-  "include": ["./*.mjs"]
+  "include": ["./*.mjs", "sound.mjs"]
 }
