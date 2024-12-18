@@ -13,15 +13,49 @@
   var LAST_FILE_VAR = 'lasIN2f';
   player.set('scope', scope);
 
+  files[`TestRoom2.json`] = function (id) {
+    player.set(CURRENT_FILE_VAR, 'TestRoom2.json');
+    // next_file
+    scope.uf6zhlclh = function () {
+      var key = `Caves_BelowCellar.json`;
+      var func = files[key];
+      if (!func) {
+        func = files[player.get(key)];
+      }
+      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
+      var nodeId = player.get('NEXT_NODE_ID');
+      if (func) {
+        player.set('NEXT_NODE_ID', null);
+        func(nodeId);
+      } else {
+        core.exit();
+      }
+    };
+
+    if (id === undefined) {
+      scope.uf6zhlclh();
+    } else if (id) {
+      scope[id]();
+    }
+    return player.state;
+  };
+
   files[`main1.json`] = function (id) {
     player.set(CURRENT_FILE_VAR, 'main1.json');
     // text
     scope.cmgnfk2o3 = () => {
       player.set(CURRENT_NODE_VAR, 'cmgnfk2o3');
-      var text = `Initializing soul: ${engine.getClass().toUpperCase()}...`;
-      core.say(text, scope.cxskgl8me, 'cmgnfk2o3', 'cxskgl8me');
+      var text = `Initializing soul: ${engine.getClass().toUpperCase()}.`;
+      core.say(text, scope.nufg2ghuz, 'cmgnfk2o3', 'nufg2ghuz');
     };
     scope['cmgnfk2o3'].isText = true;
+
+    // action
+    scope.nufg2ghuz = () => {
+      player.set(CURRENT_NODE_VAR, 'nufg2ghuz');
+      engine.setCanvasAreaVisible(true);
+      scope.cxskgl8me();
+    };
 
     // switch
     scope.cxskgl8me = () => {
@@ -168,386 +202,182 @@
     return player.state;
   };
 
-  files[`TestRoom.json`] = function (id) {
-    player.set(CURRENT_FILE_VAR, 'TestRoom.json');
-    // switch
-    scope.ee4s4acfi = () => {
-      player.set(CURRENT_NODE_VAR, 'ee4s4acfi');
-      if (true) scope.puefyqexe();
-    };
+  files[`FUNC_PickUp.json`] = function (id) {
+    player.set(CURRENT_FILE_VAR, 'FUNC_PickUp.json');
     // action
-    scope.puefyqexe = () => {
-      player.set(CURRENT_NODE_VAR, 'puefyqexe');
-      engine.setBackground('Caves_Cave1');
-      engine.setHeading('n');
-
-      if (player.get('lasIN2f') !== 'Inventory.json') {
-        engine.playOneOfSound('step', [1, 2, 3]);
-      }
-      scope.etwo71fmw();
-    };
-
-    // action
-    scope.etwo71fmw = () => {
-      player.set(CURRENT_NODE_VAR, 'etwo71fmw');
-      player.set('args.roomTitle', 'Title');
-      player.set('args.nextNodeId', 'm1rg8itpw');
-      player.set('args.nextFileId', player.get('curIN2f'));
-      player.set('args.customExit1', false);
-      player.set('args.northExit', 'Caves_Cave1.json');
-      player.set('args.eastExit', false);
-      player.set('args.southExit', false);
-      player.set('args.westExit', false);
-      scope.m9q4pc0yx();
-    };
-
-    // next_file
-    scope.m9q4pc0yx = function () {
-      var key = `FUNC_BasicRoom.json`;
-      var func = files[key];
-      if (!func) {
-        func = files[player.get(key)];
-      }
-      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
-      var nodeId = player.get('NEXT_NODE_ID');
-      if (func) {
-        player.set('NEXT_NODE_ID', null);
-        func(nodeId);
-      } else {
-        core.exit();
-      }
-    };
-
-    if (id === undefined) {
-      scope.ee4s4acfi();
-    } else if (id) {
-      scope[id]();
-    }
-    return player.state;
-  };
-
-  // sub_root
-  scope.fo0imirfg = () => {
-    player.set(CURRENT_NODE_VAR, 'fo0imirfg');
-    scope.gam26tnhh();
-  };
-
-  // action
-  scope.gam26tnhh = () => {
-    player.set(CURRENT_NODE_VAR, 'gam26tnhh');
-    player.set('itemsText', engine.getRoomItemsText());
-    scope.ndy6qieya();
-  };
-
-  // text
-  scope.ndy6qieya = () => {
-    player.set(CURRENT_NODE_VAR, 'ndy6qieya');
-    var text = `<Succinct Description>.
-
-${player.get('exitText')}
-
-${player.get('itemsText')}`;
-    core.say(text, scope.gcpidxufb, 'ndy6qieya', 'gcpidxufb');
-  };
-  scope['ndy6qieya'].isText = true;
-
-  // choice
-  scope.gcpidxufb = function () {
-    player.set(CURRENT_NODE_VAR, 'gcpidxufb');
-    let text = ``;
-    core.choose(text, 'gcpidxufb', [
-      {
-        t: `Pick up items.`,
-        id: 'xud3lcg3s',
-        cb: scope.xud3lcg3s,
-        c: function () {
-          return engine.getRoomItems().length > 0;
-        },
-      },
-      {
-        t: `Back.`,
-        id: 'puefyqexe',
-        cb: scope.puefyqexe,
-        c: function () {
-          return true;
-        },
-      },
-    ]);
-  };
-  scope['gcpidxufb'].isChoice = true;
-
-  // action
-  scope.xud3lcg3s = () => {
-    player.set(CURRENT_NODE_VAR, 'xud3lcg3s');
-    player.set('PICKUP_NEXT_FILE_ID', player.get('curIN2f'));
-    player.set('PICKUP_NEXT_NODE_ID', 'fo0imirfg');
-    scope.l3rkquuof();
-  };
-
-  // next_file
-  scope.l3rkquuof = function () {
-    var key = `FUNC_PickUp.json`;
-    var func = files[key];
-    if (!func) {
-      func = files[player.get(key)];
-    }
-    player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
-    var nodeId = player.get('NEXT_NODE_ID');
-    if (func) {
-      player.set('NEXT_NODE_ID', null);
-      func(nodeId);
-    } else {
-      core.exit();
-    }
-  };
-
-  // sub_root
-  scope.m1rg8itpw = () => {
-    player.set(CURRENT_NODE_VAR, 'm1rg8itpw');
-    scope.lg1ncogp3();
-  };
-
-  // action
-  scope.lg1ncogp3 = () => {
-    player.set(CURRENT_NODE_VAR, 'lg1ncogp3');
-    scope.g6wgwtfwr();
-  };
-
-  // switch
-  scope.g6wgwtfwr = () => {
-    player.set(CURRENT_NODE_VAR, 'g6wgwtfwr');
-    if (player.get('output.roomChoice') === 'examine-surroundings')
-      scope.xz70trakb();
-    else if (true) scope.puefyqexe();
-  };
-  // action
-  scope.xz70trakb = () => {
-    player.set(CURRENT_NODE_VAR, 'xz70trakb');
-    player.set('itemsText', engine.getRoomItemsText());
-    player.set('exitText', 'There are exits to the NORTH.');
-    scope.g9aqn6gaa();
-  };
-
-  // text
-  scope.g9aqn6gaa = () => {
-    player.set(CURRENT_NODE_VAR, 'g9aqn6gaa');
-    var text = `<Primary Description>.
-
-${player.get('exitText')}
-
-${player.get('itemsText')}`;
-    core.say(text, scope.gcpidxufb, 'g9aqn6gaa', 'gcpidxufb');
-  };
-  scope['g9aqn6gaa'].isText = true;
-
-  files[`TestRoom2.json`] = function (id) {
-    player.set(CURRENT_FILE_VAR, 'TestRoom2.json');
-    // next_file
-    scope.uf6zhlclh = function () {
-      var key = `Caves_BelowCellar.json`;
-      var func = files[key];
-      if (!func) {
-        func = files[player.get(key)];
-      }
-      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
-      var nodeId = player.get('NEXT_NODE_ID');
-      if (func) {
-        player.set('NEXT_NODE_ID', null);
-        func(nodeId);
-      } else {
-        core.exit();
-      }
-    };
-
-    if (id === undefined) {
-      scope.uf6zhlclh();
-    } else if (id) {
-      scope[id]();
-    }
-    return player.state;
-  };
-
-  files[`FUNC_PickUpEvents.json`] = function (id) {
-    player.set(CURRENT_FILE_VAR, 'FUNC_PickUpEvents.json');
-    // switch
-    scope.a06hr4dm4 = () => {
-      player.set(CURRENT_NODE_VAR, 'a06hr4dm4');
-      if (player.get('PICK_UP_EVENT_NAME') === 'candle') scope.r2fgio524();
-      else if (player.get('PICK_UP_EVENT_NAME') === 'chapel_robes')
-        scope.aixgtfp26();
-      else if (true) scope.gsupyrnnc();
-    };
-    // text
-    scope.r2fgio524 = () => {
-      player.set(CURRENT_NODE_VAR, 'r2fgio524');
-      var text = `When you pick up this candle it buzzes softly in your hand.`;
-      core.say(text, scope.rmxzh8br6, 'r2fgio524', 'rmxzh8br6');
-    };
-    scope['r2fgio524'].isText = true;
-
-    // action
-    scope.rmxzh8br6 = () => {
-      player.set(CURRENT_NODE_VAR, 'rmxzh8br6');
-      player.set('NEXT_NODE_ID', player.get('PICKUP_RETURN_NODE_ID'));
-      scope.omggy4arm();
-    };
-
-    // next_file
-    scope.omggy4arm = function () {
-      var key = `PICKUP_RETURN_FILE_ID`;
-      var func = files[key];
-      if (!func) {
-        func = files[player.get(key)];
-      }
-      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
-      var nodeId = player.get('NEXT_NODE_ID');
-      if (func) {
-        player.set('NEXT_NODE_ID', null);
-        func(nodeId);
-      } else {
-        core.exit();
-      }
-    };
-
-    // action
-    scope.aixgtfp26 = () => {
-      player.set(CURRENT_NODE_VAR, 'aixgtfp26');
-      engine.addItemToInventory('cleric_chains_key');
-      engine.playSound('get_item');
-      scope.g3ld2uuck();
+    scope.ed1wyr86w = () => {
+      player.set(CURRENT_NODE_VAR, 'ed1wyr86w');
+      scope.p4sew37sn();
     };
 
     // text
-    scope.g3ld2uuck = () => {
-      player.set(CURRENT_NODE_VAR, 'g3ld2uuck');
-      var text = `When you grab a robe, your hand feels something solid in the folds.  Rummaging around in the pockets, you find a small key.  You take it.`;
-      core.say(text, scope.rmxzh8br6, 'g3ld2uuck', 'rmxzh8br6');
+    scope.p4sew37sn = () => {
+      player.set(CURRENT_NODE_VAR, 'p4sew37sn');
+      var text = `PICK UP what?`;
+      core.say(text, scope.nus21kl2t, 'p4sew37sn', 'nus21kl2t');
     };
-    scope['g3ld2uuck'].isText = true;
-
-    // text
-    scope.gsupyrnnc = () => {
-      player.set(CURRENT_NODE_VAR, 'gsupyrnnc');
-      var text = `There is no Pick Up Event associated with this item even though this utility was called.  This is probably an ERROR.`;
-      core.say(text, scope.rmxzh8br6, 'gsupyrnnc', 'rmxzh8br6');
-    };
-    scope['gsupyrnnc'].isText = true;
-
-    if (id === undefined) {
-      scope.a06hr4dm4();
-    } else if (id) {
-      scope[id]();
-    }
-    return player.state;
-  };
-
-  files[`FUNC_BasicRoom.json`] = function (id) {
-    player.set(CURRENT_FILE_VAR, 'FUNC_BasicRoom.json');
-    // action
-    scope.xbt1wf3qa = () => {
-      player.set(CURRENT_NODE_VAR, 'xbt1wf3qa');
-      scope.zkukhbup3();
-    };
-
-    // text
-    scope.zkukhbup3 = () => {
-      player.set(CURRENT_NODE_VAR, 'zkukhbup3');
-      var text = `${player.get('args.roomTitle')}`;
-      core.say(text, scope.kxiyfc6z9, 'zkukhbup3', 'kxiyfc6z9');
-    };
-    scope['zkukhbup3'].isText = true;
+    scope['p4sew37sn'].isText = true;
 
     // choice
-    scope.kxiyfc6z9 = function () {
-      player.set(CURRENT_NODE_VAR, 'kxiyfc6z9');
+    scope.nus21kl2t = function () {
+      player.set(CURRENT_NODE_VAR, 'nus21kl2t');
       let text = ``;
-      core.choose(text, 'kxiyfc6z9', [
+      core.choose(text, 'nus21kl2t', [
         {
-          t: `Examine surroundings.`,
-          id: 'udtsd9ai5',
-          cb: scope.udtsd9ai5,
+          t: `Pick up: ${
+            engine.getRoomItems(player.get('PICKUP_NEXT_FILE_ID'))?.[0]?.label
+          }.`,
+          id: 'm2cmsgflt',
+          cb: scope.m2cmsgflt,
+          c: function () {
+            return Boolean(
+              engine.getRoomItems(player.get('PICKUP_NEXT_FILE_ID'))?.[0]
+            );
+          },
+        },
+        {
+          t: `Pick up: ${
+            engine.getRoomItems(player.get('PICKUP_NEXT_FILE_ID'))?.[1]?.label
+          }.`,
+          id: 'oxcrt402c',
+          cb: scope.oxcrt402c,
+          c: function () {
+            return Boolean(
+              engine.getRoomItems(player.get('PICKUP_NEXT_FILE_ID'))?.[1]
+            );
+          },
+        },
+        {
+          t: `Pick up: ${
+            engine.getRoomItems(player.get('PICKUP_NEXT_FILE_ID'))?.[2]?.label
+          }.`,
+          id: 'u6lgm32kz',
+          cb: scope.u6lgm32kz,
+          c: function () {
+            return Boolean(
+              engine.getRoomItems(player.get('PICKUP_NEXT_FILE_ID'))?.[2]
+            );
+          },
+        },
+        {
+          t: `Pick up: ${
+            engine.getRoomItems(player.get('PICKUP_NEXT_FILE_ID'))?.[3]?.label
+          }.`,
+          id: 'bt82yswsq',
+          cb: scope.bt82yswsq,
+          c: function () {
+            return Boolean(
+              engine.getRoomItems(player.get('PICKUP_NEXT_FILE_ID'))?.[3]
+            );
+          },
+        },
+        {
+          t: `Pick up: ${
+            engine.getRoomItems(player.get('PICKUP_NEXT_FILE_ID'))?.[4]?.label
+          }.`,
+          id: 'mwqzobf5l',
+          cb: scope.mwqzobf5l,
+          c: function () {
+            return Boolean(
+              engine.getRoomItems(player.get('PICKUP_NEXT_FILE_ID'))?.[4]
+            );
+          },
+        },
+        {
+          t: `Pick up: ${
+            engine.getRoomItems(player.get('PICKUP_NEXT_FILE_ID'))?.[5]?.label
+          }.`,
+          id: 'r5b6aqgio',
+          cb: scope.r5b6aqgio,
+          c: function () {
+            return Boolean(
+              engine.getRoomItems(player.get('PICKUP_NEXT_FILE_ID'))?.[5]
+            );
+          },
+        },
+        {
+          t: `Pick up: ${
+            engine.getRoomItems(player.get('PICKUP_NEXT_FILE_ID'))?.[6]?.label
+          }.`,
+          id: 'n7ywzdf75',
+          cb: scope.n7ywzdf75,
+          c: function () {
+            return Boolean(
+              engine.getRoomItems(player.get('PICKUP_NEXT_FILE_ID'))?.[6]
+            );
+          },
+        },
+        {
+          t: `Pick up: ${
+            engine.getRoomItems(player.get('PICKUP_NEXT_FILE_ID'))?.[7]?.label
+          }.`,
+          id: 'm9ocmmnk4',
+          cb: scope.m9ocmmnk4,
+          c: function () {
+            return Boolean(
+              engine.getRoomItems(player.get('PICKUP_NEXT_FILE_ID'))?.[7]
+            );
+          },
+        },
+        {
+          t: `Back.`,
+          id: 'o454csg3a',
+          cb: scope.o454csg3a,
           c: function () {
             return true;
-          },
-        },
-        {
-          t: `Inventory.`,
-          id: 'clza01da7',
-          cb: scope.clza01da7,
-          c: function () {
-            return true;
-          },
-        },
-        {
-          t: `[Cleric] Pray for assistance.`,
-          id: 'ggmqizgl3',
-          cb: scope.ggmqizgl3,
-          c: function () {
-            return player.get('vars.class') === 'Cleric';
-          },
-        },
-        {
-          t: `Go NORTH.`,
-          id: 'koca8m14h',
-          cb: scope.koca8m14h,
-          c: function () {
-            return player.get('args.northExit');
-          },
-        },
-        {
-          t: `Go EAST.`,
-          id: 'b6ffm03tc',
-          cb: scope.b6ffm03tc,
-          c: function () {
-            return player.get('args.eastExit');
-          },
-        },
-        {
-          t: `Go SOUTH.`,
-          id: 'whfmcc4sp',
-          cb: scope.whfmcc4sp,
-          c: function () {
-            return player.get('args.southExit');
-          },
-        },
-        {
-          t: `Go WEST.`,
-          id: 'fe1f814di',
-          cb: scope.fe1f814di,
-          c: function () {
-            return player.get('args.westExit');
-          },
-        },
-        {
-          t: `Go player.get('args.customExit1')Label.`,
-          id: 'p9ho07422',
-          cb: scope.p9ho07422,
-          c: function () {
-            return player.get('args.customExit1');
           },
         },
       ]);
     };
-    scope['kxiyfc6z9'].isChoice = true;
+    scope['nus21kl2t'].isChoice = true;
 
     // action
-    scope.udtsd9ai5 = () => {
-      player.set(CURRENT_NODE_VAR, 'udtsd9ai5');
-      player.set('output.roomChoice', 'examine-surroundings');
-      scope.yfshypnn4();
+    scope.m2cmsgflt = () => {
+      player.set(CURRENT_NODE_VAR, 'm2cmsgflt');
+      player.set(
+        'item',
+        engine.getRoomItems(player.get('PICKUP_NEXT_FILE_ID'))?.[0]
+      );
+      scope.hhmeympop();
     };
 
+    // pass_fail
+    scope.hhmeympop = function () {
+      player.set(CURRENT_NODE_VAR, 'hhmeympop');
+      var condition = (function () {
+        return Boolean(engine.getItemPickUpEvent(player.get('item')));
+      })();
+      if (condition) {
+        player.set(CURRENT_NODE_VAR, 'linoc6tb2');
+        scope.b6fglmomn();
+      }
+      if (!condition) {
+        player.set(CURRENT_NODE_VAR, 'p9yy0xkqe');
+        scope.m1gmkhc60();
+      }
+    };
     // action
-    scope.yfshypnn4 = () => {
-      player.set(CURRENT_NODE_VAR, 'yfshypnn4');
-      player.set('NEXT_NODE_ID', player.get('args.nextNodeId'));
-      player.set('NEXT_FILE_ID', player.get('args.nextFileId'));
-      player.clearArgs();
-      scope.anfl8gupb();
+    scope.b6fglmomn = () => {
+      player.set(CURRENT_NODE_VAR, 'b6fglmomn');
+      const obj = engine.getItemPickUpEvent(player.get('item'));
+      console.log('get item pickeup event', player.get('item'), obj);
+      if (obj) {
+        const { cb, node, file } = obj;
+        cb();
+        player.set('NEXT_NODE_ID', node);
+        player.set('NEXT_FILE_ID', file);
+        player.set('PICKUP_RETURN_NODE_ID', 'p4sew37sn');
+        player.set('PICKUP_RETURN_FILE_ID', 'FUNC_PickUp.json');
+      }
+      engine.pickUpRoomItem(
+        player.get('item')?.name,
+        player.get('PICKUP_NEXT_FILE_ID')
+      );
+      scope.zncans8x0();
     };
 
     // next_file
-    scope.anfl8gupb = function () {
+    scope.zncans8x0 = function () {
       var key = `NEXT_FILE_ID`;
       var func = files[key];
       if (!func) {
@@ -564,102 +394,63 @@ ${player.get('itemsText')}`;
     };
 
     // action
-    scope.clza01da7 = () => {
-      player.set(CURRENT_NODE_VAR, 'clza01da7');
-      player.set('INVENTORY_NEXT_NODE_ID', 'xbt1wf3qa');
-      player.set('INVENTORY_NEXT_FILE_ID', player.get('curIN2f'));
-      scope.xr843uht5();
-    };
-
-    // next_file
-    scope.xr843uht5 = function () {
-      var key = `FUNC_Inventory.json`;
-      var func = files[key];
-      if (!func) {
-        func = files[player.get(key)];
-      }
-      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
-      var nodeId = player.get('NEXT_NODE_ID');
-      if (func) {
-        player.set('NEXT_NODE_ID', null);
-        func(nodeId);
-      } else {
-        core.exit();
-      }
+    scope.m1gmkhc60 = () => {
+      player.set(CURRENT_NODE_VAR, 'm1gmkhc60');
+      engine.pickUpRoomItem(
+        player.get('item')?.name,
+        player.get('PICKUP_NEXT_FILE_ID')
+      );
+      engine.playSound('get_item');
+      scope.o9i8izgkn();
     };
 
     // pass_fail
-    scope.ggmqizgl3 = function () {
-      player.set(CURRENT_NODE_VAR, 'ggmqizgl3');
+    scope.o9i8izgkn = function () {
+      player.set(CURRENT_NODE_VAR, 'o9i8izgkn');
       var condition = (function () {
-        return player.get('args.powerClericSpecial');
+        return (
+          engine.getRoomItems(player.get('PICKUP_NEXT_FILE_ID'))?.length > 0
+        );
       })();
       if (condition) {
-        player.set(CURRENT_NODE_VAR, 'dam8ncsn8');
-        scope.rrkdatdgf();
+        player.set(CURRENT_NODE_VAR, 'mmsgy8e0q');
+        scope.nhf51t11i();
       }
       if (!condition) {
-        player.set(CURRENT_NODE_VAR, 'gf67f2c7o');
-        scope.bwqyr28zi();
-      }
-    };
-    // action
-    scope.rrkdatdgf = () => {
-      player.set(CURRENT_NODE_VAR, 'rrkdatdgf');
-      player.set('output.roomChoice', 'pray');
-      scope.yfshypnn4();
-    };
-
-    // pass_fail
-    scope.bwqyr28zi = function () {
-      player.set(CURRENT_NODE_VAR, 'bwqyr28zi');
-      var condition = (function () {
-        return player.once() ? true : false;
-      })();
-      if (condition) {
-        player.set(CURRENT_NODE_VAR, 'eq8ubzore');
-        scope.kmod6g550();
-      }
-      if (!condition) {
-        player.set(CURRENT_NODE_VAR, 'd4wrkhoq2');
-        scope.z04etxd8y();
+        player.set(CURRENT_NODE_VAR, 'ru6r7tw2b');
+        scope.yq4ngrdgt();
       }
     };
     // text
-    scope.kmod6g550 = () => {
-      player.set(CURRENT_NODE_VAR, 'kmod6g550');
-      var text = `You close your eyes and clear your thoughts, entering a state of deep meditation and praying for guidance.  After a moment you open your eyes.
+    scope.nhf51t11i = () => {
+      player.set(CURRENT_NODE_VAR, 'nhf51t11i');
+      var text = `You pick up the ${player.get('item')?.label}.
 
-Nothing apparent happens.`;
-      core.say(text, scope.zkukhbup3, 'kmod6g550', 'zkukhbup3');
+${player.get('item')?.description}`;
+      core.say(text, scope.nus21kl2t, 'nhf51t11i', 'nus21kl2t');
     };
-    scope['kmod6g550'].isText = true;
+    scope['nhf51t11i'].isText = true;
 
     // text
-    scope.z04etxd8y = () => {
-      player.set(CURRENT_NODE_VAR, 'z04etxd8y');
-      var text = `You pray for guidance, but nothing apparent happens.`;
-      core.say(text, scope.zkukhbup3, 'z04etxd8y', 'zkukhbup3');
+    scope.yq4ngrdgt = () => {
+      player.set(CURRENT_NODE_VAR, 'yq4ngrdgt');
+      var text = `You pick up the ${player.get('item')?.label}.
+
+${player.get('item')?.description}`;
+      core.say(text, scope.o454csg3a, 'yq4ngrdgt', 'o454csg3a');
     };
-    scope['z04etxd8y'].isText = true;
+    scope['yq4ngrdgt'].isText = true;
 
     // action
-    scope.koca8m14h = () => {
-      player.set(CURRENT_NODE_VAR, 'koca8m14h');
-      player.set('NEXT_FILE_NODE', player.get('args.northExit'));
-      scope.zqhtle4rd();
-    };
-
-    // action
-    scope.zqhtle4rd = () => {
-      player.set(CURRENT_NODE_VAR, 'zqhtle4rd');
-      player.clearArgs();
-      scope.np6os6dwl();
+    scope.o454csg3a = () => {
+      player.set(CURRENT_NODE_VAR, 'o454csg3a');
+      player.set('NEXT_NODE_ID', player.get('PICKUP_NEXT_NODE_ID'));
+      scope.ap6n2rr8o();
     };
 
     // next_file
-    scope.np6os6dwl = function () {
-      var key = `NEXT_FILE_NODE`;
+    scope.ap6n2rr8o = function () {
+      var key = `PICKUP_NEXT_FILE_ID`;
       var func = files[key];
       if (!func) {
         func = files[player.get(key)];
@@ -675,35 +466,77 @@ Nothing apparent happens.`;
     };
 
     // action
-    scope.b6ffm03tc = () => {
-      player.set(CURRENT_NODE_VAR, 'b6ffm03tc');
-      player.set('NEXT_FILE_NODE', player.get('args.eastExit'));
-      scope.zqhtle4rd();
+    scope.oxcrt402c = () => {
+      player.set(CURRENT_NODE_VAR, 'oxcrt402c');
+      player.set(
+        'item',
+        engine.getRoomItems(player.get('PICKUP_NEXT_FILE_ID'))?.[1]
+      );
+      scope.hhmeympop();
     };
 
     // action
-    scope.whfmcc4sp = () => {
-      player.set(CURRENT_NODE_VAR, 'whfmcc4sp');
-      player.set('NEXT_FILE_NODE', player.get('args.southExit'));
-      scope.zqhtle4rd();
+    scope.u6lgm32kz = () => {
+      player.set(CURRENT_NODE_VAR, 'u6lgm32kz');
+      player.set(
+        'item',
+        engine.getRoomItems(player.get('PICKUP_NEXT_FILE_ID'))?.[2]
+      );
+      scope.hhmeympop();
     };
 
     // action
-    scope.fe1f814di = () => {
-      player.set(CURRENT_NODE_VAR, 'fe1f814di');
-      player.set('NEXT_FILE_NODE', player.get('args.westExit'));
-      scope.zqhtle4rd();
+    scope.bt82yswsq = () => {
+      player.set(CURRENT_NODE_VAR, 'bt82yswsq');
+      player.set(
+        'item',
+        engine.getRoomItems(player.get('PICKUP_NEXT_FILE_ID'))?.[3]
+      );
+      scope.hhmeympop();
     };
 
     // action
-    scope.p9ho07422 = () => {
-      player.set(CURRENT_NODE_VAR, 'p9ho07422');
-      player.set('NEXT_FILE_NODE', player.get('args.customExit1'));
-      scope.zqhtle4rd();
+    scope.mwqzobf5l = () => {
+      player.set(CURRENT_NODE_VAR, 'mwqzobf5l');
+      player.set(
+        'item',
+        engine.getRoomItems(player.get('PICKUP_NEXT_FILE_ID'))?.[4]
+      );
+      scope.hhmeympop();
+    };
+
+    // action
+    scope.r5b6aqgio = () => {
+      player.set(CURRENT_NODE_VAR, 'r5b6aqgio');
+      player.set(
+        'item',
+        engine.getRoomItems(player.get('PICKUP_NEXT_FILE_ID'))?.[5]
+      );
+      scope.hhmeympop();
+    };
+
+    // action
+    scope.n7ywzdf75 = () => {
+      player.set(CURRENT_NODE_VAR, 'n7ywzdf75');
+      player.set(
+        'item',
+        engine.getRoomItems(player.get('PICKUP_NEXT_FILE_ID'))?.[6]
+      );
+      scope.hhmeympop();
+    };
+
+    // action
+    scope.m9ocmmnk4 = () => {
+      player.set(CURRENT_NODE_VAR, 'm9ocmmnk4');
+      player.set(
+        'item',
+        engine.getRoomItems(player.get('PICKUP_NEXT_FILE_ID'))?.[7]
+      );
+      scope.hhmeympop();
     };
 
     if (id === undefined) {
-      scope.xbt1wf3qa();
+      scope.ed1wyr86w();
     } else if (id) {
       scope[id]();
     }
@@ -1164,6 +997,1073 @@ You have ${
 
     if (id === undefined) {
       scope.ecf76fqk1();
+    } else if (id) {
+      scope[id]();
+    }
+    return player.state;
+  };
+
+  files[`TestRoom.json`] = function (id) {
+    player.set(CURRENT_FILE_VAR, 'TestRoom.json');
+    // switch
+    scope.ee4s4acfi = () => {
+      player.set(CURRENT_NODE_VAR, 'ee4s4acfi');
+      if (true) scope.puefyqexe();
+    };
+    // action
+    scope.puefyqexe = () => {
+      player.set(CURRENT_NODE_VAR, 'puefyqexe');
+      engine.setBackground('Caves_Cave1');
+      engine.setHeading('n');
+
+      if (player.get('lasIN2f') !== 'Inventory.json') {
+        engine.playOneOfSound('step', [1, 2, 3]);
+      }
+      scope.etwo71fmw();
+    };
+
+    // action
+    scope.etwo71fmw = () => {
+      player.set(CURRENT_NODE_VAR, 'etwo71fmw');
+      player.set('args.roomTitle', 'Title');
+      player.set('args.nextNodeId', 'm1rg8itpw');
+      player.set('args.nextFileId', player.get('curIN2f'));
+      player.set('args.customExit1', false);
+      player.set('args.northExit', 'Caves_Cave1.json');
+      player.set('args.eastExit', false);
+      player.set('args.southExit', false);
+      player.set('args.westExit', false);
+      scope.m9q4pc0yx();
+    };
+
+    // next_file
+    scope.m9q4pc0yx = function () {
+      var key = `FUNC_BasicRoom.json`;
+      var func = files[key];
+      if (!func) {
+        func = files[player.get(key)];
+      }
+      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
+      var nodeId = player.get('NEXT_NODE_ID');
+      if (func) {
+        player.set('NEXT_NODE_ID', null);
+        func(nodeId);
+      } else {
+        core.exit();
+      }
+    };
+
+    if (id === undefined) {
+      scope.ee4s4acfi();
+    } else if (id) {
+      scope[id]();
+    }
+    return player.state;
+  };
+
+  // sub_root
+  scope.fo0imirfg = () => {
+    player.set(CURRENT_NODE_VAR, 'fo0imirfg');
+    scope.gam26tnhh();
+  };
+
+  // action
+  scope.gam26tnhh = () => {
+    player.set(CURRENT_NODE_VAR, 'gam26tnhh');
+    player.set('itemsText', engine.getRoomItemsText());
+    scope.ndy6qieya();
+  };
+
+  // text
+  scope.ndy6qieya = () => {
+    player.set(CURRENT_NODE_VAR, 'ndy6qieya');
+    var text = `<Succinct Description>.
+
+${player.get('exitText')}
+
+${player.get('itemsText')}`;
+    core.say(text, scope.gcpidxufb, 'ndy6qieya', 'gcpidxufb');
+  };
+  scope['ndy6qieya'].isText = true;
+
+  // choice
+  scope.gcpidxufb = function () {
+    player.set(CURRENT_NODE_VAR, 'gcpidxufb');
+    let text = ``;
+    core.choose(text, 'gcpidxufb', [
+      {
+        t: `Pick up items.`,
+        id: 'xud3lcg3s',
+        cb: scope.xud3lcg3s,
+        c: function () {
+          return engine.getRoomItems().length > 0;
+        },
+      },
+      {
+        t: `Back.`,
+        id: 'puefyqexe',
+        cb: scope.puefyqexe,
+        c: function () {
+          return true;
+        },
+      },
+    ]);
+  };
+  scope['gcpidxufb'].isChoice = true;
+
+  // action
+  scope.xud3lcg3s = () => {
+    player.set(CURRENT_NODE_VAR, 'xud3lcg3s');
+    player.set('PICKUP_NEXT_FILE_ID', player.get('curIN2f'));
+    player.set('PICKUP_NEXT_NODE_ID', 'fo0imirfg');
+    scope.l3rkquuof();
+  };
+
+  // next_file
+  scope.l3rkquuof = function () {
+    var key = `FUNC_PickUp.json`;
+    var func = files[key];
+    if (!func) {
+      func = files[player.get(key)];
+    }
+    player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
+    var nodeId = player.get('NEXT_NODE_ID');
+    if (func) {
+      player.set('NEXT_NODE_ID', null);
+      func(nodeId);
+    } else {
+      core.exit();
+    }
+  };
+
+  // sub_root
+  scope.m1rg8itpw = () => {
+    player.set(CURRENT_NODE_VAR, 'm1rg8itpw');
+    scope.lg1ncogp3();
+  };
+
+  // action
+  scope.lg1ncogp3 = () => {
+    player.set(CURRENT_NODE_VAR, 'lg1ncogp3');
+    scope.g6wgwtfwr();
+  };
+
+  // switch
+  scope.g6wgwtfwr = () => {
+    player.set(CURRENT_NODE_VAR, 'g6wgwtfwr');
+    if (player.get('output.roomChoice') === 'examine-surroundings')
+      scope.xz70trakb();
+    else if (true) scope.puefyqexe();
+  };
+  // action
+  scope.xz70trakb = () => {
+    player.set(CURRENT_NODE_VAR, 'xz70trakb');
+    player.set('itemsText', engine.getRoomItemsText());
+    player.set('exitText', 'There are exits to the NORTH.');
+    scope.g9aqn6gaa();
+  };
+
+  // text
+  scope.g9aqn6gaa = () => {
+    player.set(CURRENT_NODE_VAR, 'g9aqn6gaa');
+    var text = `<Primary Description>.
+
+${player.get('exitText')}
+
+${player.get('itemsText')}`;
+    core.say(text, scope.gcpidxufb, 'g9aqn6gaa', 'gcpidxufb');
+  };
+  scope['g9aqn6gaa'].isText = true;
+
+  files[`FUNC_InventoryExamineEvents.json`] = function (id) {
+    player.set(CURRENT_FILE_VAR, 'FUNC_InventoryExamineEvents.json');
+    // switch
+    scope.uk2h4p9nl = () => {
+      player.set(CURRENT_NODE_VAR, 'uk2h4p9nl');
+      if (player.get('INVENTORY_EXAMINE_EVENT_NAME') === 'candle')
+        scope.khutx6uq6();
+      else if (true) scope.fcg1f1my6();
+    };
+    // text
+    scope.khutx6uq6 = () => {
+      player.set(CURRENT_NODE_VAR, 'khutx6uq6');
+      var text = `When you pick up this candle it buzzes softly in your hand.`;
+      core.say(text, scope.sh049mkfo, 'khutx6uq6', 'sh049mkfo');
+    };
+    scope['khutx6uq6'].isText = true;
+
+    // action
+    scope.sh049mkfo = () => {
+      player.set(CURRENT_NODE_VAR, 'sh049mkfo');
+      player.set('NEXT_NODE_ID', player.get('INVENTORY_RETURN_NODE_ID'));
+      scope.dfs5haz2t();
+    };
+
+    // next_file
+    scope.dfs5haz2t = function () {
+      var key = `PICKUP_RETURN_FILE_ID`;
+      var func = files[key];
+      if (!func) {
+        func = files[player.get(key)];
+      }
+      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
+      var nodeId = player.get('NEXT_NODE_ID');
+      if (func) {
+        player.set('NEXT_NODE_ID', null);
+        func(nodeId);
+      } else {
+        core.exit();
+      }
+    };
+
+    // text
+    scope.fcg1f1my6 = () => {
+      player.set(CURRENT_NODE_VAR, 'fcg1f1my6');
+      var text = `There is no Inventory Examine Event associated with this item even though this utility was called.  This is probably an ERROR.`;
+      core.say(text, scope.sh049mkfo, 'fcg1f1my6', 'sh049mkfo');
+    };
+    scope['fcg1f1my6'].isText = true;
+
+    if (id === undefined) {
+      scope.uk2h4p9nl();
+    } else if (id) {
+      scope[id]();
+    }
+    return player.state;
+  };
+
+  files[`FUNC_BasicRoom.json`] = function (id) {
+    player.set(CURRENT_FILE_VAR, 'FUNC_BasicRoom.json');
+    // action
+    scope.xbt1wf3qa = () => {
+      player.set(CURRENT_NODE_VAR, 'xbt1wf3qa');
+      scope.zkukhbup3();
+    };
+
+    // text
+    scope.zkukhbup3 = () => {
+      player.set(CURRENT_NODE_VAR, 'zkukhbup3');
+      var text = `${player.get('args.roomTitle')}`;
+      core.say(text, scope.kxiyfc6z9, 'zkukhbup3', 'kxiyfc6z9');
+    };
+    scope['zkukhbup3'].isText = true;
+
+    // choice
+    scope.kxiyfc6z9 = function () {
+      player.set(CURRENT_NODE_VAR, 'kxiyfc6z9');
+      let text = ``;
+      core.choose(text, 'kxiyfc6z9', [
+        {
+          t: `Examine surroundings.`,
+          id: 'udtsd9ai5',
+          cb: scope.udtsd9ai5,
+          c: function () {
+            return true;
+          },
+        },
+        {
+          t: `Inventory.`,
+          id: 'clza01da7',
+          cb: scope.clza01da7,
+          c: function () {
+            return true;
+          },
+        },
+        {
+          t: `[Cleric] Pray for assistance.`,
+          id: 'ggmqizgl3',
+          cb: scope.ggmqizgl3,
+          c: function () {
+            return player.get('vars.class') === 'Cleric';
+          },
+        },
+        {
+          t: `Go NORTH.`,
+          id: 'koca8m14h',
+          cb: scope.koca8m14h,
+          c: function () {
+            return player.get('args.northExit');
+          },
+        },
+        {
+          t: `Go EAST.`,
+          id: 'b6ffm03tc',
+          cb: scope.b6ffm03tc,
+          c: function () {
+            return player.get('args.eastExit');
+          },
+        },
+        {
+          t: `Go SOUTH.`,
+          id: 'whfmcc4sp',
+          cb: scope.whfmcc4sp,
+          c: function () {
+            return player.get('args.southExit');
+          },
+        },
+        {
+          t: `Go WEST.`,
+          id: 'fe1f814di',
+          cb: scope.fe1f814di,
+          c: function () {
+            return player.get('args.westExit');
+          },
+        },
+        {
+          t: `Go player.get('args.customExit1')Label.`,
+          id: 'p9ho07422',
+          cb: scope.p9ho07422,
+          c: function () {
+            return player.get('args.customExit1');
+          },
+        },
+      ]);
+    };
+    scope['kxiyfc6z9'].isChoice = true;
+
+    // action
+    scope.udtsd9ai5 = () => {
+      player.set(CURRENT_NODE_VAR, 'udtsd9ai5');
+      player.set('output.roomChoice', 'examine-surroundings');
+      scope.yfshypnn4();
+    };
+
+    // action
+    scope.yfshypnn4 = () => {
+      player.set(CURRENT_NODE_VAR, 'yfshypnn4');
+      player.set('NEXT_NODE_ID', player.get('args.nextNodeId'));
+      player.set('NEXT_FILE_ID', player.get('args.nextFileId'));
+      player.clearArgs();
+      scope.anfl8gupb();
+    };
+
+    // next_file
+    scope.anfl8gupb = function () {
+      var key = `NEXT_FILE_ID`;
+      var func = files[key];
+      if (!func) {
+        func = files[player.get(key)];
+      }
+      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
+      var nodeId = player.get('NEXT_NODE_ID');
+      if (func) {
+        player.set('NEXT_NODE_ID', null);
+        func(nodeId);
+      } else {
+        core.exit();
+      }
+    };
+
+    // action
+    scope.clza01da7 = () => {
+      player.set(CURRENT_NODE_VAR, 'clza01da7');
+      player.set('INVENTORY_NEXT_NODE_ID', 'xbt1wf3qa');
+      player.set('INVENTORY_NEXT_FILE_ID', player.get('curIN2f'));
+      scope.xr843uht5();
+    };
+
+    // next_file
+    scope.xr843uht5 = function () {
+      var key = `FUNC_Inventory.json`;
+      var func = files[key];
+      if (!func) {
+        func = files[player.get(key)];
+      }
+      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
+      var nodeId = player.get('NEXT_NODE_ID');
+      if (func) {
+        player.set('NEXT_NODE_ID', null);
+        func(nodeId);
+      } else {
+        core.exit();
+      }
+    };
+
+    // pass_fail
+    scope.ggmqizgl3 = function () {
+      player.set(CURRENT_NODE_VAR, 'ggmqizgl3');
+      var condition = (function () {
+        return player.get('args.powerClericSpecial');
+      })();
+      if (condition) {
+        player.set(CURRENT_NODE_VAR, 'dam8ncsn8');
+        scope.rrkdatdgf();
+      }
+      if (!condition) {
+        player.set(CURRENT_NODE_VAR, 'gf67f2c7o');
+        scope.bwqyr28zi();
+      }
+    };
+    // action
+    scope.rrkdatdgf = () => {
+      player.set(CURRENT_NODE_VAR, 'rrkdatdgf');
+      player.set('output.roomChoice', 'pray');
+      scope.yfshypnn4();
+    };
+
+    // pass_fail
+    scope.bwqyr28zi = function () {
+      player.set(CURRENT_NODE_VAR, 'bwqyr28zi');
+      var condition = (function () {
+        return player.once() ? true : false;
+      })();
+      if (condition) {
+        player.set(CURRENT_NODE_VAR, 'eq8ubzore');
+        scope.kmod6g550();
+      }
+      if (!condition) {
+        player.set(CURRENT_NODE_VAR, 'd4wrkhoq2');
+        scope.z04etxd8y();
+      }
+    };
+    // text
+    scope.kmod6g550 = () => {
+      player.set(CURRENT_NODE_VAR, 'kmod6g550');
+      var text = `You close your eyes and clear your thoughts, entering a state of deep meditation and praying for guidance.  After a moment you open your eyes.
+
+Nothing apparent happens.`;
+      core.say(text, scope.zkukhbup3, 'kmod6g550', 'zkukhbup3');
+    };
+    scope['kmod6g550'].isText = true;
+
+    // text
+    scope.z04etxd8y = () => {
+      player.set(CURRENT_NODE_VAR, 'z04etxd8y');
+      var text = `You pray for guidance, but nothing apparent happens.`;
+      core.say(text, scope.zkukhbup3, 'z04etxd8y', 'zkukhbup3');
+    };
+    scope['z04etxd8y'].isText = true;
+
+    // action
+    scope.koca8m14h = () => {
+      player.set(CURRENT_NODE_VAR, 'koca8m14h');
+      player.set('NEXT_FILE_NODE', player.get('args.northExit'));
+      scope.zqhtle4rd();
+    };
+
+    // action
+    scope.zqhtle4rd = () => {
+      player.set(CURRENT_NODE_VAR, 'zqhtle4rd');
+      player.clearArgs();
+      scope.np6os6dwl();
+    };
+
+    // next_file
+    scope.np6os6dwl = function () {
+      var key = `NEXT_FILE_NODE`;
+      var func = files[key];
+      if (!func) {
+        func = files[player.get(key)];
+      }
+      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
+      var nodeId = player.get('NEXT_NODE_ID');
+      if (func) {
+        player.set('NEXT_NODE_ID', null);
+        func(nodeId);
+      } else {
+        core.exit();
+      }
+    };
+
+    // action
+    scope.b6ffm03tc = () => {
+      player.set(CURRENT_NODE_VAR, 'b6ffm03tc');
+      player.set('NEXT_FILE_NODE', player.get('args.eastExit'));
+      scope.zqhtle4rd();
+    };
+
+    // action
+    scope.whfmcc4sp = () => {
+      player.set(CURRENT_NODE_VAR, 'whfmcc4sp');
+      player.set('NEXT_FILE_NODE', player.get('args.southExit'));
+      scope.zqhtle4rd();
+    };
+
+    // action
+    scope.fe1f814di = () => {
+      player.set(CURRENT_NODE_VAR, 'fe1f814di');
+      player.set('NEXT_FILE_NODE', player.get('args.westExit'));
+      scope.zqhtle4rd();
+    };
+
+    // action
+    scope.p9ho07422 = () => {
+      player.set(CURRENT_NODE_VAR, 'p9ho07422');
+      player.set('NEXT_FILE_NODE', player.get('args.customExit1'));
+      scope.zqhtle4rd();
+    };
+
+    if (id === undefined) {
+      scope.xbt1wf3qa();
+    } else if (id) {
+      scope[id]();
+    }
+    return player.state;
+  };
+
+  files[`Caves_Waterfall.json`] = function (id) {
+    player.set(CURRENT_FILE_VAR, 'Caves_Waterfall.json');
+    // switch
+    scope.lf8gyt65k = () => {
+      player.set(CURRENT_NODE_VAR, 'lf8gyt65k');
+      if (player.once()) scope.kdtd6xhqp();
+      else if (true) scope.e5ocu5kuz();
+    };
+    // action
+    scope.kdtd6xhqp = () => {
+      player.set(CURRENT_NODE_VAR, 'kdtd6xhqp');
+      engine.setBackground('Caves_Waterfall');
+      engine.setHeading('n');
+      engine.playSound('waterfall');
+      scope.xgdx8bmi4();
+    };
+
+    // text
+    scope.xgdx8bmi4 = () => {
+      player.set(CURRENT_NODE_VAR, 'xgdx8bmi4');
+      var text = `The sound of rushing water gets louder as you walk.  Eventually you emerge into a large cavern with a waterfall.
+
+Waterfall Cave.`;
+      core.say(text, scope.f6c5u0xbq, 'xgdx8bmi4', 'f6c5u0xbq');
+    };
+    scope['xgdx8bmi4'].isText = true;
+
+    // choice
+    scope.f6c5u0xbq = function () {
+      player.set(CURRENT_NODE_VAR, 'f6c5u0xbq');
+      let text = ``;
+      core.choose(text, 'f6c5u0xbq', [
+        {
+          t: `Examine surroundings.`,
+          id: 'uda69gq16',
+          cb: scope.uda69gq16,
+          c: function () {
+            return true;
+          },
+        },
+        {
+          t: `Inventory.`,
+          id: 'lolzbqrns',
+          cb: scope.lolzbqrns,
+          c: function () {
+            return true;
+          },
+        },
+        {
+          t: `Go NORTH (through waterfall).`,
+          id: 'oztg6gr5f',
+          cb: scope.oztg6gr5f,
+          c: function () {
+            return player.get('flags.waterfall_jumped_through');
+          },
+        },
+        {
+          t: `Go EAST.`,
+          id: 'nggggg3sn',
+          cb: scope.nggggg3sn,
+          c: function () {
+            return true;
+          },
+        },
+        {
+          t: `Go SOUTH.`,
+          id: 'rfp9kp182',
+          cb: scope.rfp9kp182,
+          c: function () {
+            return true;
+          },
+        },
+        {
+          t: `Go WEST.`,
+          id: 'w3w82b5so',
+          cb: scope.w3w82b5so,
+          c: function () {
+            return true;
+          },
+        },
+      ]);
+    };
+    scope['f6c5u0xbq'].isChoice = true;
+
+    // action
+    scope.uda69gq16 = () => {
+      player.set(CURRENT_NODE_VAR, 'uda69gq16');
+      player.set(
+        'examineText',
+        'You stand at the base of a loud waterfall that cascades down a cliff.  It sprays water on the cave walls, droplets of which form small pools on the ground that must be stepped around as you traverse.  The waterfall feeds a creek that meanders further into the caves to the SOUTHEAST.  A faint glowing moss on the ceiling dimly illuminates the cavern.'
+      );
+      player.set('itemsText', engine.getRoomItemsText());
+      scope.xa7ubepkp();
+    };
+
+    // pass_fail
+    scope.xa7ubepkp = function () {
+      player.set(CURRENT_NODE_VAR, 'xa7ubepkp');
+      var condition = (function () {
+        return player.get('flags.waterfall_jumped_through');
+      })();
+      if (!condition) {
+        player.set(CURRENT_NODE_VAR, 'w9htgtc6s');
+        scope.s7kuco7b8();
+      }
+      if (condition) {
+        player.set(CURRENT_NODE_VAR, 'i9mipblsx');
+        scope.hhe13xq29();
+      }
+    };
+    // text
+    scope.s7kuco7b8 = () => {
+      player.set(CURRENT_NODE_VAR, 's7kuco7b8');
+      var text = `${player.get('examineText')}
+
+There are exits to the EAST, SOUTH, and WEST.
+
+${player.get('itemsText')}`;
+      core.say(text, scope.mrs5fc6f6, 's7kuco7b8', 'mrs5fc6f6');
+    };
+    scope['s7kuco7b8'].isText = true;
+
+    // choice
+    scope.mrs5fc6f6 = function () {
+      player.set(CURRENT_NODE_VAR, 'mrs5fc6f6');
+      let text = ``;
+      core.choose(text, 'mrs5fc6f6', [
+        {
+          t: `Pick up items.`,
+          id: 'fscu3q9f2',
+          cb: scope.fscu3q9f2,
+          c: function () {
+            return engine.getRoomItems().length > 0;
+          },
+        },
+        {
+          t: `Examine waterfall.`,
+          id: 'd4fee2tcn',
+          cb: scope.d4fee2tcn,
+          c: function () {
+            return true;
+          },
+        },
+        {
+          t: `Examine creek.`,
+          id: 'oyqk97dx2',
+          cb: scope.oyqk97dx2,
+          c: function () {
+            return true;
+          },
+        },
+        {
+          t: `Back.`,
+          id: 'plrdyzta5',
+          cb: scope.plrdyzta5,
+          c: function () {
+            return true;
+          },
+        },
+      ]);
+    };
+    scope['mrs5fc6f6'].isChoice = true;
+
+    // action
+    scope.fscu3q9f2 = () => {
+      player.set(CURRENT_NODE_VAR, 'fscu3q9f2');
+      player.set('PICKUP_NEXT_FILE_ID', player.get('curIN2f'));
+      player.set('PICKUP_NEXT_NODE_ID', 'uda69gq16');
+      scope.fftfli8sk();
+    };
+
+    // next_file
+    scope.fftfli8sk = function () {
+      var key = `FUNC_PickUp.json`;
+      var func = files[key];
+      if (!func) {
+        func = files[player.get(key)];
+      }
+      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
+      var nodeId = player.get('NEXT_NODE_ID');
+      if (func) {
+        player.set('NEXT_NODE_ID', null);
+        func(nodeId);
+      } else {
+        core.exit();
+      }
+    };
+
+    // action
+    scope.d4fee2tcn = () => {
+      player.set(CURRENT_NODE_VAR, 'd4fee2tcn');
+      engine.setBackground('Caves_Waterfall_2');
+      scope.xgribx6r2();
+    };
+
+    // text
+    scope.xgribx6r2 = () => {
+      player.set(CURRENT_NODE_VAR, 'xgribx6r2');
+      var text = `You approach the waterfall and are sprayed with a cold mist as you get close.  The water flows from a tall cliff that is too steep and slippery to climb.`;
+      core.say(text, scope.kw2ty6bs2, 'xgribx6r2', 'kw2ty6bs2');
+    };
+    scope['xgribx6r2'].isText = true;
+
+    // pass_fail
+    scope.kw2ty6bs2 = function () {
+      player.set(CURRENT_NODE_VAR, 'kw2ty6bs2');
+      var condition = (function () {
+        return (
+          player.get('flags.waterfall_knowledge') &&
+          !player.get('flags.waterfall_jumped_through')
+        );
+      })();
+      if (condition) {
+        player.set(CURRENT_NODE_VAR, 'ay1s7gi43');
+        scope.gz5ggm3di();
+      }
+      if (!condition) {
+        player.set(CURRENT_NODE_VAR, 'ih7kr0fxf');
+        scope.a5tbsf54g();
+      }
+    };
+    // text
+    scope.gz5ggm3di = () => {
+      player.set(CURRENT_NODE_VAR, 'gz5ggm3di');
+      var text = `That note you found in the eastern cave in mentioned a passage "behind the waterfall".  You can try to jump through it.  Would you like to?`;
+      core.say(text, scope.m1870fb1i, 'gz5ggm3di', 'm1870fb1i');
+    };
+    scope['gz5ggm3di'].isText = true;
+
+    // choice
+    scope.m1870fb1i = function () {
+      player.set(CURRENT_NODE_VAR, 'm1870fb1i');
+      let text = ``;
+      core.choose(text, 'm1870fb1i', [
+        {
+          t: `Yes.`,
+          id: 'pyqix41rq',
+          cb: scope.pyqix41rq,
+          c: function () {
+            return true;
+          },
+        },
+        {
+          t: `No.`,
+          id: 'f4nufck15',
+          cb: scope.f4nufck15,
+          c: function () {
+            return true;
+          },
+        },
+      ]);
+    };
+    scope['m1870fb1i'].isChoice = true;
+
+    // action
+    scope.pyqix41rq = () => {
+      player.set(CURRENT_NODE_VAR, 'pyqix41rq');
+      const ms = 300;
+      engine.playSound('step_1');
+      setTimeout(() => {
+        engine.playSound('step_2');
+      }, ms);
+      setTimeout(() => {
+        engine.playSound('step_3');
+      }, ms * 2);
+      setTimeout(() => {
+        engine.playSound('step_1');
+      }, ms * 3);
+      setTimeout(() => {
+        engine.playSound('grunt');
+      }, ms * 3.5);
+      scope.u7yf8x017();
+    };
+
+    // text
+    scope.u7yf8x017 = () => {
+      player.set(CURRENT_NODE_VAR, 'u7yf8x017');
+      var text = `Gathering courage, you jump through the rushing water.  You are airborne for a brief moment before landing on solid ground, tumbling forward onto solid rock.
+
+Although now you are are dripping with cold water, you can indeed see that there is a passage to the NORTH.`;
+      core.say(text, scope.dcbbhozf8, 'u7yf8x017', 'dcbbhozf8');
+    };
+    scope['u7yf8x017'].isText = true;
+
+    // choice
+    scope.dcbbhozf8 = function () {
+      player.set(CURRENT_NODE_VAR, 'dcbbhozf8');
+      let text = ``;
+      core.choose(text, 'dcbbhozf8', [
+        {
+          t: `Go NORTH.`,
+          id: 'xrhrfcgw5',
+          cb: scope.xrhrfcgw5,
+          c: function () {
+            return true;
+          },
+        },
+      ]);
+    };
+    scope['dcbbhozf8'].isChoice = true;
+
+    // action
+    scope.xrhrfcgw5 = () => {
+      player.set(CURRENT_NODE_VAR, 'xrhrfcgw5');
+      player.set('flags.waterfall_jumped_through', true);
+      scope.kxf0wkcgy();
+    };
+
+    // next_file
+    scope.kxf0wkcgy = function () {
+      var key = `Caves_StoneStairway1.json`;
+      var func = files[key];
+      if (!func) {
+        func = files[player.get(key)];
+      }
+      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
+      var nodeId = player.get('NEXT_NODE_ID');
+      if (func) {
+        player.set('NEXT_NODE_ID', null);
+        func(nodeId);
+      } else {
+        core.exit();
+      }
+    };
+
+    // action
+    scope.f4nufck15 = () => {
+      player.set(CURRENT_NODE_VAR, 'f4nufck15');
+      engine.setBackground('Caves_Waterfall');
+      scope.i8qqnwp7r();
+    };
+
+    // text
+    scope.i8qqnwp7r = () => {
+      player.set(CURRENT_NODE_VAR, 'i8qqnwp7r');
+      var text = `You decide not to jump through the waterfall.`;
+      core.say(text, scope.mrs5fc6f6, 'i8qqnwp7r', 'mrs5fc6f6');
+    };
+    scope['i8qqnwp7r'].isText = true;
+
+    // action
+    scope.a5tbsf54g = () => {
+      player.set(CURRENT_NODE_VAR, 'a5tbsf54g');
+      engine.setBackground('Caves_Waterfall');
+      scope.rsxnbrtwt();
+    };
+
+    // text
+    scope.rsxnbrtwt = () => {
+      player.set(CURRENT_NODE_VAR, 'rsxnbrtwt');
+      var text = `You don't see anything too interesting by the base of the waterfall.`;
+      core.say(text, scope.mrs5fc6f6, 'rsxnbrtwt', 'mrs5fc6f6');
+    };
+    scope['rsxnbrtwt'].isText = true;
+
+    // text
+    scope.oyqk97dx2 = () => {
+      player.set(CURRENT_NODE_VAR, 'oyqk97dx2');
+      var text = `Water flows briskly to the SOUTHEAST.  It heads into a narrow gap in the wall and disappears behind it.  It is not deep enough for you to attempt to swim through the gap.`;
+      core.say(text, scope.mrs5fc6f6, 'oyqk97dx2', 'mrs5fc6f6');
+    };
+    scope['oyqk97dx2'].isText = true;
+
+    // text
+    scope.plrdyzta5 = () => {
+      player.set(CURRENT_NODE_VAR, 'plrdyzta5');
+      var text = `Waterfall Cave.`;
+      core.say(text, scope.f6c5u0xbq, 'plrdyzta5', 'f6c5u0xbq');
+    };
+    scope['plrdyzta5'].isText = true;
+
+    // text
+    scope.hhe13xq29 = () => {
+      player.set(CURRENT_NODE_VAR, 'hhe13xq29');
+      var text = `${player.get('examineText')}
+
+There are exits to the NORTH, EAST, SOUTH, and WEST.
+
+${player.get('itemsText')}`;
+      core.say(text, scope.mrs5fc6f6, 'hhe13xq29', 'mrs5fc6f6');
+    };
+    scope['hhe13xq29'].isText = true;
+
+    // action
+    scope.lolzbqrns = () => {
+      player.set(CURRENT_NODE_VAR, 'lolzbqrns');
+      player.set('INVENTORY_NEXT_NODE_ID', 'plrdyzta5');
+      player.set('INVENTORY_NEXT_FILE_ID', player.get(CURRENT_FILE_VAR));
+      scope.gdrgb35fp();
+    };
+
+    // next_file
+    scope.gdrgb35fp = function () {
+      var key = `FUNC_Inventory.json`;
+      var func = files[key];
+      if (!func) {
+        func = files[player.get(key)];
+      }
+      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
+      var nodeId = player.get('NEXT_NODE_ID');
+      if (func) {
+        player.set('NEXT_NODE_ID', null);
+        func(nodeId);
+      } else {
+        core.exit();
+      }
+    };
+
+    // next_file
+    scope.oztg6gr5f = function () {
+      var key = `Caves_StoneStairway1.json`;
+      var func = files[key];
+      if (!func) {
+        func = files[player.get(key)];
+      }
+      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
+      var nodeId = player.get('NEXT_NODE_ID');
+      if (func) {
+        player.set('NEXT_NODE_ID', null);
+        func(nodeId);
+      } else {
+        core.exit();
+      }
+    };
+
+    // next_file
+    scope.nggggg3sn = function () {
+      var key = `Caves_Cave2.json`;
+      var func = files[key];
+      if (!func) {
+        func = files[player.get(key)];
+      }
+      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
+      var nodeId = player.get('NEXT_NODE_ID');
+      if (func) {
+        player.set('NEXT_NODE_ID', null);
+        func(nodeId);
+      } else {
+        core.exit();
+      }
+    };
+
+    // next_file
+    scope.rfp9kp182 = function () {
+      var key = `Caves_BelowDungeon.json`;
+      var func = files[key];
+      if (!func) {
+        func = files[player.get(key)];
+      }
+      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
+      var nodeId = player.get('NEXT_NODE_ID');
+      if (func) {
+        player.set('NEXT_NODE_ID', null);
+        func(nodeId);
+      } else {
+        core.exit();
+      }
+    };
+
+    // next_file
+    scope.w3w82b5so = function () {
+      var key = `Caves_Cave1.json`;
+      var func = files[key];
+      if (!func) {
+        func = files[player.get(key)];
+      }
+      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
+      var nodeId = player.get('NEXT_NODE_ID');
+      if (func) {
+        player.set('NEXT_NODE_ID', null);
+        func(nodeId);
+      } else {
+        core.exit();
+      }
+    };
+
+    // action
+    scope.e5ocu5kuz = () => {
+      player.set(CURRENT_NODE_VAR, 'e5ocu5kuz');
+      engine.setBackground('Caves_Waterfall');
+      engine.setHeading('n');
+      if (player.get('lasIN2f') !== 'Inventory.json') {
+        engine.playSound('waterfall');
+      }
+      scope.plrdyzta5();
+    };
+
+    if (id === undefined) {
+      scope.lf8gyt65k();
+    } else if (id) {
+      scope[id]();
+    }
+    return player.state;
+  };
+
+  files[`FUNC_PickUpEvents.json`] = function (id) {
+    player.set(CURRENT_FILE_VAR, 'FUNC_PickUpEvents.json');
+    // switch
+    scope.a06hr4dm4 = () => {
+      player.set(CURRENT_NODE_VAR, 'a06hr4dm4');
+      if (player.get('PICK_UP_EVENT_NAME') === 'candle') scope.r2fgio524();
+      else if (player.get('PICK_UP_EVENT_NAME') === 'chapel_robes')
+        scope.aixgtfp26();
+      else if (true) scope.gsupyrnnc();
+    };
+    // text
+    scope.r2fgio524 = () => {
+      player.set(CURRENT_NODE_VAR, 'r2fgio524');
+      var text = `When you pick up this candle it buzzes softly in your hand.`;
+      core.say(text, scope.rmxzh8br6, 'r2fgio524', 'rmxzh8br6');
+    };
+    scope['r2fgio524'].isText = true;
+
+    // action
+    scope.rmxzh8br6 = () => {
+      player.set(CURRENT_NODE_VAR, 'rmxzh8br6');
+      player.set('NEXT_NODE_ID', player.get('PICKUP_RETURN_NODE_ID'));
+      scope.omggy4arm();
+    };
+
+    // next_file
+    scope.omggy4arm = function () {
+      var key = `PICKUP_RETURN_FILE_ID`;
+      var func = files[key];
+      if (!func) {
+        func = files[player.get(key)];
+      }
+      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
+      var nodeId = player.get('NEXT_NODE_ID');
+      if (func) {
+        player.set('NEXT_NODE_ID', null);
+        func(nodeId);
+      } else {
+        core.exit();
+      }
+    };
+
+    // action
+    scope.aixgtfp26 = () => {
+      player.set(CURRENT_NODE_VAR, 'aixgtfp26');
+      engine.addItemToInventory('cleric_chains_key');
+      engine.playSound('get_item');
+      scope.g3ld2uuck();
+    };
+
+    // text
+    scope.g3ld2uuck = () => {
+      player.set(CURRENT_NODE_VAR, 'g3ld2uuck');
+      var text = `When you grab a robe, your hand feels something solid in the folds.  Rummaging around in the pockets, you find a small key.  You take it.`;
+      core.say(text, scope.rmxzh8br6, 'g3ld2uuck', 'rmxzh8br6');
+    };
+    scope['g3ld2uuck'].isText = true;
+
+    // text
+    scope.gsupyrnnc = () => {
+      player.set(CURRENT_NODE_VAR, 'gsupyrnnc');
+      var text = `There is no Pick Up Event associated with this item even though this utility was called.  This is probably an ERROR.`;
+      core.say(text, scope.rmxzh8br6, 'gsupyrnnc', 'rmxzh8br6');
+    };
+    scope['gsupyrnnc'].isText = true;
+
+    if (id === undefined) {
+      scope.a06hr4dm4();
     } else if (id) {
       scope[id]();
     }
@@ -1788,500 +2688,412 @@ ${player.get('itemsText')}`;
   };
   scope['k9odb6gg6'].isText = true;
 
-  files[`Caves_Waterfall.json`] = function (id) {
-    player.set(CURRENT_FILE_VAR, 'Caves_Waterfall.json');
+  files[`Caves_StoneTempleChantry.json`] = function (id) {
+    player.set(CURRENT_FILE_VAR, 'Caves_StoneTempleChantry.json');
     // switch
-    scope.lf8gyt65k = () => {
-      player.set(CURRENT_NODE_VAR, 'lf8gyt65k');
-      if (player.once()) scope.kdtd6xhqp();
-      else if (true) scope.e5ocu5kuz();
+    scope.yxzzmr43h = () => {
+      player.set(CURRENT_NODE_VAR, 'yxzzmr43h');
+      if (true) scope.zr1wtnax7();
     };
     // action
-    scope.kdtd6xhqp = () => {
-      player.set(CURRENT_NODE_VAR, 'kdtd6xhqp');
-      engine.setBackground('Caves_Waterfall');
-      engine.setHeading('n');
-      engine.playSound('waterfall');
-      scope.xgdx8bmi4();
+    scope.zr1wtnax7 = () => {
+      player.set(CURRENT_NODE_VAR, 'zr1wtnax7');
+      scope.mnk837g9f();
     };
-
-    // text
-    scope.xgdx8bmi4 = () => {
-      player.set(CURRENT_NODE_VAR, 'xgdx8bmi4');
-      var text = `The sound of rushing water gets louder as you walk.  Eventually you emerge into a large cavern with a waterfall.
-
-Waterfall Cave.`;
-      core.say(text, scope.f6c5u0xbq, 'xgdx8bmi4', 'f6c5u0xbq');
-    };
-    scope['xgdx8bmi4'].isText = true;
-
-    // choice
-    scope.f6c5u0xbq = function () {
-      player.set(CURRENT_NODE_VAR, 'f6c5u0xbq');
-      let text = ``;
-      core.choose(text, 'f6c5u0xbq', [
-        {
-          t: `Examine surroundings.`,
-          id: 'uda69gq16',
-          cb: scope.uda69gq16,
-          c: function () {
-            return true;
-          },
-        },
-        {
-          t: `Inventory.`,
-          id: 'lolzbqrns',
-          cb: scope.lolzbqrns,
-          c: function () {
-            return true;
-          },
-        },
-        {
-          t: `Go NORTH (through waterfall).`,
-          id: 'oztg6gr5f',
-          cb: scope.oztg6gr5f,
-          c: function () {
-            return player.get('flags.waterfall_jumped_through');
-          },
-        },
-        {
-          t: `Go EAST.`,
-          id: 'nggggg3sn',
-          cb: scope.nggggg3sn,
-          c: function () {
-            return true;
-          },
-        },
-        {
-          t: `Go SOUTH.`,
-          id: 'rfp9kp182',
-          cb: scope.rfp9kp182,
-          c: function () {
-            return true;
-          },
-        },
-        {
-          t: `Go WEST.`,
-          id: 'w3w82b5so',
-          cb: scope.w3w82b5so,
-          c: function () {
-            return true;
-          },
-        },
-      ]);
-    };
-    scope['f6c5u0xbq'].isChoice = true;
 
     // action
-    scope.uda69gq16 = () => {
-      player.set(CURRENT_NODE_VAR, 'uda69gq16');
-      player.set(
-        'examineText',
-        'You stand at the base of a loud waterfall that cascades down a cliff.  It sprays water on the cave walls, droplets of which form small pools on the ground that must be stepped around as you traverse.  The waterfall feeds a creek that meanders further into the caves to the SOUTHEAST.  A faint glowing moss on the ceiling dimly illuminates the cavern.'
-      );
-      player.set('itemsText', engine.getRoomItemsText());
-      scope.xa7ubepkp();
-    };
+    scope.mnk837g9f = () => {
+      player.set(CURRENT_NODE_VAR, 'mnk837g9f');
+      player.setIfUnset('flags.chantrySarcOpen', false);
+      player.setIfUnset('portals.1', false);
 
-    // pass_fail
-    scope.xa7ubepkp = function () {
-      player.set(CURRENT_NODE_VAR, 'xa7ubepkp');
-      var condition = (function () {
-        return player.get('flags.waterfall_jumped_through');
-      })();
-      if (!condition) {
-        player.set(CURRENT_NODE_VAR, 'w9htgtc6s');
-        scope.s7kuco7b8();
-      }
-      if (condition) {
-        player.set(CURRENT_NODE_VAR, 'i9mipblsx');
-        scope.hhe13xq29();
-      }
-    };
-    // text
-    scope.s7kuco7b8 = () => {
-      player.set(CURRENT_NODE_VAR, 's7kuco7b8');
-      var text = `${player.get('examineText')}
-
-There are exits to the EAST, SOUTH, and WEST.
-
-${player.get('itemsText')}`;
-      core.say(text, scope.mrs5fc6f6, 's7kuco7b8', 'mrs5fc6f6');
-    };
-    scope['s7kuco7b8'].isText = true;
-
-    // choice
-    scope.mrs5fc6f6 = function () {
-      player.set(CURRENT_NODE_VAR, 'mrs5fc6f6');
-      let text = ``;
-      core.choose(text, 'mrs5fc6f6', [
-        {
-          t: `Pick up items.`,
-          id: 'fscu3q9f2',
-          cb: scope.fscu3q9f2,
-          c: function () {
-            return engine.getRoomItems().length > 0;
-          },
-        },
-        {
-          t: `Examine waterfall.`,
-          id: 'd4fee2tcn',
-          cb: scope.d4fee2tcn,
-          c: function () {
-            return true;
-          },
-        },
-        {
-          t: `Examine creek.`,
-          id: 'oyqk97dx2',
-          cb: scope.oyqk97dx2,
-          c: function () {
-            return true;
-          },
-        },
-        {
-          t: `Back.`,
-          id: 'plrdyzta5',
-          cb: scope.plrdyzta5,
-          c: function () {
-            return true;
-          },
-        },
-      ]);
-    };
-    scope['mrs5fc6f6'].isChoice = true;
-
-    // action
-    scope.fscu3q9f2 = () => {
-      player.set(CURRENT_NODE_VAR, 'fscu3q9f2');
-      player.set('PICKUP_NEXT_FILE_ID', player.get('curIN2f'));
-      player.set('PICKUP_NEXT_NODE_ID', 'uda69gq16');
-      scope.fftfli8sk();
-    };
-
-    // next_file
-    scope.fftfli8sk = function () {
-      var key = `FUNC_PickUp.json`;
-      var func = files[key];
-      if (!func) {
-        func = files[player.get(key)];
-      }
-      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
-      var nodeId = player.get('NEXT_NODE_ID');
-      if (func) {
-        player.set('NEXT_NODE_ID', null);
-        func(nodeId);
+      if (player.get('flags.chantrySarcOpen')) {
+        if (player.get('portals.1')) {
+          engine.setBackground('Caves_StoneTempleChantry_2');
+          engine.playSound('glow');
+        } else {
+          engine.setBackground('Caves_StoneTempleChantry_3');
+        }
       } else {
-        core.exit();
+        engine.setBackground('Caves_StoneTempleChantry');
       }
-    };
 
-    // action
-    scope.d4fee2tcn = () => {
-      player.set(CURRENT_NODE_VAR, 'd4fee2tcn');
-      engine.setBackground('Caves_Waterfall_2');
-      scope.xgribx6r2();
-    };
+      engine.setHeading('se');
 
-    // text
-    scope.xgribx6r2 = () => {
-      player.set(CURRENT_NODE_VAR, 'xgribx6r2');
-      var text = `You approach the waterfall and are sprayed with a cold mist as you get close.  The water flows from a tall cliff that is too steep and slippery to climb.`;
-      core.say(text, scope.kw2ty6bs2, 'xgribx6r2', 'kw2ty6bs2');
-    };
-    scope['xgribx6r2'].isText = true;
-
-    // pass_fail
-    scope.kw2ty6bs2 = function () {
-      player.set(CURRENT_NODE_VAR, 'kw2ty6bs2');
-      var condition = (function () {
-        return (
-          player.get('flags.waterfall_knowledge') &&
-          !player.get('flags.waterfall_jumped_through')
-        );
-      })();
-      if (condition) {
-        player.set(CURRENT_NODE_VAR, 'ay1s7gi43');
-        scope.gz5ggm3di();
-      }
-      if (!condition) {
-        player.set(CURRENT_NODE_VAR, 'ih7kr0fxf');
-        scope.a5tbsf54g();
-      }
-    };
-    // text
-    scope.gz5ggm3di = () => {
-      player.set(CURRENT_NODE_VAR, 'gz5ggm3di');
-      var text = `Since you know that there is a passage behind the waterfall, you can try to jump through it.  Would you like to?`;
-      core.say(text, scope.m1870fb1i, 'gz5ggm3di', 'm1870fb1i');
-    };
-    scope['gz5ggm3di'].isText = true;
-
-    // choice
-    scope.m1870fb1i = function () {
-      player.set(CURRENT_NODE_VAR, 'm1870fb1i');
-      let text = ``;
-      core.choose(text, 'm1870fb1i', [
-        {
-          t: `Yes.`,
-          id: 'pyqix41rq',
-          cb: scope.pyqix41rq,
-          c: function () {
-            return true;
-          },
-        },
-        {
-          t: `No.`,
-          id: 'f4nufck15',
-          cb: scope.f4nufck15,
-          c: function () {
-            return true;
-          },
-        },
-      ]);
-    };
-    scope['m1870fb1i'].isChoice = true;
-
-    // action
-    scope.pyqix41rq = () => {
-      player.set(CURRENT_NODE_VAR, 'pyqix41rq');
-      const ms = 300;
-      engine.playSound('step_1');
-      setTimeout(() => {
-        engine.playSound('step_2');
-      }, ms);
-      setTimeout(() => {
-        engine.playSound('step_3');
-      }, ms * 2);
-      setTimeout(() => {
-        engine.playSound('step_1');
-      }, ms * 3);
-      setTimeout(() => {
-        engine.playSound('grunt');
-      }, ms * 3.5);
-      scope.u7yf8x017();
-    };
-
-    // text
-    scope.u7yf8x017 = () => {
-      player.set(CURRENT_NODE_VAR, 'u7yf8x017');
-      var text = `Gathering courage, you jump through the rushing water.  You are airborne for a brief moment before landing on solid ground, tumbling forward onto solid rock.
-
-Although now you are are dripping with cold water, you can indeed see that there is a passage to the NORTH.`;
-      core.say(text, scope.dcbbhozf8, 'u7yf8x017', 'dcbbhozf8');
-    };
-    scope['u7yf8x017'].isText = true;
-
-    // choice
-    scope.dcbbhozf8 = function () {
-      player.set(CURRENT_NODE_VAR, 'dcbbhozf8');
-      let text = ``;
-      core.choose(text, 'dcbbhozf8', [
-        {
-          t: `Go NORTH.`,
-          id: 'xrhrfcgw5',
-          cb: scope.xrhrfcgw5,
-          c: function () {
-            return true;
-          },
-        },
-      ]);
-    };
-    scope['dcbbhozf8'].isChoice = true;
-
-    // action
-    scope.xrhrfcgw5 = () => {
-      player.set(CURRENT_NODE_VAR, 'xrhrfcgw5');
-      player.set('flags.waterfall_jumped_through', true);
-      scope.kxf0wkcgy();
-    };
-
-    // next_file
-    scope.kxf0wkcgy = function () {
-      var key = `Caves_StoneStairway1.json`;
-      var func = files[key];
-      if (!func) {
-        func = files[player.get(key)];
-      }
-      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
-      var nodeId = player.get('NEXT_NODE_ID');
-      if (func) {
-        player.set('NEXT_NODE_ID', null);
-        func(nodeId);
-      } else {
-        core.exit();
-      }
-    };
-
-    // action
-    scope.f4nufck15 = () => {
-      player.set(CURRENT_NODE_VAR, 'f4nufck15');
-      engine.setBackground('Caves_Waterfall');
-      scope.i8qqnwp7r();
-    };
-
-    // text
-    scope.i8qqnwp7r = () => {
-      player.set(CURRENT_NODE_VAR, 'i8qqnwp7r');
-      var text = `You decide not to jump through the waterfall.`;
-      core.say(text, scope.mrs5fc6f6, 'i8qqnwp7r', 'mrs5fc6f6');
-    };
-    scope['i8qqnwp7r'].isText = true;
-
-    // action
-    scope.a5tbsf54g = () => {
-      player.set(CURRENT_NODE_VAR, 'a5tbsf54g');
-      engine.setBackground('Caves_Waterfall');
-      scope.rsxnbrtwt();
-    };
-
-    // text
-    scope.rsxnbrtwt = () => {
-      player.set(CURRENT_NODE_VAR, 'rsxnbrtwt');
-      var text = `You don't see anything too interesting by the base of the waterfall.`;
-      core.say(text, scope.mrs5fc6f6, 'rsxnbrtwt', 'mrs5fc6f6');
-    };
-    scope['rsxnbrtwt'].isText = true;
-
-    // text
-    scope.oyqk97dx2 = () => {
-      player.set(CURRENT_NODE_VAR, 'oyqk97dx2');
-      var text = `Water flows briskly to the SOUTHEAST.  It heads into a narrow gap in the wall and disappears behind it.  It is not deep enough for you to attempt to swim through the gap.`;
-      core.say(text, scope.mrs5fc6f6, 'oyqk97dx2', 'mrs5fc6f6');
-    };
-    scope['oyqk97dx2'].isText = true;
-
-    // text
-    scope.plrdyzta5 = () => {
-      player.set(CURRENT_NODE_VAR, 'plrdyzta5');
-      var text = `Waterfall Cave.`;
-      core.say(text, scope.f6c5u0xbq, 'plrdyzta5', 'f6c5u0xbq');
-    };
-    scope['plrdyzta5'].isText = true;
-
-    // text
-    scope.hhe13xq29 = () => {
-      player.set(CURRENT_NODE_VAR, 'hhe13xq29');
-      var text = `${player.get('examineText')}
-
-There are exits to the NORTH, EAST, SOUTH, and WEST.
-
-${player.get('itemsText')}`;
-      core.say(text, scope.mrs5fc6f6, 'hhe13xq29', 'mrs5fc6f6');
-    };
-    scope['hhe13xq29'].isText = true;
-
-    // action
-    scope.lolzbqrns = () => {
-      player.set(CURRENT_NODE_VAR, 'lolzbqrns');
-      player.set('INVENTORY_NEXT_NODE_ID', 'plrdyzta5');
-      player.set('INVENTORY_NEXT_FILE_ID', player.get(CURRENT_FILE_VAR));
-      scope.gdrgb35fp();
-    };
-
-    // next_file
-    scope.gdrgb35fp = function () {
-      var key = `FUNC_Inventory.json`;
-      var func = files[key];
-      if (!func) {
-        func = files[player.get(key)];
-      }
-      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
-      var nodeId = player.get('NEXT_NODE_ID');
-      if (func) {
-        player.set('NEXT_NODE_ID', null);
-        func(nodeId);
-      } else {
-        core.exit();
-      }
-    };
-
-    // next_file
-    scope.oztg6gr5f = function () {
-      var key = `Caves_StoneStairway1.json`;
-      var func = files[key];
-      if (!func) {
-        func = files[player.get(key)];
-      }
-      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
-      var nodeId = player.get('NEXT_NODE_ID');
-      if (func) {
-        player.set('NEXT_NODE_ID', null);
-        func(nodeId);
-      } else {
-        core.exit();
-      }
-    };
-
-    // next_file
-    scope.nggggg3sn = function () {
-      var key = `Caves_Cave2.json`;
-      var func = files[key];
-      if (!func) {
-        func = files[player.get(key)];
-      }
-      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
-      var nodeId = player.get('NEXT_NODE_ID');
-      if (func) {
-        player.set('NEXT_NODE_ID', null);
-        func(nodeId);
-      } else {
-        core.exit();
-      }
-    };
-
-    // next_file
-    scope.rfp9kp182 = function () {
-      var key = `Caves_BelowDungeon.json`;
-      var func = files[key];
-      if (!func) {
-        func = files[player.get(key)];
-      }
-      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
-      var nodeId = player.get('NEXT_NODE_ID');
-      if (func) {
-        player.set('NEXT_NODE_ID', null);
-        func(nodeId);
-      } else {
-        core.exit();
-      }
-    };
-
-    // next_file
-    scope.w3w82b5so = function () {
-      var key = `Caves_Cave1.json`;
-      var func = files[key];
-      if (!func) {
-        func = files[player.get(key)];
-      }
-      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
-      var nodeId = player.get('NEXT_NODE_ID');
-      if (func) {
-        player.set('NEXT_NODE_ID', null);
-        func(nodeId);
-      } else {
-        core.exit();
-      }
-    };
-
-    // action
-    scope.e5ocu5kuz = () => {
-      player.set(CURRENT_NODE_VAR, 'e5ocu5kuz');
-      engine.setBackground('Caves_Waterfall');
-      engine.setHeading('n');
       if (player.get('lasIN2f') !== 'Inventory.json') {
-        engine.playSound('waterfall');
+        engine.playOneOfSound('step_floor', [1]);
       }
-      scope.plrdyzta5();
+      scope.gm9g1p7b2();
+    };
+
+    // action
+    scope.gm9g1p7b2 = () => {
+      player.set(CURRENT_NODE_VAR, 'gm9g1p7b2');
+
+      player.set('args.roomTitle', 'Stone Temple Chantry');
+      player.set('args.nextNodeId', 'rxnar4fgr');
+      player.set('args.nextFileId', player.get('curIN2f'));
+      player.set('args.customExit1', false);
+      player.set('args.northExit', false);
+      player.set('args.eastExit', false);
+      player.set('args.southExit', false);
+      player.set('args.westExit', 'Caves_StoneTempleChapel.json');
+      scope.fnqho8fun();
+    };
+
+    // next_file
+    scope.fnqho8fun = function () {
+      var key = `FUNC_BasicRoom.json`;
+      var func = files[key];
+      if (!func) {
+        func = files[player.get(key)];
+      }
+      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
+      var nodeId = player.get('NEXT_NODE_ID');
+      if (func) {
+        player.set('NEXT_NODE_ID', null);
+        func(nodeId);
+      } else {
+        core.exit();
+      }
     };
 
     if (id === undefined) {
-      scope.lf8gyt65k();
+      scope.yxzzmr43h();
     } else if (id) {
       scope[id]();
     }
     return player.state;
   };
+
+  // sub_root
+  scope.pg28n80pd = () => {
+    player.set(CURRENT_NODE_VAR, 'pg28n80pd');
+    scope.egxfukg7t();
+  };
+
+  // action
+  scope.egxfukg7t = () => {
+    player.set(CURRENT_NODE_VAR, 'egxfukg7t');
+    player.set('itemsText', engine.getRoomItemsText());
+    scope.iks4y40xy();
+  };
+
+  // text
+  scope.iks4y40xy = () => {
+    player.set(CURRENT_NODE_VAR, 'iks4y40xy');
+    var text = `You are standing in the chantry inside the Stone Temple.
+
+${player.get('exitText')}
+
+${player.get('itemsText')}`;
+    core.say(text, scope.eklm9wlff, 'iks4y40xy', 'eklm9wlff');
+  };
+  scope['iks4y40xy'].isText = true;
+
+  // choice
+  scope.eklm9wlff = function () {
+    player.set(CURRENT_NODE_VAR, 'eklm9wlff');
+    let text = ``;
+    core.choose(text, 'eklm9wlff', [
+      {
+        t: `Pick up items.`,
+        id: 'g4uwl1fqu',
+        cb: scope.g4uwl1fqu,
+        c: function () {
+          return engine.getRoomItems().length > 0;
+        },
+      },
+      {
+        t: `Examine sarcophagus.`,
+        id: 'gdwp6lt0h',
+        cb: scope.gdwp6lt0h,
+        c: function () {
+          return true;
+        },
+      },
+      {
+        t: `Examine symbol.`,
+        id: 'd9lsgxqzm',
+        cb: scope.d9lsgxqzm,
+        c: function () {
+          return true;
+        },
+      },
+      {
+        t: `Back.`,
+        id: 'mnk837g9f',
+        cb: scope.mnk837g9f,
+        c: function () {
+          return true;
+        },
+      },
+    ]);
+  };
+  scope['eklm9wlff'].isChoice = true;
+
+  // action
+  scope.g4uwl1fqu = () => {
+    player.set(CURRENT_NODE_VAR, 'g4uwl1fqu');
+    player.set('PICKUP_NEXT_FILE_ID', player.get('curIN2f'));
+    player.set('PICKUP_NEXT_NODE_ID', 'pg28n80pd');
+    scope.hogns4c30();
+  };
+
+  // next_file
+  scope.hogns4c30 = function () {
+    var key = `FUNC_PickUp.json`;
+    var func = files[key];
+    if (!func) {
+      func = files[player.get(key)];
+    }
+    player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
+    var nodeId = player.get('NEXT_NODE_ID');
+    if (func) {
+      player.set('NEXT_NODE_ID', null);
+      func(nodeId);
+    } else {
+      core.exit();
+    }
+  };
+
+  // pass_fail
+  scope.gdwp6lt0h = function () {
+    player.set(CURRENT_NODE_VAR, 'gdwp6lt0h');
+    var condition = (function () {
+      return player.get('flags.chantrySarcOpen');
+    })();
+    if (!condition) {
+      player.set(CURRENT_NODE_VAR, 'wlua483q7');
+      scope.ers7t1ez2();
+    }
+    if (condition) {
+      player.set(CURRENT_NODE_VAR, 'kz2fsfbum');
+      scope.bwto4smoh();
+    }
+  };
+  // text
+  scope.ers7t1ez2 = () => {
+    player.set(CURRENT_NODE_VAR, 'ers7t1ez2');
+    var text = `It's a thick, stone box with an intricate pattern on the heavy-looking lid.  The sarcophagus itself is massive, easily able to hold two average-sized people inside of it.`;
+    core.say(text, scope.io0zzrk81, 'ers7t1ez2', 'io0zzrk81');
+  };
+  scope['ers7t1ez2'].isText = true;
+
+  // choice
+  scope.io0zzrk81 = function () {
+    player.set(CURRENT_NODE_VAR, 'io0zzrk81');
+    let text = ``;
+    core.choose(text, 'io0zzrk81', [
+      {
+        t: `Open the sarcophagus.`,
+        id: 'pydfsaic2',
+        cb: scope.pydfsaic2,
+        c: function () {
+          return !player.get('flags.chantrySarcOpen');
+        },
+      },
+      {
+        t: `Back.`,
+        id: 'eklm9wlff',
+        cb: scope.eklm9wlff,
+        c: function () {
+          return true;
+        },
+      },
+    ]);
+  };
+  scope['io0zzrk81'].isChoice = true;
+
+  // action
+  scope.pydfsaic2 = () => {
+    player.set(CURRENT_NODE_VAR, 'pydfsaic2');
+    player.set('flags.chantrySarcOpen', true);
+    engine.playSound('stone_lid_fall');
+    engine.setBackground('Caves_StoneTempleChantry_3');
+    scope.uwga7r3q8();
+  };
+
+  // text
+  scope.uwga7r3q8 = () => {
+    player.set(CURRENT_NODE_VAR, 'uwga7r3q8');
+    var text = `[STRENGTH] You squat and lift, and with great effort, the lid slides to the floor.`;
+    core.say(text, scope.cctwcpwnk, 'uwga7r3q8', 'cctwcpwnk');
+  };
+  scope['uwga7r3q8'].isText = true;
+
+  // action
+  scope.cctwcpwnk = () => {
+    player.set(CURRENT_NODE_VAR, 'cctwcpwnk');
+    engine.addItemToInventory('stone_hand');
+    engine.playSound('get_item');
+    scope.ypbk2kd04();
+  };
+
+  // text
+  scope.ypbk2kd04 = () => {
+    player.set(CURRENT_NODE_VAR, 'ypbk2kd04');
+    var text = `Peering inside, you see that it is mostly empty, save for a curious stone hand, haphazardly lying in the corner.
+
+You take it.  It might be useful.`;
+    core.say(text, scope.eklm9wlff, 'ypbk2kd04', 'eklm9wlff');
+  };
+  scope['ypbk2kd04'].isText = true;
+
+  // pass_fail
+  scope.bwto4smoh = function () {
+    player.set(CURRENT_NODE_VAR, 'bwto4smoh');
+    var condition = (function () {
+      return player.get('portals.1');
+    })();
+    if (condition) {
+      player.set(CURRENT_NODE_VAR, 'w4nzm9yii');
+      scope.z3f8fm1ql();
+    }
+    if (!condition) {
+      player.set(CURRENT_NODE_VAR, 'er9mddrxk');
+      scope.quzbg39of();
+    }
+  };
+  // text
+  scope.z3f8fm1ql = () => {
+    player.set(CURRENT_NODE_VAR, 'z3f8fm1ql');
+    var text = `The light is blinding, and it's difficult to see the actual sarcophagus.  It seems to be beckoning you to touch it, to join it...`;
+    core.say(text, scope.io0zzrk81, 'z3f8fm1ql', 'io0zzrk81');
+  };
+  scope['z3f8fm1ql'].isText = true;
+
+  // text
+  scope.quzbg39of = () => {
+    player.set(CURRENT_NODE_VAR, 'quzbg39of');
+    var text = `With the lid of the sarcophagus on the floor, you can see inside; but there's nothing.  It's empty.`;
+    core.say(text, scope.eklm9wlff, 'quzbg39of', 'eklm9wlff');
+  };
+  scope['quzbg39of'].isText = true;
+
+  // pass_fail
+  scope.d9lsgxqzm = function () {
+    player.set(CURRENT_NODE_VAR, 'd9lsgxqzm');
+    var condition = (function () {
+      return engine.isClass('Cleric');
+    })();
+    if (condition) {
+      player.set(CURRENT_NODE_VAR, 'rycg29ioh');
+      scope.lww8wlsyf();
+    }
+    if (!condition) {
+      player.set(CURRENT_NODE_VAR, 'inf9cq4ua');
+      scope.ob69g0t2g();
+    }
+  };
+  // text
+  scope.lww8wlsyf = () => {
+    player.set(CURRENT_NODE_VAR, 'lww8wlsyf');
+    var text = `The symbol for 'portal' in incantation script.`;
+    core.say(text, scope.eklm9wlff, 'lww8wlsyf', 'eklm9wlff');
+  };
+  scope['lww8wlsyf'].isText = true;
+
+  // text
+  scope.ob69g0t2g = () => {
+    player.set(CURRENT_NODE_VAR, 'ob69g0t2g');
+    var text = `It's another cryptic symbol you've seen all over this temple.  You have no idea what it is.`;
+    core.say(text, scope.eklm9wlff, 'ob69g0t2g', 'eklm9wlff');
+  };
+  scope['ob69g0t2g'].isText = true;
+
+  // sub_root
+  scope.rxnar4fgr = () => {
+    player.set(CURRENT_NODE_VAR, 'rxnar4fgr');
+    scope.y70cp1sq9();
+  };
+
+  // action
+  scope.y70cp1sq9 = () => {
+    player.set(CURRENT_NODE_VAR, 'y70cp1sq9');
+    scope.n0t91lrg0();
+  };
+
+  // switch
+  scope.n0t91lrg0 = () => {
+    player.set(CURRENT_NODE_VAR, 'n0t91lrg0');
+    if (player.get('output.roomChoice') === 'examine-surroundings')
+      scope.fddsd6emz();
+    else if (true) scope.mnk837g9f();
+  };
+  // action
+  scope.fddsd6emz = () => {
+    player.set(CURRENT_NODE_VAR, 'fddsd6emz');
+    player.set('itemsText', engine.getRoomItemsText());
+    player.set('exitText', 'There is an exit to the WEST.');
+    scope.hn38uy9mz();
+  };
+
+  // pass_fail
+  scope.hn38uy9mz = function () {
+    player.set(CURRENT_NODE_VAR, 'hn38uy9mz');
+    var condition = (function () {
+      return player.get('flags.chantrySarcOpen');
+    })();
+    if (!condition) {
+      player.set(CURRENT_NODE_VAR, 'nd6xd36is');
+      scope.h1zdm1u2e();
+    }
+    if (condition) {
+      player.set(CURRENT_NODE_VAR, 'dcntg25yc');
+      scope.lwy8l0az4();
+    }
+  };
+  // text
+  scope.h1zdm1u2e = () => {
+    player.set(CURRENT_NODE_VAR, 'h1zdm1u2e');
+    var text = `This room is octagonal and echoey; the ceiling rises high up into the darkness above you.  A single row of pews encircles a closed stone sarcophagus, tall windows directing a glowing, green light from outside directly onto it.  Another strange symbol adorns the southern wall.
+
+${player.get('exitText')}
+
+${player.get('itemsText')}`;
+    core.say(text, scope.eklm9wlff, 'h1zdm1u2e', 'eklm9wlff');
+  };
+  scope['h1zdm1u2e'].isText = true;
+
+  // pass_fail
+  scope.lwy8l0az4 = function () {
+    player.set(CURRENT_NODE_VAR, 'lwy8l0az4');
+    var condition = (function () {
+      return player.get('portals.1');
+    })();
+    if (condition) {
+      player.set(CURRENT_NODE_VAR, 'p4kfolebe');
+      scope.s90kr7gxl();
+    }
+    if (!condition) {
+      player.set(CURRENT_NODE_VAR, 'g0ghiub1e');
+      scope.abutg4mrh();
+    }
+  };
+  // text
+  scope.s90kr7gxl = () => {
+    player.set(CURRENT_NODE_VAR, 's90kr7gxl');
+    var text = `This room is octagonal and echoey; the ceiling rises high up into the darkness above you.  A single row of pews encircles a open stone sarcophagus.
+
+${player.get('exitText')}
+
+${player.get('itemsText')}`;
+    core.say(text, scope.eklm9wlff, 's90kr7gxl', 'eklm9wlff');
+  };
+  scope['s90kr7gxl'].isText = true;
+
+  // text
+  scope.abutg4mrh = () => {
+    player.set(CURRENT_NODE_VAR, 'abutg4mrh');
+    var text = `A single row of pews encircles a glowing stone sarcophagus, with an eye-blinding light pouring out of it.
+
+${player.get('exitText')}
+
+${player.get('itemsText')}`;
+    core.say(text, scope.eklm9wlff, 'abutg4mrh', 'eklm9wlff');
+  };
+  scope['abutg4mrh'].isText = true;
 
   files[`Caves_StoneTempleMeditation.json`] = function (id) {
     player.set(CURRENT_FILE_VAR, 'Caves_StoneTempleMeditation.json');
@@ -2649,7 +3461,7 @@ Oddly, the statue is chained to the ground, its wrists and ankles bound by thick
   // text
   scope.xu6fzhaq7 = () => {
     player.set(CURRENT_NODE_VAR, 'xu6fzhaq7');
-    var text = `This room is tiny, much smaller than the others in the Temple.  An unlit torch is on the eastern wall, and a symbol is painted into the northern wall.
+    var text = `This room is tiny, cramped, and dark.  An unlit torch is on the eastern wall, and a symbol is painted into the northern wall.
 
 An intricate, life-size stone statue is kneeling on the floor, chained to rivets on the ground.
 
@@ -2678,7 +3490,7 @@ ${player.get('itemsText')}`;
   // text
   scope.x24t3hqlo = () => {
     player.set(CURRENT_NODE_VAR, 'x24t3hqlo');
-    var text = `This room is tiny, much smaller than the others in the Temple.  An unlit torch is on the eastern wall, and a symbol is painted into the northern wall..
+    var text = `This room is tiny, cramped, and dark.  An unlit torch is on the eastern wall, and a symbol is painted into the northern wall..
 
 An intricate, life-size stone statue is kneeling on the floor.
 
@@ -2692,7 +3504,7 @@ ${player.get('itemsText')}`;
   // text
   scope.aolbeztxl = () => {
     player.set(CURRENT_NODE_VAR, 'aolbeztxl');
-    var text = `This room is tiny, much smaller than the others in the Temple.  An unlit torch is on the eastern wall, and a symbol is painted into the northern wall.
+    var text = `This room is tiny, cramped, and dark.  An unlit torch is on the eastern wall, and a symbol is painted into the northern wall.
 
 ${player.get('exitText')}
 
@@ -2776,6 +3588,503 @@ ${player.get('itemsText')}`;
     core.say(text, scope.w1d8lqmfm, 'aqrugemqa', 'w1d8lqmfm');
   };
   scope['aqrugemqa'].isText = true;
+
+  files[`Caves_StoneTempleEntrance.json`] = function (id) {
+    player.set(CURRENT_FILE_VAR, 'Caves_StoneTempleEntrance.json');
+    // action
+    scope.ckh49tg59 = () => {
+      player.set(CURRENT_NODE_VAR, 'ckh49tg59');
+      scope.ukb45ddum();
+    };
+
+    // switch
+    scope.ukb45ddum = () => {
+      player.set(CURRENT_NODE_VAR, 'ukb45ddum');
+      if (false) scope.ftsgr83op();
+      else if (true) scope.ilkdw5b8g();
+    };
+    // action
+    scope.ftsgr83op = () => {
+      player.set(CURRENT_NODE_VAR, 'ftsgr83op');
+      player.set('itemsText', engine.getRoomItemsText());
+      scope.yl3szgl0z();
+    };
+
+    // text
+    scope.yl3szgl0z = () => {
+      player.set(CURRENT_NODE_VAR, 'yl3szgl0z');
+      var text = `A massive structure fills this cavern, with a stairway that leads up to a set of sturdy, stone doors.
+
+${player.get('exitText')}
+
+${player.get('itemsText')}`;
+      core.say(text, scope.q1h874es2, 'yl3szgl0z', 'q1h874es2');
+    };
+    scope['yl3szgl0z'].isText = true;
+
+    // choice
+    scope.q1h874es2 = function () {
+      player.set(CURRENT_NODE_VAR, 'q1h874es2');
+      let text = ``;
+      core.choose(text, 'q1h874es2', [
+        {
+          t: `Pick up items.`,
+          id: 'yn9ycacuy',
+          cb: scope.yn9ycacuy,
+          c: function () {
+            return engine.getRoomItems().length > 0;
+          },
+        },
+        {
+          t: `Examine structure.`,
+          id: 'fxgrr3fqs',
+          cb: scope.fxgrr3fqs,
+          c: function () {
+            return true;
+          },
+        },
+        {
+          t: `Place the HOLY SYMBOL in the indentation.`,
+          id: 'rslud6ufx',
+          cb: scope.rslud6ufx,
+          c: function () {
+            return (
+              engine.hasItemInInventory('holy_symbol_of_the_temple') &&
+              !player.get('flags.StoneTempleEntrance_open') &&
+              player.get('nodes.ulpfrs20d')
+            );
+          },
+        },
+        {
+          t: `Examine markings.`,
+          id: 'ppah3g2cd',
+          cb: scope.ppah3g2cd,
+          c: function () {
+            return player.get('nodes.ulpfrs20d');
+          },
+        },
+        {
+          t: `Examine small indentation.`,
+          id: 'iif2qdeab',
+          cb: scope.iif2qdeab,
+          c: function () {
+            return (
+              player.get('nodes.ulpfrs20d') &&
+              !player.get('flags.StoneTempleEntrance_open')
+            );
+          },
+        },
+        {
+          t: `Knock on door.`,
+          id: 'ku02sbufa',
+          cb: scope.ku02sbufa,
+          c: function () {
+            return (
+              player.get('nodes.ulpfrs20d') &&
+              !player.get('flags.StoneTempleEntrance_open')
+            );
+          },
+        },
+        {
+          t: `Shout for somebody.`,
+          id: 'hiq5hy0ig',
+          cb: scope.hiq5hy0ig,
+          c: function () {
+            return true;
+          },
+        },
+        {
+          t: `Back.`,
+          id: 'ilkdw5b8g',
+          cb: scope.ilkdw5b8g,
+          c: function () {
+            return true;
+          },
+        },
+      ]);
+    };
+    scope['q1h874es2'].isChoice = true;
+
+    // action
+    scope.yn9ycacuy = () => {
+      player.set(CURRENT_NODE_VAR, 'yn9ycacuy');
+      player.set('PICKUP_NEXT_FILE_ID', player.get('curIN2f'));
+      player.set('PICKUP_NEXT_NODE_ID', 'ftsgr83op');
+      scope.t6d64rgz6();
+    };
+
+    // next_file
+    scope.t6d64rgz6 = function () {
+      var key = `FUNC_PickUp.json`;
+      var func = files[key];
+      if (!func) {
+        func = files[player.get(key)];
+      }
+      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
+      var nodeId = player.get('NEXT_NODE_ID');
+      if (func) {
+        player.set('NEXT_NODE_ID', null);
+        func(nodeId);
+      } else {
+        core.exit();
+      }
+    };
+
+    // pass_fail
+    scope.fxgrr3fqs = function () {
+      player.set(CURRENT_NODE_VAR, 'fxgrr3fqs');
+      var condition = (function () {
+        return player.get('flags.StoneTempleEntrance_open');
+      })();
+      if (condition) {
+        player.set(CURRENT_NODE_VAR, 'zr47elsbx');
+        scope.fexnf8c1f();
+      }
+      if (!condition) {
+        player.set(CURRENT_NODE_VAR, 'g1141rrty');
+        scope.fnuo3rufc();
+      }
+    };
+    // action
+    scope.fexnf8c1f = () => {
+      player.set(CURRENT_NODE_VAR, 'fexnf8c1f');
+      engine.setBackground('Caves_StoneTempleEntrance_3');
+      scope.bfigga552();
+    };
+
+    // text
+    scope.bfigga552 = () => {
+      player.set(CURRENT_NODE_VAR, 'bfigga552');
+      var text = `The structure is hewn of smooth stone, although in some places it is cracked and weathered.  The large stone doors before you are open, inviting you inside.`;
+      core.say(text, scope.q1h874es2, 'bfigga552', 'q1h874es2');
+    };
+    scope['bfigga552'].isText = true;
+
+    // action
+    scope.fnuo3rufc = () => {
+      player.set(CURRENT_NODE_VAR, 'fnuo3rufc');
+      engine.setBackground('Caves_StoneTempleEntrance_2');
+      scope.ulpfrs20d();
+    };
+
+    // text
+    scope.ulpfrs20d = () => {
+      player.set(CURRENT_NODE_VAR, 'ulpfrs20d');
+      var text = `The structure is hewn of smooth stone, although in some places it is cracked and weathered.  A parapet encircles the roof, and is sloped outwards to prevent would-be climbers from gaining untoward access to the roof.  There are large markings that cover the walls.
+ 
+The doors consist of slabs of stone so large you'd likely need all your strength to push them open on your own.  
+`;
+      core.say(text, scope.rc0gi0fxr, 'ulpfrs20d', 'rc0gi0fxr');
+    };
+    scope['ulpfrs20d'].isText = true;
+
+    // pass_fail
+    scope.rc0gi0fxr = function () {
+      player.set(CURRENT_NODE_VAR, 'rc0gi0fxr');
+      var condition = (function () {
+        return player.once() ? true : false;
+      })();
+      if (condition) {
+        player.set(CURRENT_NODE_VAR, 'ybdsbzdcp');
+        scope.z14rftgo7();
+      }
+      if (!condition) {
+        player.set(CURRENT_NODE_VAR, 'sf0bdfpch');
+        scope.q1h874es2();
+      }
+    };
+    // text
+    scope.z14rftgo7 = () => {
+      player.set(CURRENT_NODE_VAR, 'z14rftgo7');
+      var text = `There is no handle with which to open these doors, but you notice a small indentation on one of them, like some kind of keyhole, but much more shallow.`;
+      core.say(text, scope.q1h874es2, 'z14rftgo7', 'q1h874es2');
+    };
+    scope['z14rftgo7'].isText = true;
+
+    // action
+    scope.rslud6ufx = () => {
+      player.set(CURRENT_NODE_VAR, 'rslud6ufx');
+      engine.setBackground('Caves_StoneTempleEntrance_2');
+      engine.playSound('chime_solve');
+      scope.nnqmg5a44();
+    };
+
+    // text
+    scope.nnqmg5a44 = () => {
+      player.set(CURRENT_NODE_VAR, 'nnqmg5a44');
+      var text = `You carefully place the Holy Symbol into the indentation on the large stone doors.  It fits perfectly, and after a moment it begins to glow a faint blue.  It hums softly as it slowly begins to disintegrate into light.`;
+      core.say(text, scope.whebkcl8q, 'nnqmg5a44', 'whebkcl8q');
+    };
+    scope['nnqmg5a44'].isText = true;
+
+    // text
+    scope.whebkcl8q = () => {
+      player.set(CURRENT_NODE_VAR, 'whebkcl8q');
+      var text = `Just as the HOLY SYMOBL vanishes into blue light, a large rumble sounds, and the stone doors before you begin to open...`;
+      core.say(text, scope.io9mim1fg, 'whebkcl8q', 'io9mim1fg');
+    };
+    scope['whebkcl8q'].isText = true;
+
+    // action
+    scope.io9mim1fg = () => {
+      player.set(CURRENT_NODE_VAR, 'io9mim1fg');
+      engine.setBackground('Caves_StoneTempleEntrance_3');
+      engine.playSound('stone_doors');
+      scope.ogag0dih0();
+    };
+
+    // text
+    scope.ogag0dih0 = () => {
+      player.set(CURRENT_NODE_VAR, 'ogag0dih0');
+      var text = `After a minute, the doors stop moving.  It appears that you may now proceed inside.`;
+      core.say(text, scope.m527p1uud, 'ogag0dih0', 'm527p1uud');
+    };
+    scope['ogag0dih0'].isText = true;
+
+    // action
+    scope.m527p1uud = () => {
+      player.set(CURRENT_NODE_VAR, 'm527p1uud');
+      player.set('flags.StoneTempleEntrance_open', true);
+      engine.removeItemFromInventory('holy_symbol_of_the_temple');
+      scope.ilkdw5b8g();
+    };
+
+    // action
+    scope.ilkdw5b8g = () => {
+      player.set(CURRENT_NODE_VAR, 'ilkdw5b8g');
+      engine.setHeading('n');
+      player.setIfUnset('flags.StoneTempleEntrance_open', false);
+
+      if (player.get('flags.StoneTempleEntrance_open')) {
+        engine.setBackground('Caves_StoneTempleEntrance_4');
+      } else {
+        engine.setBackground('Caves_StoneTempleEntrance');
+      }
+
+      if (
+        player.get('lasIN2f') !== 'Inventory.json' &&
+        player.get('lasIN2n') !== 'lh2gb1wlz'
+      ) {
+        engine.playOneOfSound('step', [1, 2, 3]);
+      }
+      scope.wubefyyr4();
+    };
+
+    // text
+    scope.wubefyyr4 = () => {
+      player.set(CURRENT_NODE_VAR, 'wubefyyr4');
+      var text = `Stone Temple Entrance.`;
+      core.say(text, scope.o7df8dfmg, 'wubefyyr4', 'o7df8dfmg');
+    };
+    scope['wubefyyr4'].isText = true;
+
+    // choice
+    scope.o7df8dfmg = function () {
+      player.set(CURRENT_NODE_VAR, 'o7df8dfmg');
+      let text = ``;
+      core.choose(text, 'o7df8dfmg', [
+        {
+          t: `Examine surroundings.`,
+          id: 'a02ue2ani',
+          cb: scope.a02ue2ani,
+          c: function () {
+            return true;
+          },
+        },
+        {
+          t: `Inventory.`,
+          id: 'cfqf4gsnf',
+          cb: scope.cfqf4gsnf,
+          c: function () {
+            return true;
+          },
+        },
+        {
+          t: `Go NORTH (into the structure).`,
+          id: 'aguyyftg2',
+          cb: scope.aguyyftg2,
+          c: function () {
+            return player.get('flags.StoneTempleEntrance_open');
+          },
+        },
+        {
+          t: `Go EAST.`,
+          id: 'b5wkf5rq9',
+          cb: scope.b5wkf5rq9,
+          c: function () {
+            return true;
+          },
+        },
+        {
+          t: `Go SOUTH.`,
+          id: 'd9s1kn8h9',
+          cb: scope.d9s1kn8h9,
+          c: function () {
+            return true;
+          },
+        },
+      ]);
+    };
+    scope['o7df8dfmg'].isChoice = true;
+
+    // action
+    scope.a02ue2ani = () => {
+      player.set(CURRENT_NODE_VAR, 'a02ue2ani');
+      player.set('itemsText', engine.getRoomItemsText());
+      player.set('exitText', 'There are exits to the EAST and SOUTH.');
+      scope.iin7r5kkb();
+    };
+
+    // text
+    scope.iin7r5kkb = () => {
+      player.set(CURRENT_NODE_VAR, 'iin7r5kkb');
+      var text = `A massive structure fills this cavern, with a stairway that leads up to a set of sturdy, stone doors.
+
+${player.get('exitText')}
+
+${player.get('itemsText')}`;
+      core.say(text, scope.q1h874es2, 'iin7r5kkb', 'q1h874es2');
+    };
+    scope['iin7r5kkb'].isText = true;
+
+    // action
+    scope.cfqf4gsnf = () => {
+      player.set(CURRENT_NODE_VAR, 'cfqf4gsnf');
+      player.set('INVENTORY_NEXT_NODE_ID', 'ilkdw5b8g');
+      player.set('INVENTORY_NEXT_FILE_ID', player.get(CURRENT_FILE_VAR));
+      scope.s1fgacct4();
+    };
+
+    // next_file
+    scope.s1fgacct4 = function () {
+      var key = `FUNC_Inventory.json`;
+      var func = files[key];
+      if (!func) {
+        func = files[player.get(key)];
+      }
+      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
+      var nodeId = player.get('NEXT_NODE_ID');
+      if (func) {
+        player.set('NEXT_NODE_ID', null);
+        func(nodeId);
+      } else {
+        core.exit();
+      }
+    };
+
+    // next_file
+    scope.aguyyftg2 = function () {
+      var key = `Caves_StoneTempleChapel.json`;
+      var func = files[key];
+      if (!func) {
+        func = files[player.get(key)];
+      }
+      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
+      var nodeId = player.get('NEXT_NODE_ID');
+      if (func) {
+        player.set('NEXT_NODE_ID', null);
+        func(nodeId);
+      } else {
+        core.exit();
+      }
+    };
+
+    // next_file
+    scope.b5wkf5rq9 = function () {
+      var key = `Caves_Cave3.json`;
+      var func = files[key];
+      if (!func) {
+        func = files[player.get(key)];
+      }
+      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
+      var nodeId = player.get('NEXT_NODE_ID');
+      if (func) {
+        player.set('NEXT_NODE_ID', null);
+        func(nodeId);
+      } else {
+        core.exit();
+      }
+    };
+
+    // next_file
+    scope.d9s1kn8h9 = function () {
+      var key = `Caves_StoneStairway1.json`;
+      var func = files[key];
+      if (!func) {
+        func = files[player.get(key)];
+      }
+      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
+      var nodeId = player.get('NEXT_NODE_ID');
+      if (func) {
+        player.set('NEXT_NODE_ID', null);
+        func(nodeId);
+      } else {
+        core.exit();
+      }
+    };
+
+    // text
+    scope.ppah3g2cd = () => {
+      player.set(CURRENT_NODE_VAR, 'ppah3g2cd');
+      var text = `The markings are white, and appear to be made of some kind of chalk.  As far as you can tell, they are gibberish, although it seems like they have been drawn rather elegantly.`;
+      core.say(text, scope.q1h874es2, 'ppah3g2cd', 'q1h874es2');
+    };
+    scope['ppah3g2cd'].isText = true;
+
+    // text
+    scope.iif2qdeab = () => {
+      player.set(CURRENT_NODE_VAR, 'iif2qdeab');
+      var text = `At first this seemed like a keyhole, but it is much more shallow, and does not penetrate fully through the door.  It seems like some kind of symbol is supposed to fit here, but is hard to be certain what shape it's supposed to be.`;
+      core.say(text, scope.q1h874es2, 'iif2qdeab', 'q1h874es2');
+    };
+    scope['iif2qdeab'].isText = true;
+
+    // action
+    scope.ku02sbufa = () => {
+      player.set(CURRENT_NODE_VAR, 'ku02sbufa');
+      engine.setBackground('Caves_StoneTempleEntrance_2');
+      scope.g6nry2sis();
+    };
+
+    // text
+    scope.g6nry2sis = () => {
+      player.set(CURRENT_NODE_VAR, 'g6nry2sis');
+      var text = `You give the stone door a few sturdy knocks, the sound of which reverberate loudly about the large cavern walls.`;
+      core.say(text, scope.gh8oz5omz, 'g6nry2sis', 'gh8oz5omz');
+    };
+    scope['g6nry2sis'].isText = true;
+
+    // text
+    scope.gh8oz5omz = () => {
+      player.set(CURRENT_NODE_VAR, 'gh8oz5omz');
+      var text = `You wait for a while, but there is no answer.`;
+      core.say(text, scope.q1h874es2, 'gh8oz5omz', 'q1h874es2');
+    };
+    scope['gh8oz5omz'].isText = true;
+
+    // text
+    scope.hiq5hy0ig = () => {
+      player.set(CURRENT_NODE_VAR, 'hiq5hy0ig');
+      var text = `You fill your lungs and open your mouth to yell, but all you can manage is a feeble croak.`;
+      core.say(text, scope.adxm81z49, 'hiq5hy0ig', 'adxm81z49');
+    };
+    scope['hiq5hy0ig'].isText = true;
+
+    // text
+    scope.adxm81z49 = () => {
+      player.set(CURRENT_NODE_VAR, 'adxm81z49');
+      var text = `There is something wrong with your voice.`;
+      core.say(text, scope.q1h874es2, 'adxm81z49', 'q1h874es2');
+    };
+    scope['adxm81z49'].isText = true;
+
+    if (id === undefined) {
+      scope.ckh49tg59();
+    } else if (id) {
+      scope[id]();
+    }
+    return player.state;
+  };
 
   files[`Caves_StoneTempleDorms1.json`] = function (id) {
     player.set(CURRENT_FILE_VAR, 'Caves_StoneTempleDorms1.json');
@@ -3245,413 +4554,6 @@ ${player.get('itemsText')}`;
   };
   scope['x77fg64ep'].isText = true;
 
-  files[`Caves_StoneTempleChantry.json`] = function (id) {
-    player.set(CURRENT_FILE_VAR, 'Caves_StoneTempleChantry.json');
-    // switch
-    scope.yxzzmr43h = () => {
-      player.set(CURRENT_NODE_VAR, 'yxzzmr43h');
-      if (true) scope.zr1wtnax7();
-    };
-    // action
-    scope.zr1wtnax7 = () => {
-      player.set(CURRENT_NODE_VAR, 'zr1wtnax7');
-      scope.mnk837g9f();
-    };
-
-    // action
-    scope.mnk837g9f = () => {
-      player.set(CURRENT_NODE_VAR, 'mnk837g9f');
-      player.setIfUnset('flags.chantrySarcOpen', false);
-      player.setIfUnset('portals.1', false);
-
-      if (player.get('flags.chantrySarcOpen')) {
-        if (player.get('portals.1')) {
-          engine.setBackground('Caves_StoneTempleChantry_2');
-          engine.playSound('glow');
-        } else {
-          engine.setBackground('Caves_StoneTempleChantry_3');
-        }
-      } else {
-        engine.setBackground('Caves_StoneTempleChantry');
-      }
-
-      engine.setHeading('se');
-
-      if (player.get('lasIN2f') !== 'Inventory.json') {
-        engine.playOneOfSound('step_floor', [1]);
-      }
-      scope.gm9g1p7b2();
-    };
-
-    // action
-    scope.gm9g1p7b2 = () => {
-      player.set(CURRENT_NODE_VAR, 'gm9g1p7b2');
-
-      player.set('args.roomTitle', 'Stone Temple Chantry');
-      player.set('args.nextNodeId', 'rxnar4fgr');
-      player.set('args.nextFileId', player.get('curIN2f'));
-      player.set('args.customExit1', false);
-      player.set('args.northExit', false);
-      player.set('args.eastExit', false);
-      player.set('args.southExit', false);
-      player.set('args.westExit', 'Caves_StoneTempleChapel.json');
-      scope.fnqho8fun();
-    };
-
-    // next_file
-    scope.fnqho8fun = function () {
-      var key = `FUNC_BasicRoom.json`;
-      var func = files[key];
-      if (!func) {
-        func = files[player.get(key)];
-      }
-      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
-      var nodeId = player.get('NEXT_NODE_ID');
-      if (func) {
-        player.set('NEXT_NODE_ID', null);
-        func(nodeId);
-      } else {
-        core.exit();
-      }
-    };
-
-    if (id === undefined) {
-      scope.yxzzmr43h();
-    } else if (id) {
-      scope[id]();
-    }
-    return player.state;
-  };
-
-  // sub_root
-  scope.pg28n80pd = () => {
-    player.set(CURRENT_NODE_VAR, 'pg28n80pd');
-    scope.egxfukg7t();
-  };
-
-  // action
-  scope.egxfukg7t = () => {
-    player.set(CURRENT_NODE_VAR, 'egxfukg7t');
-    player.set('itemsText', engine.getRoomItemsText());
-    scope.iks4y40xy();
-  };
-
-  // text
-  scope.iks4y40xy = () => {
-    player.set(CURRENT_NODE_VAR, 'iks4y40xy');
-    var text = `You are standing in the chantry inside the Stone Temple.
-
-${player.get('exitText')}
-
-${player.get('itemsText')}`;
-    core.say(text, scope.eklm9wlff, 'iks4y40xy', 'eklm9wlff');
-  };
-  scope['iks4y40xy'].isText = true;
-
-  // choice
-  scope.eklm9wlff = function () {
-    player.set(CURRENT_NODE_VAR, 'eklm9wlff');
-    let text = ``;
-    core.choose(text, 'eklm9wlff', [
-      {
-        t: `Pick up items.`,
-        id: 'g4uwl1fqu',
-        cb: scope.g4uwl1fqu,
-        c: function () {
-          return engine.getRoomItems().length > 0;
-        },
-      },
-      {
-        t: `Examine sarcophagus.`,
-        id: 'gdwp6lt0h',
-        cb: scope.gdwp6lt0h,
-        c: function () {
-          return true;
-        },
-      },
-      {
-        t: `Examine symbol.`,
-        id: 'd9lsgxqzm',
-        cb: scope.d9lsgxqzm,
-        c: function () {
-          return true;
-        },
-      },
-      {
-        t: `Back.`,
-        id: 'mnk837g9f',
-        cb: scope.mnk837g9f,
-        c: function () {
-          return true;
-        },
-      },
-    ]);
-  };
-  scope['eklm9wlff'].isChoice = true;
-
-  // action
-  scope.g4uwl1fqu = () => {
-    player.set(CURRENT_NODE_VAR, 'g4uwl1fqu');
-    player.set('PICKUP_NEXT_FILE_ID', player.get('curIN2f'));
-    player.set('PICKUP_NEXT_NODE_ID', 'pg28n80pd');
-    scope.hogns4c30();
-  };
-
-  // next_file
-  scope.hogns4c30 = function () {
-    var key = `FUNC_PickUp.json`;
-    var func = files[key];
-    if (!func) {
-      func = files[player.get(key)];
-    }
-    player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
-    var nodeId = player.get('NEXT_NODE_ID');
-    if (func) {
-      player.set('NEXT_NODE_ID', null);
-      func(nodeId);
-    } else {
-      core.exit();
-    }
-  };
-
-  // pass_fail
-  scope.gdwp6lt0h = function () {
-    player.set(CURRENT_NODE_VAR, 'gdwp6lt0h');
-    var condition = (function () {
-      return player.get('flags.chantrySarcOpen');
-    })();
-    if (!condition) {
-      player.set(CURRENT_NODE_VAR, 'wlua483q7');
-      scope.ers7t1ez2();
-    }
-    if (condition) {
-      player.set(CURRENT_NODE_VAR, 'kz2fsfbum');
-      scope.bwto4smoh();
-    }
-  };
-  // text
-  scope.ers7t1ez2 = () => {
-    player.set(CURRENT_NODE_VAR, 'ers7t1ez2');
-    var text = `It's a thick, stone box with an intricate pattern on the heavy-looking lid.  The sarcophagus itself is massive, easily able to hold two average-sized people inside of it.`;
-    core.say(text, scope.io0zzrk81, 'ers7t1ez2', 'io0zzrk81');
-  };
-  scope['ers7t1ez2'].isText = true;
-
-  // choice
-  scope.io0zzrk81 = function () {
-    player.set(CURRENT_NODE_VAR, 'io0zzrk81');
-    let text = ``;
-    core.choose(text, 'io0zzrk81', [
-      {
-        t: `Open the sarcophagus.`,
-        id: 'pydfsaic2',
-        cb: scope.pydfsaic2,
-        c: function () {
-          return !player.get('flags.chantrySarcOpen');
-        },
-      },
-      {
-        t: `Back.`,
-        id: 'eklm9wlff',
-        cb: scope.eklm9wlff,
-        c: function () {
-          return true;
-        },
-      },
-    ]);
-  };
-  scope['io0zzrk81'].isChoice = true;
-
-  // action
-  scope.pydfsaic2 = () => {
-    player.set(CURRENT_NODE_VAR, 'pydfsaic2');
-    player.set('flags.chantrySarcOpen', true);
-    engine.playSound('stone_lid_fall');
-    engine.setBackground('Caves_StoneTempleChantry_3');
-    scope.uwga7r3q8();
-  };
-
-  // text
-  scope.uwga7r3q8 = () => {
-    player.set(CURRENT_NODE_VAR, 'uwga7r3q8');
-    var text = `[STRENGTH] You squat and lift, and with great effort, the lid slides to the floor.`;
-    core.say(text, scope.cctwcpwnk, 'uwga7r3q8', 'cctwcpwnk');
-  };
-  scope['uwga7r3q8'].isText = true;
-
-  // action
-  scope.cctwcpwnk = () => {
-    player.set(CURRENT_NODE_VAR, 'cctwcpwnk');
-    engine.addItemToInventory('stone_hand');
-    engine.playSound('get_item');
-    scope.ypbk2kd04();
-  };
-
-  // text
-  scope.ypbk2kd04 = () => {
-    player.set(CURRENT_NODE_VAR, 'ypbk2kd04');
-    var text = `Peering inside, you see that it is mostly empty, save for a curious stone hand, haphazardly lying in the corner.
-
-You take it.  It might be useful.`;
-    core.say(text, scope.eklm9wlff, 'ypbk2kd04', 'eklm9wlff');
-  };
-  scope['ypbk2kd04'].isText = true;
-
-  // pass_fail
-  scope.bwto4smoh = function () {
-    player.set(CURRENT_NODE_VAR, 'bwto4smoh');
-    var condition = (function () {
-      return player.get('portals.1');
-    })();
-    if (condition) {
-      player.set(CURRENT_NODE_VAR, 'w4nzm9yii');
-      scope.z3f8fm1ql();
-    }
-    if (!condition) {
-      player.set(CURRENT_NODE_VAR, 'er9mddrxk');
-      scope.quzbg39of();
-    }
-  };
-  // text
-  scope.z3f8fm1ql = () => {
-    player.set(CURRENT_NODE_VAR, 'z3f8fm1ql');
-    var text = `The light is blinding, and it's difficult to see the actual sarcophagus.  It seems to be beckoning you to touch it, to join it...`;
-    core.say(text, scope.io0zzrk81, 'z3f8fm1ql', 'io0zzrk81');
-  };
-  scope['z3f8fm1ql'].isText = true;
-
-  // text
-  scope.quzbg39of = () => {
-    player.set(CURRENT_NODE_VAR, 'quzbg39of');
-    var text = `With the lid of the sarcophagus on the floor, you can see inside; but there's nothing.  It's empty.`;
-    core.say(text, scope.eklm9wlff, 'quzbg39of', 'eklm9wlff');
-  };
-  scope['quzbg39of'].isText = true;
-
-  // pass_fail
-  scope.d9lsgxqzm = function () {
-    player.set(CURRENT_NODE_VAR, 'd9lsgxqzm');
-    var condition = (function () {
-      return engine.isClass('Cleric');
-    })();
-    if (condition) {
-      player.set(CURRENT_NODE_VAR, 'rycg29ioh');
-      scope.lww8wlsyf();
-    }
-    if (!condition) {
-      player.set(CURRENT_NODE_VAR, 'inf9cq4ua');
-      scope.ob69g0t2g();
-    }
-  };
-  // text
-  scope.lww8wlsyf = () => {
-    player.set(CURRENT_NODE_VAR, 'lww8wlsyf');
-    var text = `The symbol for 'portal' in incantation script.`;
-    core.say(text, scope.eklm9wlff, 'lww8wlsyf', 'eklm9wlff');
-  };
-  scope['lww8wlsyf'].isText = true;
-
-  // text
-  scope.ob69g0t2g = () => {
-    player.set(CURRENT_NODE_VAR, 'ob69g0t2g');
-    var text = `It's another cryptic symbol you've seen all over this temple.  You have no idea what it is.`;
-    core.say(text, scope.eklm9wlff, 'ob69g0t2g', 'eklm9wlff');
-  };
-  scope['ob69g0t2g'].isText = true;
-
-  // sub_root
-  scope.rxnar4fgr = () => {
-    player.set(CURRENT_NODE_VAR, 'rxnar4fgr');
-    scope.y70cp1sq9();
-  };
-
-  // action
-  scope.y70cp1sq9 = () => {
-    player.set(CURRENT_NODE_VAR, 'y70cp1sq9');
-    scope.n0t91lrg0();
-  };
-
-  // switch
-  scope.n0t91lrg0 = () => {
-    player.set(CURRENT_NODE_VAR, 'n0t91lrg0');
-    if (player.get('output.roomChoice') === 'examine-surroundings')
-      scope.fddsd6emz();
-    else if (true) scope.mnk837g9f();
-  };
-  // action
-  scope.fddsd6emz = () => {
-    player.set(CURRENT_NODE_VAR, 'fddsd6emz');
-    player.set('itemsText', engine.getRoomItemsText());
-    player.set('exitText', 'There is an exit to the WEST.');
-    scope.hn38uy9mz();
-  };
-
-  // pass_fail
-  scope.hn38uy9mz = function () {
-    player.set(CURRENT_NODE_VAR, 'hn38uy9mz');
-    var condition = (function () {
-      return player.get('flags.chantrySarcOpen');
-    })();
-    if (!condition) {
-      player.set(CURRENT_NODE_VAR, 'nd6xd36is');
-      scope.h1zdm1u2e();
-    }
-    if (condition) {
-      player.set(CURRENT_NODE_VAR, 'dcntg25yc');
-      scope.lwy8l0az4();
-    }
-  };
-  // text
-  scope.h1zdm1u2e = () => {
-    player.set(CURRENT_NODE_VAR, 'h1zdm1u2e');
-    var text = `This room is octagonal and echoey; the ceiling rises high up into the darkness above you.  A single row of pews encircles a closed stone sarcophagus, tall windows directing a glowing, green light from outside directly onto it.  Another strange symbol adorns the southern wall.
-
-${player.get('exitText')}
-
-${player.get('itemsText')}`;
-    core.say(text, scope.eklm9wlff, 'h1zdm1u2e', 'eklm9wlff');
-  };
-  scope['h1zdm1u2e'].isText = true;
-
-  // pass_fail
-  scope.lwy8l0az4 = function () {
-    player.set(CURRENT_NODE_VAR, 'lwy8l0az4');
-    var condition = (function () {
-      return player.get('portals.1');
-    })();
-    if (condition) {
-      player.set(CURRENT_NODE_VAR, 'p4kfolebe');
-      scope.s90kr7gxl();
-    }
-    if (!condition) {
-      player.set(CURRENT_NODE_VAR, 'g0ghiub1e');
-      scope.abutg4mrh();
-    }
-  };
-  // text
-  scope.s90kr7gxl = () => {
-    player.set(CURRENT_NODE_VAR, 's90kr7gxl');
-    var text = `This room is octagonal and echoey; the ceiling rises high up into the darkness above you.  A single row of pews encircles a open stone sarcophagus.
-
-${player.get('exitText')}
-
-${player.get('itemsText')}`;
-    core.say(text, scope.eklm9wlff, 's90kr7gxl', 'eklm9wlff');
-  };
-  scope['s90kr7gxl'].isText = true;
-
-  // text
-  scope.abutg4mrh = () => {
-    player.set(CURRENT_NODE_VAR, 'abutg4mrh');
-    var text = `A single row of pews encircles a glowing stone sarcophagus, with an eye-blinding light pouring out of it.
-
-${player.get('exitText')}
-
-${player.get('itemsText')}`;
-    core.say(text, scope.eklm9wlff, 'abutg4mrh', 'eklm9wlff');
-  };
-  scope['abutg4mrh'].isText = true;
-
   files[`Caves_StoneTempleChambers1.json`] = function (id) {
     player.set(CURRENT_FILE_VAR, 'Caves_StoneTempleChambers1.json');
     // switch
@@ -3914,7 +4816,7 @@ ${player.get('itemsText')}`;
   // text
   scope.aayulnmnp = () => {
     player.set(CURRENT_NODE_VAR, 'aayulnmnp');
-    var text = `This is a stone altar with a white cloth draped over the middle of it.  There are neither decorations nor etching on it anywhere that you can see, and it even looks pristine: you can't find a single crack or worn corner due to age.  You get the feeling that something ought to be placed there.`;
+    var text = `This is a stone altar with a white cloth draped over the middle of it.  There are neither decorations nor etching on it anywhere that you can see.  It is utterly pristine: you can't find a single crack or worn corner due to age.  Perhaps it's new?  You get the feeling that something ought to be placed there.`;
     core.say(text, scope.nw95bdfrp, 'aayulnmnp', 'nw95bdfrp');
   };
   scope['aayulnmnp'].isText = true;
@@ -4485,503 +5387,6 @@ ${player.get('itemsText')}`;
 
     if (id === undefined) {
       scope.l6pgidff2();
-    } else if (id) {
-      scope[id]();
-    }
-    return player.state;
-  };
-
-  files[`Caves_StoneTempleEntrance.json`] = function (id) {
-    player.set(CURRENT_FILE_VAR, 'Caves_StoneTempleEntrance.json');
-    // action
-    scope.ckh49tg59 = () => {
-      player.set(CURRENT_NODE_VAR, 'ckh49tg59');
-      scope.ukb45ddum();
-    };
-
-    // switch
-    scope.ukb45ddum = () => {
-      player.set(CURRENT_NODE_VAR, 'ukb45ddum');
-      if (false) scope.ftsgr83op();
-      else if (true) scope.ilkdw5b8g();
-    };
-    // action
-    scope.ftsgr83op = () => {
-      player.set(CURRENT_NODE_VAR, 'ftsgr83op');
-      player.set('itemsText', engine.getRoomItemsText());
-      scope.yl3szgl0z();
-    };
-
-    // text
-    scope.yl3szgl0z = () => {
-      player.set(CURRENT_NODE_VAR, 'yl3szgl0z');
-      var text = `A massive structure fills this cavern, with a stairway that leads up to a set of sturdy, stone doors.
-
-${player.get('exitText')}
-
-${player.get('itemsText')}`;
-      core.say(text, scope.q1h874es2, 'yl3szgl0z', 'q1h874es2');
-    };
-    scope['yl3szgl0z'].isText = true;
-
-    // choice
-    scope.q1h874es2 = function () {
-      player.set(CURRENT_NODE_VAR, 'q1h874es2');
-      let text = ``;
-      core.choose(text, 'q1h874es2', [
-        {
-          t: `Pick up items.`,
-          id: 'yn9ycacuy',
-          cb: scope.yn9ycacuy,
-          c: function () {
-            return engine.getRoomItems().length > 0;
-          },
-        },
-        {
-          t: `Examine structure.`,
-          id: 'fxgrr3fqs',
-          cb: scope.fxgrr3fqs,
-          c: function () {
-            return true;
-          },
-        },
-        {
-          t: `Place the HOLY SYMOBL in the indentation.`,
-          id: 'rslud6ufx',
-          cb: scope.rslud6ufx,
-          c: function () {
-            return (
-              engine.hasItemInInventory('holy_symbol_of_the_temple') &&
-              !player.get('flags.StoneTempleEntrance_open') &&
-              player.get('nodes.ulpfrs20d')
-            );
-          },
-        },
-        {
-          t: `Examine markings.`,
-          id: 'ppah3g2cd',
-          cb: scope.ppah3g2cd,
-          c: function () {
-            return player.get('nodes.ulpfrs20d');
-          },
-        },
-        {
-          t: `Examine small indentation.`,
-          id: 'iif2qdeab',
-          cb: scope.iif2qdeab,
-          c: function () {
-            return (
-              player.get('nodes.ulpfrs20d') &&
-              !player.get('flags.StoneTempleEntrance_open')
-            );
-          },
-        },
-        {
-          t: `Knock on door.`,
-          id: 'ku02sbufa',
-          cb: scope.ku02sbufa,
-          c: function () {
-            return (
-              player.get('nodes.ulpfrs20d') &&
-              !player.get('flags.StoneTempleEntrance_open')
-            );
-          },
-        },
-        {
-          t: `Shout for somebody.`,
-          id: 'hiq5hy0ig',
-          cb: scope.hiq5hy0ig,
-          c: function () {
-            return true;
-          },
-        },
-        {
-          t: `Back.`,
-          id: 'ilkdw5b8g',
-          cb: scope.ilkdw5b8g,
-          c: function () {
-            return true;
-          },
-        },
-      ]);
-    };
-    scope['q1h874es2'].isChoice = true;
-
-    // action
-    scope.yn9ycacuy = () => {
-      player.set(CURRENT_NODE_VAR, 'yn9ycacuy');
-      player.set('PICKUP_NEXT_FILE_ID', player.get('curIN2f'));
-      player.set('PICKUP_NEXT_NODE_ID', 'ftsgr83op');
-      scope.t6d64rgz6();
-    };
-
-    // next_file
-    scope.t6d64rgz6 = function () {
-      var key = `FUNC_PickUp.json`;
-      var func = files[key];
-      if (!func) {
-        func = files[player.get(key)];
-      }
-      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
-      var nodeId = player.get('NEXT_NODE_ID');
-      if (func) {
-        player.set('NEXT_NODE_ID', null);
-        func(nodeId);
-      } else {
-        core.exit();
-      }
-    };
-
-    // pass_fail
-    scope.fxgrr3fqs = function () {
-      player.set(CURRENT_NODE_VAR, 'fxgrr3fqs');
-      var condition = (function () {
-        return player.get('flags.StoneTempleEntrance_open');
-      })();
-      if (condition) {
-        player.set(CURRENT_NODE_VAR, 'zr47elsbx');
-        scope.fexnf8c1f();
-      }
-      if (!condition) {
-        player.set(CURRENT_NODE_VAR, 'g1141rrty');
-        scope.fnuo3rufc();
-      }
-    };
-    // action
-    scope.fexnf8c1f = () => {
-      player.set(CURRENT_NODE_VAR, 'fexnf8c1f');
-      engine.setBackground('Caves_StoneTempleEntrance_3');
-      scope.bfigga552();
-    };
-
-    // text
-    scope.bfigga552 = () => {
-      player.set(CURRENT_NODE_VAR, 'bfigga552');
-      var text = `The structure is hewn of smooth stone, although in some places it is cracked and weathered.  The large stone doors before you are open, inviting you inside.`;
-      core.say(text, scope.q1h874es2, 'bfigga552', 'q1h874es2');
-    };
-    scope['bfigga552'].isText = true;
-
-    // action
-    scope.fnuo3rufc = () => {
-      player.set(CURRENT_NODE_VAR, 'fnuo3rufc');
-      engine.setBackground('Caves_StoneTempleEntrance_2');
-      scope.ulpfrs20d();
-    };
-
-    // text
-    scope.ulpfrs20d = () => {
-      player.set(CURRENT_NODE_VAR, 'ulpfrs20d');
-      var text = `The structure is hewn of smooth stone, although in some places it is cracked and weathered.  A parapet encircles the roof, and is sloped outwards to prevent would-be climbers from gaining untoward access to the roof.  There are large markings that cover the walls.
- 
-The doors consist of slabs of stone so large you'd likely need all your strength to push them open on your own.  
-`;
-      core.say(text, scope.rc0gi0fxr, 'ulpfrs20d', 'rc0gi0fxr');
-    };
-    scope['ulpfrs20d'].isText = true;
-
-    // pass_fail
-    scope.rc0gi0fxr = function () {
-      player.set(CURRENT_NODE_VAR, 'rc0gi0fxr');
-      var condition = (function () {
-        return player.once() ? true : false;
-      })();
-      if (condition) {
-        player.set(CURRENT_NODE_VAR, 'ybdsbzdcp');
-        scope.z14rftgo7();
-      }
-      if (!condition) {
-        player.set(CURRENT_NODE_VAR, 'sf0bdfpch');
-        scope.q1h874es2();
-      }
-    };
-    // text
-    scope.z14rftgo7 = () => {
-      player.set(CURRENT_NODE_VAR, 'z14rftgo7');
-      var text = `There is no handle with which to open these doors, but you notice a small indentation on one of them, like some kind of keyhole, but much more shallow.`;
-      core.say(text, scope.q1h874es2, 'z14rftgo7', 'q1h874es2');
-    };
-    scope['z14rftgo7'].isText = true;
-
-    // action
-    scope.rslud6ufx = () => {
-      player.set(CURRENT_NODE_VAR, 'rslud6ufx');
-      engine.setBackground('Caves_StoneTempleEntrance_2');
-      engine.playSound('chime_solve');
-      scope.nnqmg5a44();
-    };
-
-    // text
-    scope.nnqmg5a44 = () => {
-      player.set(CURRENT_NODE_VAR, 'nnqmg5a44');
-      var text = `You carefully place the Holy Symbol into the indentation on the large stone doors.  It fits perfectly, and after a moment it begins to glow a faint blue.  It hums softly as it slowly begins to disintegrate into light.`;
-      core.say(text, scope.whebkcl8q, 'nnqmg5a44', 'whebkcl8q');
-    };
-    scope['nnqmg5a44'].isText = true;
-
-    // text
-    scope.whebkcl8q = () => {
-      player.set(CURRENT_NODE_VAR, 'whebkcl8q');
-      var text = `Just as the HOLY SYMOBL vanishes into blue light, a large rumble sounds, and the stone doors before you begin to open...`;
-      core.say(text, scope.io9mim1fg, 'whebkcl8q', 'io9mim1fg');
-    };
-    scope['whebkcl8q'].isText = true;
-
-    // action
-    scope.io9mim1fg = () => {
-      player.set(CURRENT_NODE_VAR, 'io9mim1fg');
-      engine.setBackground('Caves_StoneTempleEntrance_3');
-      engine.playSound('stone_doors');
-      scope.ogag0dih0();
-    };
-
-    // text
-    scope.ogag0dih0 = () => {
-      player.set(CURRENT_NODE_VAR, 'ogag0dih0');
-      var text = `After a minute, the doors stop moving.  It appears that you may now proceed inside.`;
-      core.say(text, scope.m527p1uud, 'ogag0dih0', 'm527p1uud');
-    };
-    scope['ogag0dih0'].isText = true;
-
-    // action
-    scope.m527p1uud = () => {
-      player.set(CURRENT_NODE_VAR, 'm527p1uud');
-      player.set('flags.StoneTempleEntrance_open', true);
-      engine.removeItemFromInventory('holy_symbol_of_the_temple');
-      scope.ilkdw5b8g();
-    };
-
-    // action
-    scope.ilkdw5b8g = () => {
-      player.set(CURRENT_NODE_VAR, 'ilkdw5b8g');
-      engine.setHeading('n');
-      player.setIfUnset('flags.StoneTempleEntrance_open', false);
-
-      if (player.get('flags.StoneTempleEntrance_open')) {
-        engine.setBackground('Caves_StoneTempleEntrance_4');
-      } else {
-        engine.setBackground('Caves_StoneTempleEntrance');
-      }
-
-      if (
-        player.get('lasIN2f') !== 'Inventory.json' &&
-        player.get('lasIN2n') !== 'lh2gb1wlz'
-      ) {
-        engine.playOneOfSound('step', [1, 2, 3]);
-      }
-      scope.wubefyyr4();
-    };
-
-    // text
-    scope.wubefyyr4 = () => {
-      player.set(CURRENT_NODE_VAR, 'wubefyyr4');
-      var text = `Stone Temple Entrance.`;
-      core.say(text, scope.o7df8dfmg, 'wubefyyr4', 'o7df8dfmg');
-    };
-    scope['wubefyyr4'].isText = true;
-
-    // choice
-    scope.o7df8dfmg = function () {
-      player.set(CURRENT_NODE_VAR, 'o7df8dfmg');
-      let text = ``;
-      core.choose(text, 'o7df8dfmg', [
-        {
-          t: `Examine surroundings.`,
-          id: 'a02ue2ani',
-          cb: scope.a02ue2ani,
-          c: function () {
-            return true;
-          },
-        },
-        {
-          t: `Inventory.`,
-          id: 'cfqf4gsnf',
-          cb: scope.cfqf4gsnf,
-          c: function () {
-            return true;
-          },
-        },
-        {
-          t: `Go NORTH (into the structure).`,
-          id: 'aguyyftg2',
-          cb: scope.aguyyftg2,
-          c: function () {
-            return player.get('flags.StoneTempleEntrance_open');
-          },
-        },
-        {
-          t: `Go EAST.`,
-          id: 'b5wkf5rq9',
-          cb: scope.b5wkf5rq9,
-          c: function () {
-            return true;
-          },
-        },
-        {
-          t: `Go SOUTH.`,
-          id: 'd9s1kn8h9',
-          cb: scope.d9s1kn8h9,
-          c: function () {
-            return true;
-          },
-        },
-      ]);
-    };
-    scope['o7df8dfmg'].isChoice = true;
-
-    // action
-    scope.a02ue2ani = () => {
-      player.set(CURRENT_NODE_VAR, 'a02ue2ani');
-      player.set('itemsText', engine.getRoomItemsText());
-      player.set('exitText', 'There are exits to the EAST and SOUTH.');
-      scope.iin7r5kkb();
-    };
-
-    // text
-    scope.iin7r5kkb = () => {
-      player.set(CURRENT_NODE_VAR, 'iin7r5kkb');
-      var text = `A massive structure fills this cavern, with a stairway that leads up to a set of sturdy, stone doors.
-
-${player.get('exitText')}
-
-${player.get('itemsText')}`;
-      core.say(text, scope.q1h874es2, 'iin7r5kkb', 'q1h874es2');
-    };
-    scope['iin7r5kkb'].isText = true;
-
-    // action
-    scope.cfqf4gsnf = () => {
-      player.set(CURRENT_NODE_VAR, 'cfqf4gsnf');
-      player.set('INVENTORY_NEXT_NODE_ID', 'ilkdw5b8g');
-      player.set('INVENTORY_NEXT_FILE_ID', player.get(CURRENT_FILE_VAR));
-      scope.s1fgacct4();
-    };
-
-    // next_file
-    scope.s1fgacct4 = function () {
-      var key = `FUNC_Inventory.json`;
-      var func = files[key];
-      if (!func) {
-        func = files[player.get(key)];
-      }
-      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
-      var nodeId = player.get('NEXT_NODE_ID');
-      if (func) {
-        player.set('NEXT_NODE_ID', null);
-        func(nodeId);
-      } else {
-        core.exit();
-      }
-    };
-
-    // next_file
-    scope.aguyyftg2 = function () {
-      var key = `Caves_StoneTempleChapel.json`;
-      var func = files[key];
-      if (!func) {
-        func = files[player.get(key)];
-      }
-      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
-      var nodeId = player.get('NEXT_NODE_ID');
-      if (func) {
-        player.set('NEXT_NODE_ID', null);
-        func(nodeId);
-      } else {
-        core.exit();
-      }
-    };
-
-    // next_file
-    scope.b5wkf5rq9 = function () {
-      var key = `Caves_Cave3.json`;
-      var func = files[key];
-      if (!func) {
-        func = files[player.get(key)];
-      }
-      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
-      var nodeId = player.get('NEXT_NODE_ID');
-      if (func) {
-        player.set('NEXT_NODE_ID', null);
-        func(nodeId);
-      } else {
-        core.exit();
-      }
-    };
-
-    // next_file
-    scope.d9s1kn8h9 = function () {
-      var key = `Caves_StoneStairway1.json`;
-      var func = files[key];
-      if (!func) {
-        func = files[player.get(key)];
-      }
-      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
-      var nodeId = player.get('NEXT_NODE_ID');
-      if (func) {
-        player.set('NEXT_NODE_ID', null);
-        func(nodeId);
-      } else {
-        core.exit();
-      }
-    };
-
-    // text
-    scope.ppah3g2cd = () => {
-      player.set(CURRENT_NODE_VAR, 'ppah3g2cd');
-      var text = `The markings are white, and appear to be made of some kind of chalk.  As far as you can tell, they are gibberish, although it seems like they have been drawn rather elegantly.`;
-      core.say(text, scope.q1h874es2, 'ppah3g2cd', 'q1h874es2');
-    };
-    scope['ppah3g2cd'].isText = true;
-
-    // text
-    scope.iif2qdeab = () => {
-      player.set(CURRENT_NODE_VAR, 'iif2qdeab');
-      var text = `At first this seemed like a keyhole, but it is much more shallow, and does not penetrate fully through the door.  It seems like some kind of symbol is supposed to fit here, but is hard to be certain what shape it's supposed to be.`;
-      core.say(text, scope.q1h874es2, 'iif2qdeab', 'q1h874es2');
-    };
-    scope['iif2qdeab'].isText = true;
-
-    // action
-    scope.ku02sbufa = () => {
-      player.set(CURRENT_NODE_VAR, 'ku02sbufa');
-      engine.setBackground('Caves_StoneTempleEntrance_2');
-      scope.g6nry2sis();
-    };
-
-    // text
-    scope.g6nry2sis = () => {
-      player.set(CURRENT_NODE_VAR, 'g6nry2sis');
-      var text = `You give the stone door a few sturdy knocks, the sound of which reverberate loudly about the large cavern walls.`;
-      core.say(text, scope.gh8oz5omz, 'g6nry2sis', 'gh8oz5omz');
-    };
-    scope['g6nry2sis'].isText = true;
-
-    // text
-    scope.gh8oz5omz = () => {
-      player.set(CURRENT_NODE_VAR, 'gh8oz5omz');
-      var text = `You wait for a while, but there is no answer.`;
-      core.say(text, scope.q1h874es2, 'gh8oz5omz', 'q1h874es2');
-    };
-    scope['gh8oz5omz'].isText = true;
-
-    // text
-    scope.hiq5hy0ig = () => {
-      player.set(CURRENT_NODE_VAR, 'hiq5hy0ig');
-      var text = `You fill your lungs and open your mouth to yell, but all you can manage is a feeble croak.`;
-      core.say(text, scope.adxm81z49, 'hiq5hy0ig', 'adxm81z49');
-    };
-    scope['hiq5hy0ig'].isText = true;
-
-    // text
-    scope.adxm81z49 = () => {
-      player.set(CURRENT_NODE_VAR, 'adxm81z49');
-      var text = `There is something wrong with your voice.`;
-      core.say(text, scope.q1h874es2, 'adxm81z49', 'q1h874es2');
-    };
-    scope['adxm81z49'].isText = true;
-
-    if (id === undefined) {
-      scope.ckh49tg59();
     } else if (id) {
       scope[id]();
     }
@@ -5627,6 +6032,653 @@ ${player.get('itemsText')}`;
     return player.state;
   };
 
+  files[`Caves_RuinedElevator.json`] = function (id) {
+    player.set(CURRENT_FILE_VAR, 'Caves_RuinedElevator.json');
+    // switch
+    scope.lapq1e13f = () => {
+      player.set(CURRENT_NODE_VAR, 'lapq1e13f');
+      if (false) scope.se8ia1ueu();
+      else if (true) scope.yq5fgaq93();
+    };
+    // action
+    scope.se8ia1ueu = () => {
+      player.set(CURRENT_NODE_VAR, 'se8ia1ueu');
+      player.set('itemsText', engine.getRoomItemsText());
+      scope.szqkm0uli();
+    };
+
+    // text
+    scope.szqkm0uli = () => {
+      player.set(CURRENT_NODE_VAR, 'szqkm0uli');
+      var text = `You are standing in a mine shaft next to a ruined elevator.
+
+${player.get('exitText')}
+
+${player.get('itemsText')}`;
+      core.say(text, scope.eqshna56f, 'szqkm0uli', 'eqshna56f');
+    };
+    scope['szqkm0uli'].isText = true;
+
+    // choice
+    scope.eqshna56f = function () {
+      player.set(CURRENT_NODE_VAR, 'eqshna56f');
+      let text = ``;
+      core.choose(text, 'eqshna56f', [
+        {
+          t: `Pick up items.`,
+          id: 'xc9qixqih',
+          cb: scope.xc9qixqih,
+          c: function () {
+            return engine.getRoomItems().length > 0;
+          },
+        },
+        {
+          t: `Examine shelves.`,
+          id: 'agf7c694x',
+          cb: scope.agf7c694x,
+          c: function () {
+            return true;
+          },
+        },
+        {
+          t: `Examine wooden platform.`,
+          id: 'q57uafu4k',
+          cb: scope.q57uafu4k,
+          c: function () {
+            return true;
+          },
+        },
+        {
+          t: `Back.`,
+          id: 'lf793sp34',
+          cb: scope.lf793sp34,
+          c: function () {
+            return true;
+          },
+        },
+      ]);
+    };
+    scope['eqshna56f'].isChoice = true;
+
+    // action
+    scope.xc9qixqih = () => {
+      player.set(CURRENT_NODE_VAR, 'xc9qixqih');
+      player.set('PICKUP_NEXT_FILE_ID', player.get('curIN2f'));
+      player.set('PICKUP_NEXT_NODE_ID', 'se8ia1ueu');
+      scope.rri6mf16p();
+    };
+
+    // next_file
+    scope.rri6mf16p = function () {
+      var key = `FUNC_PickUp.json`;
+      var func = files[key];
+      if (!func) {
+        func = files[player.get(key)];
+      }
+      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
+      var nodeId = player.get('NEXT_NODE_ID');
+      if (func) {
+        player.set('NEXT_NODE_ID', null);
+        func(nodeId);
+      } else {
+        core.exit();
+      }
+    };
+
+    // text
+    scope.agf7c694x = () => {
+      player.set(CURRENT_NODE_VAR, 'agf7c694x');
+      var text = `It seems like these shelves have been built as some sort of reinforcement for the cave walls.  They brace strategic locations where the wall has deep cracking.  A few of the shelves have lanterns affixed to them, but none of the lanterns are lit.  There is not a shelf low enough for you to reach.`;
+      core.say(text, scope.eqshna56f, 'agf7c694x', 'eqshna56f');
+    };
+    scope['agf7c694x'].isText = true;
+
+    // text
+    scope.q57uafu4k = () => {
+      player.set(CURRENT_NODE_VAR, 'q57uafu4k');
+      var text = `This was supposed to be an elevator to traverse up and down the mine shaft, however it has been sabotaged.  The rope has clearly been sliced clean through, and the wooden platform itself has chunks missing from its edges, like it cascaded roughly to the ground from a very tall height.`;
+      core.say(text, scope.eqshna56f, 'q57uafu4k', 'eqshna56f');
+    };
+    scope['q57uafu4k'].isText = true;
+
+    // text
+    scope.lf793sp34 = () => {
+      player.set(CURRENT_NODE_VAR, 'lf793sp34');
+      var text = `Ruined Elevator.`;
+      core.say(text, scope.cgg5quh09, 'lf793sp34', 'cgg5quh09');
+    };
+    scope['lf793sp34'].isText = true;
+
+    // choice
+    scope.cgg5quh09 = function () {
+      player.set(CURRENT_NODE_VAR, 'cgg5quh09');
+      let text = ``;
+      core.choose(text, 'cgg5quh09', [
+        {
+          t: `Examine surroundings.`,
+          id: 'rx7qa5lmh',
+          cb: scope.rx7qa5lmh,
+          c: function () {
+            return true;
+          },
+        },
+        {
+          t: `Inventory.`,
+          id: 'pynoahgkm',
+          cb: scope.pynoahgkm,
+          c: function () {
+            return true;
+          },
+        },
+        {
+          t: `Go NORTH.`,
+          id: 'kt79wb9tc',
+          cb: scope.kt79wb9tc,
+          c: function () {
+            return true;
+          },
+        },
+        {
+          t: `Go SOUTH.`,
+          id: 'ul2zb3gsd',
+          cb: scope.ul2zb3gsd,
+          c: function () {
+            return true;
+          },
+        },
+        {
+          t: `Go WEST.`,
+          id: 'bh19pwxpa',
+          cb: scope.bh19pwxpa,
+          c: function () {
+            return true;
+          },
+        },
+      ]);
+    };
+    scope['cgg5quh09'].isChoice = true;
+
+    // action
+    scope.rx7qa5lmh = () => {
+      player.set(CURRENT_NODE_VAR, 'rx7qa5lmh');
+      player.set('itemsText', engine.getRoomItemsText());
+      player.set('exitText', 'There are exits to the NORTH, SOUTH, and WEST.');
+      scope.og4u2p6pq();
+    };
+
+    // text
+    scope.og4u2p6pq = () => {
+      player.set(CURRENT_NODE_VAR, 'og4u2p6pq');
+      var text = `You stand at the bottom of a rectangular mine shaft.  You cannot see the ceiling, but around walls above you are wooden shelves reinforced with rusty, metal lining.  You can see them placed at varying intervals before they disappear into the darkness above you.
+
+A wooden platform with a thick rope tied to each corner is next to you.  The rope coils in on itself before ending in a frayed mass.
+
+${player.get('exitText')}
+
+${player.get('itemsText')}`;
+      core.say(text, scope.eqshna56f, 'og4u2p6pq', 'eqshna56f');
+    };
+    scope['og4u2p6pq'].isText = true;
+
+    // action
+    scope.pynoahgkm = () => {
+      player.set(CURRENT_NODE_VAR, 'pynoahgkm');
+      player.set('INVENTORY_NEXT_NODE_ID', 'yq5fgaq93');
+      player.set('INVENTORY_NEXT_FILE_ID', player.get(CURRENT_FILE_VAR));
+      scope.kgtresns5();
+    };
+
+    // next_file
+    scope.kgtresns5 = function () {
+      var key = `FUNC_Inventory.json`;
+      var func = files[key];
+      if (!func) {
+        func = files[player.get(key)];
+      }
+      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
+      var nodeId = player.get('NEXT_NODE_ID');
+      if (func) {
+        player.set('NEXT_NODE_ID', null);
+        func(nodeId);
+      } else {
+        core.exit();
+      }
+    };
+
+    // next_file
+    scope.kt79wb9tc = function () {
+      var key = `Caves_NarrowStairway1.json`;
+      var func = files[key];
+      if (!func) {
+        func = files[player.get(key)];
+      }
+      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
+      var nodeId = player.get('NEXT_NODE_ID');
+      if (func) {
+        player.set('NEXT_NODE_ID', null);
+        func(nodeId);
+      } else {
+        core.exit();
+      }
+    };
+
+    // next_file
+    scope.ul2zb3gsd = function () {
+      var key = `Caves_CaveChute1.json`;
+      var func = files[key];
+      if (!func) {
+        func = files[player.get(key)];
+      }
+      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
+      var nodeId = player.get('NEXT_NODE_ID');
+      if (func) {
+        player.set('NEXT_NODE_ID', null);
+        func(nodeId);
+      } else {
+        core.exit();
+      }
+    };
+
+    // next_file
+    scope.bh19pwxpa = function () {
+      var key = `Caves_Cave3.json`;
+      var func = files[key];
+      if (!func) {
+        func = files[player.get(key)];
+      }
+      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
+      var nodeId = player.get('NEXT_NODE_ID');
+      if (func) {
+        player.set('NEXT_NODE_ID', null);
+        func(nodeId);
+      } else {
+        core.exit();
+      }
+    };
+
+    // action
+    scope.yq5fgaq93 = () => {
+      player.set(CURRENT_NODE_VAR, 'yq5fgaq93');
+      engine.setBackground('Caves_RuinedElevator');
+      engine.setHeading('e');
+
+      if (player.get('lasIN2f') !== 'Inventory.json') {
+        engine.playOneOfSound('step', [1, 2, 3]);
+      }
+      scope.lf793sp34();
+    };
+
+    if (id === undefined) {
+      scope.lapq1e13f();
+    } else if (id) {
+      scope[id]();
+    }
+    return player.state;
+  };
+
+  files[`Caves_HotSprings.json`] = function (id) {
+    player.set(CURRENT_FILE_VAR, 'Caves_HotSprings.json');
+    // switch
+    scope.zwfamk92b = () => {
+      player.set(CURRENT_NODE_VAR, 'zwfamk92b');
+      if (false) scope.cn692hozz();
+      else if (true) scope.r2qlod1at();
+    };
+    // action
+    scope.cn692hozz = () => {
+      player.set(CURRENT_NODE_VAR, 'cn692hozz');
+      player.set('itemsText', engine.getRoomItemsText());
+      scope.db8qfdet3();
+    };
+
+    // text
+    scope.db8qfdet3 = () => {
+      player.set(CURRENT_NODE_VAR, 'db8qfdet3');
+      var text = `You are standing in a cave with hot springs.
+
+${player.get('exitText')}
+
+${player.get('itemsText')}`;
+      core.say(text, scope.u0xlal8h4, 'db8qfdet3', 'u0xlal8h4');
+    };
+    scope['db8qfdet3'].isText = true;
+
+    // choice
+    scope.u0xlal8h4 = function () {
+      player.set(CURRENT_NODE_VAR, 'u0xlal8h4');
+      let text = ``;
+      core.choose(text, 'u0xlal8h4', [
+        {
+          t: `Pick up items.`,
+          id: 'gxbb7p2tl',
+          cb: scope.gxbb7p2tl,
+          c: function () {
+            return engine.getRoomItems().length > 0;
+          },
+        },
+        {
+          t: `Examine pools of water.`,
+          id: 'ygptthpoo',
+          cb: scope.ygptthpoo,
+          c: function () {
+            return true;
+          },
+        },
+        {
+          t: `Back.`,
+          id: 'fs9pmoiat',
+          cb: scope.fs9pmoiat,
+          c: function () {
+            return true;
+          },
+        },
+      ]);
+    };
+    scope['u0xlal8h4'].isChoice = true;
+
+    // action
+    scope.gxbb7p2tl = () => {
+      player.set(CURRENT_NODE_VAR, 'gxbb7p2tl');
+      player.set('PICKUP_NEXT_FILE_ID', player.get('curIN2f'));
+      player.set('PICKUP_NEXT_NODE_ID', 'cn692hozz');
+      scope.xbig83gep();
+    };
+
+    // next_file
+    scope.xbig83gep = function () {
+      var key = `FUNC_PickUp.json`;
+      var func = files[key];
+      if (!func) {
+        func = files[player.get(key)];
+      }
+      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
+      var nodeId = player.get('NEXT_NODE_ID');
+      if (func) {
+        player.set('NEXT_NODE_ID', null);
+        func(nodeId);
+      } else {
+        core.exit();
+      }
+    };
+
+    // text
+    scope.ygptthpoo = () => {
+      player.set(CURRENT_NODE_VAR, 'ygptthpoo');
+      var text = `The water in here is crystal clear and the pools are not very deep.  Almost all of them are near boiling and you would certainly burn yourself should you touch them.  The rocks beneath your feet are uncomfortably warm.`;
+      core.say(text, scope.qgdu31xuz, 'ygptthpoo', 'qgdu31xuz');
+    };
+    scope['ygptthpoo'].isText = true;
+
+    // choice
+    scope.qgdu31xuz = function () {
+      player.set(CURRENT_NODE_VAR, 'qgdu31xuz');
+      let text = ``;
+      core.choose(text, 'qgdu31xuz', [
+        {
+          t: `Dip something in the hot water.`,
+          id: 'swuwz2z43',
+          cb: scope.swuwz2z43,
+          c: function () {
+            return true;
+          },
+        },
+        {
+          t: `Back.`,
+          id: 'cn692hozz',
+          cb: scope.cn692hozz,
+          c: function () {
+            return true;
+          },
+        },
+      ]);
+    };
+    scope['qgdu31xuz'].isChoice = true;
+
+    // action
+    scope.swuwz2z43 = () => {
+      player.set(CURRENT_NODE_VAR, 'swuwz2z43');
+      player.set('INVENTORY_NEXT_NODE_ID', 'qqy6of983');
+      player.set('INVENTORY_NEXT_FILE_ID', player.get(CURRENT_FILE_VAR));
+      player.set('INVENTORY_MODE', 'selectItem');
+      scope.pfq3s7ztf();
+    };
+
+    // next_file
+    scope.pfq3s7ztf = function () {
+      var key = `FUNC_Inventory.json`;
+      var func = files[key];
+      if (!func) {
+        func = files[player.get(key)];
+      }
+      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
+      var nodeId = player.get('NEXT_NODE_ID');
+      if (func) {
+        player.set('NEXT_NODE_ID', null);
+        func(nodeId);
+      } else {
+        core.exit();
+      }
+    };
+
+    // text
+    scope.fs9pmoiat = () => {
+      player.set(CURRENT_NODE_VAR, 'fs9pmoiat');
+      var text = `Hot Springs.`;
+      core.say(text, scope.ffmd6g25n, 'fs9pmoiat', 'ffmd6g25n');
+    };
+    scope['fs9pmoiat'].isText = true;
+
+    // choice
+    scope.ffmd6g25n = function () {
+      player.set(CURRENT_NODE_VAR, 'ffmd6g25n');
+      let text = ``;
+      core.choose(text, 'ffmd6g25n', [
+        {
+          t: `Examine surroundings.`,
+          id: 'zcnuptl1l',
+          cb: scope.zcnuptl1l,
+          c: function () {
+            return true;
+          },
+        },
+        {
+          t: `Inventory.`,
+          id: 's454hx8uc',
+          cb: scope.s454hx8uc,
+          c: function () {
+            return true;
+          },
+        },
+        {
+          t: `Go NORTH.`,
+          id: 'h41mq3dpr',
+          cb: scope.h41mq3dpr,
+          c: function () {
+            return true;
+          },
+        },
+        {
+          t: `Go SOUTH.`,
+          id: 'gpiroe8gz',
+          cb: scope.gpiroe8gz,
+          c: function () {
+            return true;
+          },
+        },
+      ]);
+    };
+    scope['ffmd6g25n'].isChoice = true;
+
+    // action
+    scope.zcnuptl1l = () => {
+      player.set(CURRENT_NODE_VAR, 'zcnuptl1l');
+      player.set('itemsText', engine.getRoomItemsText());
+      player.set('exitText', 'There is an exit to the SOUTH.');
+      scope.rlxr9ggxx();
+    };
+
+    // text
+    scope.rlxr9ggxx = () => {
+      player.set(CURRENT_NODE_VAR, 'rlxr9ggxx');
+      var text = `Several large pools of water fill this cavern.  Some have steam rising into the vast ceiling, some are drip-fed water from the stalactites above them, and yet others slowly overflow into smaller puddles around them.  It is like a sauna in here; hot, muggy and it smells very strongly of sulfur.
+
+${player.get('exitText')}
+
+${player.get('itemsText')}`;
+      core.say(text, scope.u0xlal8h4, 'rlxr9ggxx', 'u0xlal8h4');
+    };
+    scope['rlxr9ggxx'].isText = true;
+
+    // action
+    scope.s454hx8uc = () => {
+      player.set(CURRENT_NODE_VAR, 's454hx8uc');
+      player.set('INVENTORY_NEXT_NODE_ID', 'r2qlod1at');
+      player.set('INVENTORY_NEXT_FILE_ID', player.get(CURRENT_FILE_VAR));
+      scope.fxwx6xgse();
+    };
+
+    // next_file
+    scope.fxwx6xgse = function () {
+      var key = `FUNC_Inventory.json`;
+      var func = files[key];
+      if (!func) {
+        func = files[player.get(key)];
+      }
+      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
+      var nodeId = player.get('NEXT_NODE_ID');
+      if (func) {
+        player.set('NEXT_NODE_ID', null);
+        func(nodeId);
+      } else {
+        core.exit();
+      }
+    };
+
+    // next_file
+    scope.h41mq3dpr = function () {
+      var key = `Caves_Lava1.json`;
+      var func = files[key];
+      if (!func) {
+        func = files[player.get(key)];
+      }
+      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
+      var nodeId = player.get('NEXT_NODE_ID');
+      if (func) {
+        player.set('NEXT_NODE_ID', null);
+        func(nodeId);
+      } else {
+        core.exit();
+      }
+    };
+
+    // next_file
+    scope.gpiroe8gz = function () {
+      var key = `Caves_NarrowStairway1.json`;
+      var func = files[key];
+      if (!func) {
+        func = files[player.get(key)];
+      }
+      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
+      var nodeId = player.get('NEXT_NODE_ID');
+      if (func) {
+        player.set('NEXT_NODE_ID', null);
+        func(nodeId);
+      } else {
+        core.exit();
+      }
+    };
+
+    // action
+    scope.r2qlod1at = () => {
+      player.set(CURRENT_NODE_VAR, 'r2qlod1at');
+      engine.setBackground('Caves_HotSprings');
+      engine.setHeading('n');
+
+      if (player.get('lasIN2f') !== 'Inventory.json') {
+        engine.playOneOfSound('step', [1, 2, 3]);
+      }
+      scope.fs9pmoiat();
+    };
+
+    if (id === undefined) {
+      scope.zwfamk92b();
+    } else if (id) {
+      scope[id]();
+    }
+    return player.state;
+  };
+
+  // sub_root
+  scope.qqy6of983 = () => {
+    player.set(CURRENT_NODE_VAR, 'qqy6of983');
+    scope.gnpce395t();
+  };
+
+  // pass_fail
+  scope.gnpce395t = function () {
+    player.set(CURRENT_NODE_VAR, 'gnpce395t');
+    var condition = (function () {
+      return Boolean(player.get('selectedItem'));
+    })();
+    if (condition) {
+      player.set(CURRENT_NODE_VAR, 'ul90eqzbt');
+      scope.brgwzt2tr();
+    }
+    if (!condition) {
+      player.set(CURRENT_NODE_VAR, 'ek13yab5c');
+      scope.qgdu31xuz();
+    }
+  };
+  // text
+  scope.brgwzt2tr = () => {
+    player.set(CURRENT_NODE_VAR, 'brgwzt2tr');
+    var text = `You slowly dip the ${
+      player.get('selectedItem')?.label
+    } into the hot water of one of the pools...`;
+    core.say(text, scope.f64tosfym, 'brgwzt2tr', 'f64tosfym');
+  };
+  scope['brgwzt2tr'].isText = true;
+
+  // switch
+  scope.f64tosfym = () => {
+    player.set(CURRENT_NODE_VAR, 'f64tosfym');
+    if (player.get('selectedItem')?.name === 'rusty_axe') scope.s5eddgfyk();
+    else if (player.get('selectedItem')?.name?.includes('note_'))
+      scope.i4onsk04w();
+    else if (true) scope.fesubgn6g();
+  };
+  // text
+  scope.s5eddgfyk = () => {
+    player.set(CURRENT_NODE_VAR, 's5eddgfyk');
+    var text = `Miraculously, the rust on the axe disappears the instant it touches the water!  Your axe is now clean and shiny.`;
+    core.say(text, scope.fam4cuhx6, 's5eddgfyk', 'fam4cuhx6');
+  };
+  scope['s5eddgfyk'].isText = true;
+
+  // action
+  scope.fam4cuhx6 = () => {
+    player.set(CURRENT_NODE_VAR, 'fam4cuhx6');
+    engine.removeItemFromInventory('rusty_axe');
+    engine.addItemToInventory('shiny_axe');
+    scope.qgdu31xuz();
+  };
+
+  // text
+  scope.i4onsk04w = () => {
+    player.set(CURRENT_NODE_VAR, 'i4onsk04w');
+    var text = `It predictably becomes soggy and almost illegible.  It dries out after a bit.`;
+    core.say(text, scope.qgdu31xuz, 'i4onsk04w', 'qgdu31xuz');
+  };
+  scope['i4onsk04w'].isText = true;
+
+  // text
+  scope.fesubgn6g = () => {
+    player.set(CURRENT_NODE_VAR, 'fesubgn6g');
+    var text = `Nothing interesting happens.`;
+    core.say(text, scope.qgdu31xuz, 'fesubgn6g', 'qgdu31xuz');
+  };
+  scope['fesubgn6g'].isText = true;
+
   files[`Caves_NarrowStairway1.json`] = function (id) {
     player.set(CURRENT_FILE_VAR, 'Caves_NarrowStairway1.json');
     // switch
@@ -6100,369 +7152,6 @@ ${player.get('itemsText')}`;
     return player.state;
   };
 
-  files[`Caves_HotSprings.json`] = function (id) {
-    player.set(CURRENT_FILE_VAR, 'Caves_HotSprings.json');
-    // switch
-    scope.zwfamk92b = () => {
-      player.set(CURRENT_NODE_VAR, 'zwfamk92b');
-      if (false) scope.cn692hozz();
-      else if (true) scope.r2qlod1at();
-    };
-    // action
-    scope.cn692hozz = () => {
-      player.set(CURRENT_NODE_VAR, 'cn692hozz');
-      player.set('itemsText', engine.getRoomItemsText());
-      scope.db8qfdet3();
-    };
-
-    // text
-    scope.db8qfdet3 = () => {
-      player.set(CURRENT_NODE_VAR, 'db8qfdet3');
-      var text = `You are standing in a cave with hot springs.
-
-${player.get('exitText')}
-
-${player.get('itemsText')}`;
-      core.say(text, scope.u0xlal8h4, 'db8qfdet3', 'u0xlal8h4');
-    };
-    scope['db8qfdet3'].isText = true;
-
-    // choice
-    scope.u0xlal8h4 = function () {
-      player.set(CURRENT_NODE_VAR, 'u0xlal8h4');
-      let text = ``;
-      core.choose(text, 'u0xlal8h4', [
-        {
-          t: `Pick up items.`,
-          id: 'gxbb7p2tl',
-          cb: scope.gxbb7p2tl,
-          c: function () {
-            return engine.getRoomItems().length > 0;
-          },
-        },
-        {
-          t: `Examine pools of water.`,
-          id: 'ygptthpoo',
-          cb: scope.ygptthpoo,
-          c: function () {
-            return true;
-          },
-        },
-        {
-          t: `Back.`,
-          id: 'fs9pmoiat',
-          cb: scope.fs9pmoiat,
-          c: function () {
-            return true;
-          },
-        },
-      ]);
-    };
-    scope['u0xlal8h4'].isChoice = true;
-
-    // action
-    scope.gxbb7p2tl = () => {
-      player.set(CURRENT_NODE_VAR, 'gxbb7p2tl');
-      player.set('PICKUP_NEXT_FILE_ID', player.get('curIN2f'));
-      player.set('PICKUP_NEXT_NODE_ID', 'cn692hozz');
-      scope.xbig83gep();
-    };
-
-    // next_file
-    scope.xbig83gep = function () {
-      var key = `FUNC_PickUp.json`;
-      var func = files[key];
-      if (!func) {
-        func = files[player.get(key)];
-      }
-      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
-      var nodeId = player.get('NEXT_NODE_ID');
-      if (func) {
-        player.set('NEXT_NODE_ID', null);
-        func(nodeId);
-      } else {
-        core.exit();
-      }
-    };
-
-    // text
-    scope.ygptthpoo = () => {
-      player.set(CURRENT_NODE_VAR, 'ygptthpoo');
-      var text = `The water in here is crystal clear and the pools are not very deep.  Almost all of them are near boiling and you would certainly burn yourself should you touch them.  The rocks beneath your feet are uncomfortably warm.`;
-      core.say(text, scope.qgdu31xuz, 'ygptthpoo', 'qgdu31xuz');
-    };
-    scope['ygptthpoo'].isText = true;
-
-    // choice
-    scope.qgdu31xuz = function () {
-      player.set(CURRENT_NODE_VAR, 'qgdu31xuz');
-      let text = ``;
-      core.choose(text, 'qgdu31xuz', [
-        {
-          t: `Dip something in the hot water.`,
-          id: 'swuwz2z43',
-          cb: scope.swuwz2z43,
-          c: function () {
-            return true;
-          },
-        },
-        {
-          t: `Back.`,
-          id: 'cn692hozz',
-          cb: scope.cn692hozz,
-          c: function () {
-            return true;
-          },
-        },
-      ]);
-    };
-    scope['qgdu31xuz'].isChoice = true;
-
-    // action
-    scope.swuwz2z43 = () => {
-      player.set(CURRENT_NODE_VAR, 'swuwz2z43');
-      player.set('INVENTORY_NEXT_NODE_ID', 'qqy6of983');
-      player.set('INVENTORY_NEXT_FILE_ID', player.get(CURRENT_FILE_VAR));
-      player.set('INVENTORY_MODE', 'selectItem');
-      scope.pfq3s7ztf();
-    };
-
-    // next_file
-    scope.pfq3s7ztf = function () {
-      var key = `FUNC_Inventory.json`;
-      var func = files[key];
-      if (!func) {
-        func = files[player.get(key)];
-      }
-      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
-      var nodeId = player.get('NEXT_NODE_ID');
-      if (func) {
-        player.set('NEXT_NODE_ID', null);
-        func(nodeId);
-      } else {
-        core.exit();
-      }
-    };
-
-    // text
-    scope.fs9pmoiat = () => {
-      player.set(CURRENT_NODE_VAR, 'fs9pmoiat');
-      var text = `Hot Springs.`;
-      core.say(text, scope.ffmd6g25n, 'fs9pmoiat', 'ffmd6g25n');
-    };
-    scope['fs9pmoiat'].isText = true;
-
-    // choice
-    scope.ffmd6g25n = function () {
-      player.set(CURRENT_NODE_VAR, 'ffmd6g25n');
-      let text = ``;
-      core.choose(text, 'ffmd6g25n', [
-        {
-          t: `Examine surroundings.`,
-          id: 'zcnuptl1l',
-          cb: scope.zcnuptl1l,
-          c: function () {
-            return true;
-          },
-        },
-        {
-          t: `Inventory.`,
-          id: 's454hx8uc',
-          cb: scope.s454hx8uc,
-          c: function () {
-            return true;
-          },
-        },
-        {
-          t: `Go NORTH.`,
-          id: 'h41mq3dpr',
-          cb: scope.h41mq3dpr,
-          c: function () {
-            return true;
-          },
-        },
-        {
-          t: `Go SOUTH.`,
-          id: 'gpiroe8gz',
-          cb: scope.gpiroe8gz,
-          c: function () {
-            return true;
-          },
-        },
-      ]);
-    };
-    scope['ffmd6g25n'].isChoice = true;
-
-    // action
-    scope.zcnuptl1l = () => {
-      player.set(CURRENT_NODE_VAR, 'zcnuptl1l');
-      player.set('itemsText', engine.getRoomItemsText());
-      player.set('exitText', 'There is an exit to the SOUTH.');
-      scope.rlxr9ggxx();
-    };
-
-    // text
-    scope.rlxr9ggxx = () => {
-      player.set(CURRENT_NODE_VAR, 'rlxr9ggxx');
-      var text = `Several large pools of water fill this cavern.  Some have steam rising into the vast ceiling, some are drip-fed water from the stalactites above them, and yet others slowly overflow into smaller puddles around them.  It is like a sauna in here; hot, muggy and it smells very strongly of sulfur.
-
-${player.get('exitText')}
-
-${player.get('itemsText')}`;
-      core.say(text, scope.u0xlal8h4, 'rlxr9ggxx', 'u0xlal8h4');
-    };
-    scope['rlxr9ggxx'].isText = true;
-
-    // action
-    scope.s454hx8uc = () => {
-      player.set(CURRENT_NODE_VAR, 's454hx8uc');
-      player.set('INVENTORY_NEXT_NODE_ID', 'r2qlod1at');
-      player.set('INVENTORY_NEXT_FILE_ID', player.get(CURRENT_FILE_VAR));
-      scope.fxwx6xgse();
-    };
-
-    // next_file
-    scope.fxwx6xgse = function () {
-      var key = `FUNC_Inventory.json`;
-      var func = files[key];
-      if (!func) {
-        func = files[player.get(key)];
-      }
-      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
-      var nodeId = player.get('NEXT_NODE_ID');
-      if (func) {
-        player.set('NEXT_NODE_ID', null);
-        func(nodeId);
-      } else {
-        core.exit();
-      }
-    };
-
-    // next_file
-    scope.h41mq3dpr = function () {
-      var key = `Caves_Lava1.json`;
-      var func = files[key];
-      if (!func) {
-        func = files[player.get(key)];
-      }
-      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
-      var nodeId = player.get('NEXT_NODE_ID');
-      if (func) {
-        player.set('NEXT_NODE_ID', null);
-        func(nodeId);
-      } else {
-        core.exit();
-      }
-    };
-
-    // next_file
-    scope.gpiroe8gz = function () {
-      var key = `Caves_NarrowStairway1.json`;
-      var func = files[key];
-      if (!func) {
-        func = files[player.get(key)];
-      }
-      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
-      var nodeId = player.get('NEXT_NODE_ID');
-      if (func) {
-        player.set('NEXT_NODE_ID', null);
-        func(nodeId);
-      } else {
-        core.exit();
-      }
-    };
-
-    // action
-    scope.r2qlod1at = () => {
-      player.set(CURRENT_NODE_VAR, 'r2qlod1at');
-      engine.setBackground('Caves_HotSprings');
-      engine.setHeading('n');
-
-      if (player.get('lasIN2f') !== 'Inventory.json') {
-        engine.playOneOfSound('step', [1, 2, 3]);
-      }
-      scope.fs9pmoiat();
-    };
-
-    if (id === undefined) {
-      scope.zwfamk92b();
-    } else if (id) {
-      scope[id]();
-    }
-    return player.state;
-  };
-
-  // sub_root
-  scope.qqy6of983 = () => {
-    player.set(CURRENT_NODE_VAR, 'qqy6of983');
-    scope.gnpce395t();
-  };
-
-  // pass_fail
-  scope.gnpce395t = function () {
-    player.set(CURRENT_NODE_VAR, 'gnpce395t');
-    var condition = (function () {
-      return Boolean(player.get('selectedItem'));
-    })();
-    if (condition) {
-      player.set(CURRENT_NODE_VAR, 'ul90eqzbt');
-      scope.brgwzt2tr();
-    }
-    if (!condition) {
-      player.set(CURRENT_NODE_VAR, 'ek13yab5c');
-      scope.qgdu31xuz();
-    }
-  };
-  // text
-  scope.brgwzt2tr = () => {
-    player.set(CURRENT_NODE_VAR, 'brgwzt2tr');
-    var text = `You slowly dip the ${
-      player.get('selectedItem')?.label
-    } into the hot water of one of the pools...`;
-    core.say(text, scope.f64tosfym, 'brgwzt2tr', 'f64tosfym');
-  };
-  scope['brgwzt2tr'].isText = true;
-
-  // switch
-  scope.f64tosfym = () => {
-    player.set(CURRENT_NODE_VAR, 'f64tosfym');
-    if (player.get('selectedItem')?.name === 'rusty_axe') scope.s5eddgfyk();
-    else if (player.get('selectedItem')?.name?.includes('note_'))
-      scope.i4onsk04w();
-    else if (true) scope.fesubgn6g();
-  };
-  // text
-  scope.s5eddgfyk = () => {
-    player.set(CURRENT_NODE_VAR, 's5eddgfyk');
-    var text = `Miraculously, the rust on the axe disappears the instant it touches the water!  Your axe is now clean and shiny.`;
-    core.say(text, scope.fam4cuhx6, 's5eddgfyk', 'fam4cuhx6');
-  };
-  scope['s5eddgfyk'].isText = true;
-
-  // action
-  scope.fam4cuhx6 = () => {
-    player.set(CURRENT_NODE_VAR, 'fam4cuhx6');
-    engine.removeItemFromInventory('rusty_axe');
-    engine.addItemToInventory('shiny_axe');
-    scope.qgdu31xuz();
-  };
-
-  // text
-  scope.i4onsk04w = () => {
-    player.set(CURRENT_NODE_VAR, 'i4onsk04w');
-    var text = `It predictably becomes soggy and almost illegible.  It dries out after a bit.`;
-    core.say(text, scope.qgdu31xuz, 'i4onsk04w', 'qgdu31xuz');
-  };
-  scope['i4onsk04w'].isText = true;
-
-  // text
-  scope.fesubgn6g = () => {
-    player.set(CURRENT_NODE_VAR, 'fesubgn6g');
-    var text = `Nothing interesting happens.`;
-    core.say(text, scope.qgdu31xuz, 'fesubgn6g', 'qgdu31xuz');
-  };
-  scope['fesubgn6g'].isText = true;
-
   files[`Caves_ClearLake.json`] = function (id) {
     player.set(CURRENT_FILE_VAR, 'Caves_ClearLake.json');
     // switch
@@ -6917,6 +7606,269 @@ ${player.get('itemsText')}`;
     return player.state;
   };
 
+  files[`Caves_CaveChute1.json`] = function (id) {
+    player.set(CURRENT_FILE_VAR, 'Caves_CaveChute1.json');
+    // switch
+    scope.lnkezkxd4 = () => {
+      player.set(CURRENT_NODE_VAR, 'lnkezkxd4');
+      if (false) scope.si1q1rpai();
+      else if (true) scope.p1rd41fiq();
+    };
+    // action
+    scope.si1q1rpai = () => {
+      player.set(CURRENT_NODE_VAR, 'si1q1rpai');
+      player.set('itemsText', engine.getRoomItemsText());
+      scope.tztn6rawg();
+    };
+
+    // text
+    scope.tztn6rawg = () => {
+      player.set(CURRENT_NODE_VAR, 'tztn6rawg');
+      var text = `You are standing in a cave below a barred-window.
+
+${player.get('exitText')}
+
+${player.get('itemsText')}`;
+      core.say(text, scope.aqfa6foa0, 'tztn6rawg', 'aqfa6foa0');
+    };
+    scope['tztn6rawg'].isText = true;
+
+    // choice
+    scope.aqfa6foa0 = function () {
+      player.set(CURRENT_NODE_VAR, 'aqfa6foa0');
+      let text = ``;
+      core.choose(text, 'aqfa6foa0', [
+        {
+          t: `Pick up items.`,
+          id: 'eta9lg5xi',
+          cb: scope.eta9lg5xi,
+          c: function () {
+            return engine.getRoomItems().length > 0;
+          },
+        },
+        {
+          t: `Examine chute.`,
+          id: 'f4obgf8dq',
+          cb: scope.f4obgf8dq,
+          c: function () {
+            return true;
+          },
+        },
+        {
+          t: `Back.`,
+          id: 'p1rd41fiq',
+          cb: scope.p1rd41fiq,
+          c: function () {
+            return true;
+          },
+        },
+      ]);
+    };
+    scope['aqfa6foa0'].isChoice = true;
+
+    // action
+    scope.eta9lg5xi = () => {
+      player.set(CURRENT_NODE_VAR, 'eta9lg5xi');
+      player.set('PICKUP_NEXT_FILE_ID', player.get('curIN2f'));
+      player.set('PICKUP_NEXT_NODE_ID', 'si1q1rpai');
+      scope.k94zegcka();
+    };
+
+    // next_file
+    scope.k94zegcka = function () {
+      var key = `FUNC_PickUp.json`;
+      var func = files[key];
+      if (!func) {
+        func = files[player.get(key)];
+      }
+      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
+      var nodeId = player.get('NEXT_NODE_ID');
+      if (func) {
+        player.set('NEXT_NODE_ID', null);
+        func(nodeId);
+      } else {
+        core.exit();
+      }
+    };
+
+    // text
+    scope.f4obgf8dq = () => {
+      player.set(CURRENT_NODE_VAR, 'f4obgf8dq');
+      var text = `The chute zigs and zags its way down the cliff, but you cannot see where it ends.  It forms the shape of a "U" and is just wide enough for a person to slide down.`;
+      core.say(text, scope.aqfa6foa0, 'f4obgf8dq', 'aqfa6foa0');
+    };
+    scope['f4obgf8dq'].isText = true;
+
+    // action
+    scope.p1rd41fiq = () => {
+      player.set(CURRENT_NODE_VAR, 'p1rd41fiq');
+      engine.setBackground('Caves_CaveChute1');
+      engine.setHeading('s');
+
+      if (player.get('lasIN2f') !== 'Inventory.json') {
+        engine.playOneOfSound('step', [1, 2, 3]);
+      }
+      scope.ktbs0u5g5();
+    };
+
+    // text
+    scope.ktbs0u5g5 = () => {
+      player.set(CURRENT_NODE_VAR, 'ktbs0u5g5');
+      var text = `Chute.`;
+      core.say(text, scope.pimsqf4y0, 'ktbs0u5g5', 'pimsqf4y0');
+    };
+    scope['ktbs0u5g5'].isText = true;
+
+    // choice
+    scope.pimsqf4y0 = function () {
+      player.set(CURRENT_NODE_VAR, 'pimsqf4y0');
+      let text = ``;
+      core.choose(text, 'pimsqf4y0', [
+        {
+          t: `Examine surroundings.`,
+          id: 'k99swk371',
+          cb: scope.k99swk371,
+          c: function () {
+            return true;
+          },
+        },
+        {
+          t: `Inventory.`,
+          id: 'unsa0sgk2',
+          cb: scope.unsa0sgk2,
+          c: function () {
+            return true;
+          },
+        },
+        {
+          t: `Go NORTH.`,
+          id: 'l59rbflfn',
+          cb: scope.l59rbflfn,
+          c: function () {
+            return true;
+          },
+        },
+        {
+          t: `Go SOUTH (use chute).`,
+          id: 'aefcb72q8',
+          cb: scope.aefcb72q8,
+          c: function () {
+            return true;
+          },
+        },
+      ]);
+    };
+    scope['pimsqf4y0'].isChoice = true;
+
+    // action
+    scope.k99swk371 = () => {
+      player.set(CURRENT_NODE_VAR, 'k99swk371');
+      player.set('itemsText', engine.getRoomItemsText());
+      player.set('exitText', 'There are exits to the NORTH and SOUTH.');
+      scope.k7gg6fxtz();
+    };
+
+    // text
+    scope.k7gg6fxtz = () => {
+      player.set(CURRENT_NODE_VAR, 'k7gg6fxtz');
+      var text = `The cave sharply drops off of a cliff here, however there is a smooth chute that seems to have been carved out of the stone.
+
+${player.get('exitText')}
+
+${player.get('itemsText')}`;
+      core.say(text, scope.aqfa6foa0, 'k7gg6fxtz', 'aqfa6foa0');
+    };
+    scope['k7gg6fxtz'].isText = true;
+
+    // action
+    scope.unsa0sgk2 = () => {
+      player.set(CURRENT_NODE_VAR, 'unsa0sgk2');
+      player.set('INVENTORY_NEXT_NODE_ID', 'p1rd41fiq');
+      player.set('INVENTORY_NEXT_FILE_ID', player.get(CURRENT_FILE_VAR));
+      scope.t5ar70fdr();
+    };
+
+    // next_file
+    scope.t5ar70fdr = function () {
+      var key = `FUNC_Inventory.json`;
+      var func = files[key];
+      if (!func) {
+        func = files[player.get(key)];
+      }
+      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
+      var nodeId = player.get('NEXT_NODE_ID');
+      if (func) {
+        player.set('NEXT_NODE_ID', null);
+        func(nodeId);
+      } else {
+        core.exit();
+      }
+    };
+
+    // next_file
+    scope.l59rbflfn = function () {
+      var key = `Caves_RuinedElevator.json`;
+      var func = files[key];
+      if (!func) {
+        func = files[player.get(key)];
+      }
+      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
+      var nodeId = player.get('NEXT_NODE_ID');
+      if (func) {
+        player.set('NEXT_NODE_ID', null);
+        func(nodeId);
+      } else {
+        core.exit();
+      }
+    };
+
+    // action
+    scope.aefcb72q8 = () => {
+      player.set(CURRENT_NODE_VAR, 'aefcb72q8');
+      engine.playSound('slide');
+      scope.f9nf5yn50();
+    };
+
+    // text
+    scope.f9nf5yn50 = () => {
+      player.set(CURRENT_NODE_VAR, 'f9nf5yn50');
+      var text = `Step into the chute and push yourself down.  At first you are moving slowly but it doesn't take long for you to reach near-breakneck speeds.  You bump off hard stone with each bend, and in the darkness you completely lose track of where you are going...`;
+      core.say(text, scope.z8i7sagg0, 'f9nf5yn50', 'z8i7sagg0');
+    };
+    scope['f9nf5yn50'].isText = true;
+
+    // action
+    scope.z8i7sagg0 = () => {
+      player.set(CURRENT_NODE_VAR, 'z8i7sagg0');
+      engine.playSound('cave_drop_2');
+      scope.iunfdls6q();
+    };
+
+    // next_file
+    scope.iunfdls6q = function () {
+      var key = `Caves_CaveCliff1.json`;
+      var func = files[key];
+      if (!func) {
+        func = files[player.get(key)];
+      }
+      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
+      var nodeId = player.get('NEXT_NODE_ID');
+      if (func) {
+        player.set('NEXT_NODE_ID', null);
+        func(nodeId);
+      } else {
+        core.exit();
+      }
+    };
+
+    if (id === undefined) {
+      scope.lnkezkxd4();
+    } else if (id) {
+      scope[id]();
+    }
+    return player.state;
+  };
+
   files[`Caves_CaveCliff1.json`] = function (id) {
     player.set(CURRENT_FILE_VAR, 'Caves_CaveCliff1.json');
     // switch
@@ -7224,8 +8176,8 @@ ${player.get('itemsText')}`;
       core.choose(text, 'lk3dgkgpt', [
         {
           t: `Examine surroundings.`,
-          id: 'd8gxrmqek',
-          cb: scope.d8gxrmqek,
+          id: 'gpzg2yg3f',
+          cb: scope.gpzg2yg3f,
           c: function () {
             return true;
           },
@@ -7266,6 +8218,18 @@ ${player.get('itemsText')}`;
     };
     scope['lk3dgkgpt'].isChoice = true;
 
+    // action
+    scope.gpzg2yg3f = () => {
+      player.set(CURRENT_NODE_VAR, 'gpzg2yg3f');
+      player.set('itemsText', engine.getRoomItemsText());
+      if (player.get('vars.Caves_Cave1.rubbleBlocksPath')) {
+        player.set('exitText', 'There are exits to the EAST, and WEST.');
+      } else {
+        player.set('exitText', 'There are exits to the NORTH, EAST, and WEST.');
+      }
+      scope.d8gxrmqek();
+    };
+
     // pass_fail
     scope.d8gxrmqek = function () {
       player.set(CURRENT_NODE_VAR, 'd8gxrmqek');
@@ -7286,7 +8250,9 @@ ${player.get('itemsText')}`;
       player.set(CURRENT_NODE_VAR, 'd0k4n6d26');
       var text = `You are standing in a large cave with glowing moss dimly illuminating it.  You hear the sound of rushing water to the EAST.  
 
-There are exits to the NORTH, EAST, and WEST.`;
+${player.get('exitText')}
+
+${player.get('itemsText')}`;
       core.say(text, scope.km4g9y3ur, 'd0k4n6d26', 'km4g9y3ur');
     };
     scope['d0k4n6d26'].isText = true;
@@ -7296,6 +8262,14 @@ There are exits to the NORTH, EAST, and WEST.`;
       player.set(CURRENT_NODE_VAR, 'km4g9y3ur');
       let text = ``;
       core.choose(text, 'km4g9y3ur', [
+        {
+          t: `Pick up items.`,
+          id: 'mwx59f15n',
+          cb: scope.mwx59f15n,
+          c: function () {
+            return engine.getRoomItems().length > 0;
+          },
+        },
         {
           t: `Examine cave-in.`,
           id: 's0gg646gd',
@@ -7315,6 +8289,31 @@ There are exits to the NORTH, EAST, and WEST.`;
       ]);
     };
     scope['km4g9y3ur'].isChoice = true;
+
+    // action
+    scope.mwx59f15n = () => {
+      player.set(CURRENT_NODE_VAR, 'mwx59f15n');
+      player.set('PICKUP_NEXT_FILE_ID', player.get('curIN2f'));
+      player.set('PICKUP_NEXT_NODE_ID', 'go79ng6cn');
+      scope.n95zgzxro();
+    };
+
+    // next_file
+    scope.n95zgzxro = function () {
+      var key = `FUNC_PickUp.json`;
+      var func = files[key];
+      if (!func) {
+        func = files[player.get(key)];
+      }
+      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
+      var nodeId = player.get('NEXT_NODE_ID');
+      if (func) {
+        player.set('NEXT_NODE_ID', null);
+        func(nodeId);
+      } else {
+        core.exit();
+      }
+    };
 
     // text
     scope.s0gg646gd = () => {
@@ -7420,9 +8419,11 @@ It is a miracle you did not get hurt.`;
     // text
     scope.sgewpqfpl = () => {
       player.set(CURRENT_NODE_VAR, 'sgewpqfpl');
-      var text = `You are standing in a large cave with glowing moss dimly illuminating it.  You hear the sound of rushing water to the EAST.  
+      var text = `You are standing in a large cave with glowing moss dimly illuminating it.  You hear the sound of rushing water to the EAST.  It appears that some sort of cave-in blocks an exit to the NORTH.
 
-There are exits to the EAST and WEST, and it appears that some sort of cave-in blocks an exit to the NORTH.`;
+${player.get('exitText')}
+
+${player.get('itemsText')}`;
       core.say(text, scope.km4g9y3ur, 'sgewpqfpl', 'km4g9y3ur');
     };
     scope['sgewpqfpl'].isText = true;
@@ -7511,1601 +8512,10 @@ There are exits to the EAST and WEST, and it appears that some sort of cave-in b
     return player.state;
   };
 
-  files[`Caves_Cave2.json`] = function (id) {
-    player.set(CURRENT_FILE_VAR, 'Caves_Cave2.json');
-    // switch
-    scope.e1b3a7gmf = () => {
-      player.set(CURRENT_NODE_VAR, 'e1b3a7gmf');
-      if (false) scope.q7x5xpisc();
-      else if (true) scope.xuu1sh4fk();
-    };
-    // action
-    scope.q7x5xpisc = () => {
-      player.set(CURRENT_NODE_VAR, 'q7x5xpisc');
-      player.set('itemsText', engine.getRoomItemsText());
-      scope.pk50gyrql();
-    };
-
-    // text
-    scope.pk50gyrql = () => {
-      player.set(CURRENT_NODE_VAR, 'pk50gyrql');
-      var text = `You are standing in a cave with a three-way fork.
-
-There are exits to the EAST, SOUTH, and WEST.  You hear the sound of rushing water to the WEST.
-
-${player.get('itemsText')}`;
-      core.say(text, scope.n5y8ff5t0, 'pk50gyrql', 'n5y8ff5t0');
-    };
-    scope['pk50gyrql'].isText = true;
-
-    // choice
-    scope.n5y8ff5t0 = function () {
-      player.set(CURRENT_NODE_VAR, 'n5y8ff5t0');
-      let text = ``;
-      core.choose(text, 'n5y8ff5t0', [
-        {
-          t: `Pick up items.`,
-          id: 'l75bpsac0',
-          cb: scope.l75bpsac0,
-          c: function () {
-            return engine.getRoomItems().length > 0;
-          },
-        },
-        {
-          t: `Back.`,
-          id: 'xuu1sh4fk',
-          cb: scope.xuu1sh4fk,
-          c: function () {
-            return true;
-          },
-        },
-      ]);
-    };
-    scope['n5y8ff5t0'].isChoice = true;
-
-    // action
-    scope.l75bpsac0 = () => {
-      player.set(CURRENT_NODE_VAR, 'l75bpsac0');
-      player.set('PICKUP_NEXT_FILE_ID', player.get('curIN2f'));
-      player.set('PICKUP_NEXT_NODE_ID', 'q7x5xpisc');
-      scope.smorqb5e1();
-    };
-
-    // next_file
-    scope.smorqb5e1 = function () {
-      var key = `FUNC_PickUp.json`;
-      var func = files[key];
-      if (!func) {
-        func = files[player.get(key)];
-      }
-      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
-      var nodeId = player.get('NEXT_NODE_ID');
-      if (func) {
-        player.set('NEXT_NODE_ID', null);
-        func(nodeId);
-      } else {
-        core.exit();
-      }
-    };
-
-    // action
-    scope.xuu1sh4fk = () => {
-      player.set(CURRENT_NODE_VAR, 'xuu1sh4fk');
-      engine.setBackground('Caves_Cave2');
-      engine.setHeading('e');
-      engine.playOneOfSound('step', [1, 2, 3]);
-      scope.x001o5kh5();
-    };
-
-    // text
-    scope.x001o5kh5 = () => {
-      player.set(CURRENT_NODE_VAR, 'x001o5kh5');
-      var text = `Quiet Cave.`;
-      core.say(text, scope.y6xhkrbcm, 'x001o5kh5', 'y6xhkrbcm');
-    };
-    scope['x001o5kh5'].isText = true;
-
-    // choice
-    scope.y6xhkrbcm = function () {
-      player.set(CURRENT_NODE_VAR, 'y6xhkrbcm');
-      let text = ``;
-      core.choose(text, 'y6xhkrbcm', [
-        {
-          t: `Examine surroundings.`,
-          id: 'tqco035l1',
-          cb: scope.tqco035l1,
-          c: function () {
-            return true;
-          },
-        },
-        {
-          t: `Inventory.`,
-          id: 'xdtn93ct3',
-          cb: scope.xdtn93ct3,
-          c: function () {
-            return true;
-          },
-        },
-        {
-          t: `Go EAST.`,
-          id: 'tzzgwg87g',
-          cb: scope.tzzgwg87g,
-          c: function () {
-            return true;
-          },
-        },
-        {
-          t: `Go SOUTH.`,
-          id: 'g8dcb6ds7',
-          cb: scope.g8dcb6ds7,
-          c: function () {
-            return true;
-          },
-        },
-        {
-          t: `Go WEST.`,
-          id: 'gfkoxzg9h',
-          cb: scope.gfkoxzg9h,
-          c: function () {
-            return true;
-          },
-        },
-      ]);
-    };
-    scope['y6xhkrbcm'].isChoice = true;
-
-    // action
-    scope.tqco035l1 = () => {
-      player.set(CURRENT_NODE_VAR, 'tqco035l1');
-      player.set('itemsText', engine.getRoomItemsText());
-      scope.cdk331gsg();
-    };
-
-    // text
-    scope.cdk331gsg = () => {
-      player.set(CURRENT_NODE_VAR, 'cdk331gsg');
-      var text = `The cave splits into a three-way fork here.  The path leads downwards to the SOUTH and the path EAST leads up.
-
-There are exits to the EAST, SOUTH, and WEST.  You hear the sound of rushing water to the WEST.
-
-${player.get('itemsText')}`;
-      core.say(text, scope.n5y8ff5t0, 'cdk331gsg', 'n5y8ff5t0');
-    };
-    scope['cdk331gsg'].isText = true;
-
-    // action
-    scope.xdtn93ct3 = () => {
-      player.set(CURRENT_NODE_VAR, 'xdtn93ct3');
-      player.set('INVENTORY_NEXT_NODE_ID', 'xuu1sh4fk');
-      player.set('INVENTORY_NEXT_FILE_ID', player.get(CURRENT_FILE_VAR));
-      scope.g4wgnzef1();
-    };
-
-    // next_file
-    scope.g4wgnzef1 = function () {
-      var key = `FUNC_Inventory.json`;
-      var func = files[key];
-      if (!func) {
-        func = files[player.get(key)];
-      }
-      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
-      var nodeId = player.get('NEXT_NODE_ID');
-      if (func) {
-        player.set('NEXT_NODE_ID', null);
-        func(nodeId);
-      } else {
-        core.exit();
-      }
-    };
-
-    // next_file
-    scope.tzzgwg87g = function () {
-      var key = `Caves_CaveCliff1.json`;
-      var func = files[key];
-      if (!func) {
-        func = files[player.get(key)];
-      }
-      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
-      var nodeId = player.get('NEXT_NODE_ID');
-      if (func) {
-        player.set('NEXT_NODE_ID', null);
-        func(nodeId);
-      } else {
-        core.exit();
-      }
-    };
-
-    // next_file
-    scope.g8dcb6ds7 = function () {
-      var key = `Caves_ClearLake.json`;
-      var func = files[key];
-      if (!func) {
-        func = files[player.get(key)];
-      }
-      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
-      var nodeId = player.get('NEXT_NODE_ID');
-      if (func) {
-        player.set('NEXT_NODE_ID', null);
-        func(nodeId);
-      } else {
-        core.exit();
-      }
-    };
-
-    // next_file
-    scope.gfkoxzg9h = function () {
-      var key = `Caves_Waterfall.json`;
-      var func = files[key];
-      if (!func) {
-        func = files[player.get(key)];
-      }
-      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
-      var nodeId = player.get('NEXT_NODE_ID');
-      if (func) {
-        player.set('NEXT_NODE_ID', null);
-        func(nodeId);
-      } else {
-        core.exit();
-      }
-    };
-
-    if (id === undefined) {
-      scope.e1b3a7gmf();
-    } else if (id) {
-      scope[id]();
-    }
-    return player.state;
-  };
-
-  files[`Caves_RuinedElevator.json`] = function (id) {
-    player.set(CURRENT_FILE_VAR, 'Caves_RuinedElevator.json');
-    // switch
-    scope.lapq1e13f = () => {
-      player.set(CURRENT_NODE_VAR, 'lapq1e13f');
-      if (false) scope.se8ia1ueu();
-      else if (true) scope.yq5fgaq93();
-    };
-    // action
-    scope.se8ia1ueu = () => {
-      player.set(CURRENT_NODE_VAR, 'se8ia1ueu');
-      player.set('itemsText', engine.getRoomItemsText());
-      scope.szqkm0uli();
-    };
-
-    // text
-    scope.szqkm0uli = () => {
-      player.set(CURRENT_NODE_VAR, 'szqkm0uli');
-      var text = `You are standing in a mine shaft next to a ruined elevator.
-
-${player.get('exitText')}
-
-${player.get('itemsText')}`;
-      core.say(text, scope.eqshna56f, 'szqkm0uli', 'eqshna56f');
-    };
-    scope['szqkm0uli'].isText = true;
-
-    // choice
-    scope.eqshna56f = function () {
-      player.set(CURRENT_NODE_VAR, 'eqshna56f');
-      let text = ``;
-      core.choose(text, 'eqshna56f', [
-        {
-          t: `Pick up items.`,
-          id: 'xc9qixqih',
-          cb: scope.xc9qixqih,
-          c: function () {
-            return engine.getRoomItems().length > 0;
-          },
-        },
-        {
-          t: `Examine shelves.`,
-          id: 'agf7c694x',
-          cb: scope.agf7c694x,
-          c: function () {
-            return true;
-          },
-        },
-        {
-          t: `Examine wooden platform.`,
-          id: 'q57uafu4k',
-          cb: scope.q57uafu4k,
-          c: function () {
-            return true;
-          },
-        },
-        {
-          t: `Back.`,
-          id: 'lf793sp34',
-          cb: scope.lf793sp34,
-          c: function () {
-            return true;
-          },
-        },
-      ]);
-    };
-    scope['eqshna56f'].isChoice = true;
-
-    // action
-    scope.xc9qixqih = () => {
-      player.set(CURRENT_NODE_VAR, 'xc9qixqih');
-      player.set('PICKUP_NEXT_FILE_ID', player.get('curIN2f'));
-      player.set('PICKUP_NEXT_NODE_ID', 'se8ia1ueu');
-      scope.rri6mf16p();
-    };
-
-    // next_file
-    scope.rri6mf16p = function () {
-      var key = `FUNC_PickUp.json`;
-      var func = files[key];
-      if (!func) {
-        func = files[player.get(key)];
-      }
-      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
-      var nodeId = player.get('NEXT_NODE_ID');
-      if (func) {
-        player.set('NEXT_NODE_ID', null);
-        func(nodeId);
-      } else {
-        core.exit();
-      }
-    };
-
-    // text
-    scope.agf7c694x = () => {
-      player.set(CURRENT_NODE_VAR, 'agf7c694x');
-      var text = `It seems like these shelves have been built as some sort of reinforcement for the cave walls.  They brace strategic locations where the wall has deep cracking.  A few of the shelves have lanterns affixed to them, but none of the lanterns are lit.  There is not a shelf low enough for you to reach.`;
-      core.say(text, scope.eqshna56f, 'agf7c694x', 'eqshna56f');
-    };
-    scope['agf7c694x'].isText = true;
-
-    // text
-    scope.q57uafu4k = () => {
-      player.set(CURRENT_NODE_VAR, 'q57uafu4k');
-      var text = `This was supposed to be an elevator to traverse up and down the mine shaft, however it has been sabotaged.  The rope has clearly been sliced clean through, and the wooden platform itself has chunks missing from its edges, like it cascaded roughly to the ground from a very tall height.`;
-      core.say(text, scope.eqshna56f, 'q57uafu4k', 'eqshna56f');
-    };
-    scope['q57uafu4k'].isText = true;
-
-    // text
-    scope.lf793sp34 = () => {
-      player.set(CURRENT_NODE_VAR, 'lf793sp34');
-      var text = `Ruined Elevator.`;
-      core.say(text, scope.cgg5quh09, 'lf793sp34', 'cgg5quh09');
-    };
-    scope['lf793sp34'].isText = true;
-
-    // choice
-    scope.cgg5quh09 = function () {
-      player.set(CURRENT_NODE_VAR, 'cgg5quh09');
-      let text = ``;
-      core.choose(text, 'cgg5quh09', [
-        {
-          t: `Examine surroundings.`,
-          id: 'rx7qa5lmh',
-          cb: scope.rx7qa5lmh,
-          c: function () {
-            return true;
-          },
-        },
-        {
-          t: `Inventory.`,
-          id: 'pynoahgkm',
-          cb: scope.pynoahgkm,
-          c: function () {
-            return true;
-          },
-        },
-        {
-          t: `Go NORTH.`,
-          id: 'kt79wb9tc',
-          cb: scope.kt79wb9tc,
-          c: function () {
-            return true;
-          },
-        },
-        {
-          t: `Go SOUTH.`,
-          id: 'ul2zb3gsd',
-          cb: scope.ul2zb3gsd,
-          c: function () {
-            return true;
-          },
-        },
-        {
-          t: `Go WEST.`,
-          id: 'bh19pwxpa',
-          cb: scope.bh19pwxpa,
-          c: function () {
-            return true;
-          },
-        },
-      ]);
-    };
-    scope['cgg5quh09'].isChoice = true;
-
-    // action
-    scope.rx7qa5lmh = () => {
-      player.set(CURRENT_NODE_VAR, 'rx7qa5lmh');
-      player.set('itemsText', engine.getRoomItemsText());
-      player.set('exitText', 'There are exits to the NORTH, SOUTH, and WEST.');
-      scope.og4u2p6pq();
-    };
-
-    // text
-    scope.og4u2p6pq = () => {
-      player.set(CURRENT_NODE_VAR, 'og4u2p6pq');
-      var text = `You stand at the bottom of a rectangular mine shaft.  You cannot see the ceiling, but around walls above you are wooden shelves reinforced with rusty, metal lining.  You can see them placed at varying intervals before they disappear into the darkness above you.
-
-A wooden platform with a thick rope tied to each corner is next to you.  The rope coils in on itself before ending in a frayed mass.
-
-${player.get('exitText')}
-
-${player.get('itemsText')}`;
-      core.say(text, scope.eqshna56f, 'og4u2p6pq', 'eqshna56f');
-    };
-    scope['og4u2p6pq'].isText = true;
-
-    // action
-    scope.pynoahgkm = () => {
-      player.set(CURRENT_NODE_VAR, 'pynoahgkm');
-      player.set('INVENTORY_NEXT_NODE_ID', 'yq5fgaq93');
-      player.set('INVENTORY_NEXT_FILE_ID', player.get(CURRENT_FILE_VAR));
-      scope.kgtresns5();
-    };
-
-    // next_file
-    scope.kgtresns5 = function () {
-      var key = `FUNC_Inventory.json`;
-      var func = files[key];
-      if (!func) {
-        func = files[player.get(key)];
-      }
-      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
-      var nodeId = player.get('NEXT_NODE_ID');
-      if (func) {
-        player.set('NEXT_NODE_ID', null);
-        func(nodeId);
-      } else {
-        core.exit();
-      }
-    };
-
-    // next_file
-    scope.kt79wb9tc = function () {
-      var key = `Caves_NarrowStairway1.json`;
-      var func = files[key];
-      if (!func) {
-        func = files[player.get(key)];
-      }
-      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
-      var nodeId = player.get('NEXT_NODE_ID');
-      if (func) {
-        player.set('NEXT_NODE_ID', null);
-        func(nodeId);
-      } else {
-        core.exit();
-      }
-    };
-
-    // next_file
-    scope.ul2zb3gsd = function () {
-      var key = `Caves_CaveChute1.json`;
-      var func = files[key];
-      if (!func) {
-        func = files[player.get(key)];
-      }
-      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
-      var nodeId = player.get('NEXT_NODE_ID');
-      if (func) {
-        player.set('NEXT_NODE_ID', null);
-        func(nodeId);
-      } else {
-        core.exit();
-      }
-    };
-
-    // next_file
-    scope.bh19pwxpa = function () {
-      var key = `Caves_Cave3.json`;
-      var func = files[key];
-      if (!func) {
-        func = files[player.get(key)];
-      }
-      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
-      var nodeId = player.get('NEXT_NODE_ID');
-      if (func) {
-        player.set('NEXT_NODE_ID', null);
-        func(nodeId);
-      } else {
-        core.exit();
-      }
-    };
-
-    // action
-    scope.yq5fgaq93 = () => {
-      player.set(CURRENT_NODE_VAR, 'yq5fgaq93');
-      engine.setBackground('Caves_RuinedElevator');
-      engine.setHeading('e');
-
-      if (player.get('lasIN2f') !== 'Inventory.json') {
-        engine.playOneOfSound('step', [1, 2, 3]);
-      }
-      scope.lf793sp34();
-    };
-
-    if (id === undefined) {
-      scope.lapq1e13f();
-    } else if (id) {
-      scope[id]();
-    }
-    return player.state;
-  };
-
-  files[`FUNC_InventoryExamineEvents.json`] = function (id) {
-    player.set(CURRENT_FILE_VAR, 'FUNC_InventoryExamineEvents.json');
-    // switch
-    scope.uk2h4p9nl = () => {
-      player.set(CURRENT_NODE_VAR, 'uk2h4p9nl');
-      if (player.get('INVENTORY_EXAMINE_EVENT_NAME') === 'candle')
-        scope.khutx6uq6();
-      else if (true) scope.fcg1f1my6();
-    };
-    // text
-    scope.khutx6uq6 = () => {
-      player.set(CURRENT_NODE_VAR, 'khutx6uq6');
-      var text = `When you pick up this candle it buzzes softly in your hand.`;
-      core.say(text, scope.sh049mkfo, 'khutx6uq6', 'sh049mkfo');
-    };
-    scope['khutx6uq6'].isText = true;
-
-    // action
-    scope.sh049mkfo = () => {
-      player.set(CURRENT_NODE_VAR, 'sh049mkfo');
-      player.set('NEXT_NODE_ID', player.get('INVENTORY_RETURN_NODE_ID'));
-      scope.dfs5haz2t();
-    };
-
-    // next_file
-    scope.dfs5haz2t = function () {
-      var key = `PICKUP_RETURN_FILE_ID`;
-      var func = files[key];
-      if (!func) {
-        func = files[player.get(key)];
-      }
-      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
-      var nodeId = player.get('NEXT_NODE_ID');
-      if (func) {
-        player.set('NEXT_NODE_ID', null);
-        func(nodeId);
-      } else {
-        core.exit();
-      }
-    };
-
-    // text
-    scope.fcg1f1my6 = () => {
-      player.set(CURRENT_NODE_VAR, 'fcg1f1my6');
-      var text = `There is no Inventory Examine Event associated with this item even though this utility was called.  This is probably an ERROR.`;
-      core.say(text, scope.sh049mkfo, 'fcg1f1my6', 'sh049mkfo');
-    };
-    scope['fcg1f1my6'].isText = true;
-
-    if (id === undefined) {
-      scope.uk2h4p9nl();
-    } else if (id) {
-      scope[id]();
-    }
-    return player.state;
-  };
-
-  files[`FUNC_PickUp.json`] = function (id) {
-    player.set(CURRENT_FILE_VAR, 'FUNC_PickUp.json');
-    // action
-    scope.ed1wyr86w = () => {
-      player.set(CURRENT_NODE_VAR, 'ed1wyr86w');
-      scope.p4sew37sn();
-    };
-
-    // text
-    scope.p4sew37sn = () => {
-      player.set(CURRENT_NODE_VAR, 'p4sew37sn');
-      var text = `PICK UP what?`;
-      core.say(text, scope.nus21kl2t, 'p4sew37sn', 'nus21kl2t');
-    };
-    scope['p4sew37sn'].isText = true;
-
-    // choice
-    scope.nus21kl2t = function () {
-      player.set(CURRENT_NODE_VAR, 'nus21kl2t');
-      let text = ``;
-      core.choose(text, 'nus21kl2t', [
-        {
-          t: `Pick up: ${
-            engine.getRoomItems(player.get('PICKUP_NEXT_FILE_ID'))?.[0]?.label
-          }.`,
-          id: 'm2cmsgflt',
-          cb: scope.m2cmsgflt,
-          c: function () {
-            return Boolean(
-              engine.getRoomItems(player.get('PICKUP_NEXT_FILE_ID'))?.[0]
-            );
-          },
-        },
-        {
-          t: `Pick up: ${
-            engine.getRoomItems(player.get('PICKUP_NEXT_FILE_ID'))?.[1]?.label
-          }.`,
-          id: 'oxcrt402c',
-          cb: scope.oxcrt402c,
-          c: function () {
-            return Boolean(
-              engine.getRoomItems(player.get('PICKUP_NEXT_FILE_ID'))?.[1]
-            );
-          },
-        },
-        {
-          t: `Pick up: ${
-            engine.getRoomItems(player.get('PICKUP_NEXT_FILE_ID'))?.[2]?.label
-          }.`,
-          id: 'u6lgm32kz',
-          cb: scope.u6lgm32kz,
-          c: function () {
-            return Boolean(
-              engine.getRoomItems(player.get('PICKUP_NEXT_FILE_ID'))?.[2]
-            );
-          },
-        },
-        {
-          t: `Pick up: ${
-            engine.getRoomItems(player.get('PICKUP_NEXT_FILE_ID'))?.[3]?.label
-          }.`,
-          id: 'bt82yswsq',
-          cb: scope.bt82yswsq,
-          c: function () {
-            return Boolean(
-              engine.getRoomItems(player.get('PICKUP_NEXT_FILE_ID'))?.[3]
-            );
-          },
-        },
-        {
-          t: `Pick up: ${
-            engine.getRoomItems(player.get('PICKUP_NEXT_FILE_ID'))?.[4]?.label
-          }.`,
-          id: 'mwqzobf5l',
-          cb: scope.mwqzobf5l,
-          c: function () {
-            return Boolean(
-              engine.getRoomItems(player.get('PICKUP_NEXT_FILE_ID'))?.[4]
-            );
-          },
-        },
-        {
-          t: `Pick up: ${
-            engine.getRoomItems(player.get('PICKUP_NEXT_FILE_ID'))?.[5]?.label
-          }.`,
-          id: 'r5b6aqgio',
-          cb: scope.r5b6aqgio,
-          c: function () {
-            return Boolean(
-              engine.getRoomItems(player.get('PICKUP_NEXT_FILE_ID'))?.[5]
-            );
-          },
-        },
-        {
-          t: `Pick up: ${
-            engine.getRoomItems(player.get('PICKUP_NEXT_FILE_ID'))?.[6]?.label
-          }.`,
-          id: 'n7ywzdf75',
-          cb: scope.n7ywzdf75,
-          c: function () {
-            return Boolean(
-              engine.getRoomItems(player.get('PICKUP_NEXT_FILE_ID'))?.[6]
-            );
-          },
-        },
-        {
-          t: `Pick up: ${
-            engine.getRoomItems(player.get('PICKUP_NEXT_FILE_ID'))?.[7]?.label
-          }.`,
-          id: 'm9ocmmnk4',
-          cb: scope.m9ocmmnk4,
-          c: function () {
-            return Boolean(
-              engine.getRoomItems(player.get('PICKUP_NEXT_FILE_ID'))?.[7]
-            );
-          },
-        },
-        {
-          t: `Back.`,
-          id: 'o454csg3a',
-          cb: scope.o454csg3a,
-          c: function () {
-            return true;
-          },
-        },
-      ]);
-    };
-    scope['nus21kl2t'].isChoice = true;
-
-    // action
-    scope.m2cmsgflt = () => {
-      player.set(CURRENT_NODE_VAR, 'm2cmsgflt');
-      player.set(
-        'item',
-        engine.getRoomItems(player.get('PICKUP_NEXT_FILE_ID'))?.[0]
-      );
-      scope.hhmeympop();
-    };
-
-    // pass_fail
-    scope.hhmeympop = function () {
-      player.set(CURRENT_NODE_VAR, 'hhmeympop');
-      var condition = (function () {
-        return Boolean(engine.getItemPickUpEvent(player.get('item')));
-      })();
-      if (condition) {
-        player.set(CURRENT_NODE_VAR, 'linoc6tb2');
-        scope.b6fglmomn();
-      }
-      if (!condition) {
-        player.set(CURRENT_NODE_VAR, 'p9yy0xkqe');
-        scope.m1gmkhc60();
-      }
-    };
-    // action
-    scope.b6fglmomn = () => {
-      player.set(CURRENT_NODE_VAR, 'b6fglmomn');
-      const obj = engine.getItemPickUpEvent(player.get('item'));
-      console.log('get item pickeup event', player.get('item'), obj);
-      if (obj) {
-        const { cb, node, file } = obj;
-        cb();
-        player.set('NEXT_NODE_ID', node);
-        player.set('NEXT_FILE_ID', file);
-        player.set('PICKUP_RETURN_NODE_ID', 'p4sew37sn');
-        player.set('PICKUP_RETURN_FILE_ID', 'FUNC_PickUp.json');
-      }
-      engine.pickUpRoomItem(
-        player.get('item')?.name,
-        player.get('PICKUP_NEXT_FILE_ID')
-      );
-      scope.zncans8x0();
-    };
-
-    // next_file
-    scope.zncans8x0 = function () {
-      var key = `NEXT_FILE_ID`;
-      var func = files[key];
-      if (!func) {
-        func = files[player.get(key)];
-      }
-      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
-      var nodeId = player.get('NEXT_NODE_ID');
-      if (func) {
-        player.set('NEXT_NODE_ID', null);
-        func(nodeId);
-      } else {
-        core.exit();
-      }
-    };
-
-    // action
-    scope.m1gmkhc60 = () => {
-      player.set(CURRENT_NODE_VAR, 'm1gmkhc60');
-      engine.pickUpRoomItem(
-        player.get('item')?.name,
-        player.get('PICKUP_NEXT_FILE_ID')
-      );
-      engine.playSound('get_item');
-      scope.o9i8izgkn();
-    };
-
-    // pass_fail
-    scope.o9i8izgkn = function () {
-      player.set(CURRENT_NODE_VAR, 'o9i8izgkn');
-      var condition = (function () {
-        return (
-          engine.getRoomItems(player.get('PICKUP_NEXT_FILE_ID'))?.length > 0
-        );
-      })();
-      if (condition) {
-        player.set(CURRENT_NODE_VAR, 'mmsgy8e0q');
-        scope.nhf51t11i();
-      }
-      if (!condition) {
-        player.set(CURRENT_NODE_VAR, 'ru6r7tw2b');
-        scope.yq4ngrdgt();
-      }
-    };
-    // text
-    scope.nhf51t11i = () => {
-      player.set(CURRENT_NODE_VAR, 'nhf51t11i');
-      var text = `You pick up the ${player.get('item')?.label}.
-
-${player.get('item')?.description}`;
-      core.say(text, scope.nus21kl2t, 'nhf51t11i', 'nus21kl2t');
-    };
-    scope['nhf51t11i'].isText = true;
-
-    // text
-    scope.yq4ngrdgt = () => {
-      player.set(CURRENT_NODE_VAR, 'yq4ngrdgt');
-      var text = `You pick up the ${player.get('item')?.label}.
-
-${player.get('item')?.description}`;
-      core.say(text, scope.o454csg3a, 'yq4ngrdgt', 'o454csg3a');
-    };
-    scope['yq4ngrdgt'].isText = true;
-
-    // action
-    scope.o454csg3a = () => {
-      player.set(CURRENT_NODE_VAR, 'o454csg3a');
-      player.set('NEXT_NODE_ID', player.get('PICKUP_NEXT_NODE_ID'));
-      scope.ap6n2rr8o();
-    };
-
-    // next_file
-    scope.ap6n2rr8o = function () {
-      var key = `PICKUP_NEXT_FILE_ID`;
-      var func = files[key];
-      if (!func) {
-        func = files[player.get(key)];
-      }
-      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
-      var nodeId = player.get('NEXT_NODE_ID');
-      if (func) {
-        player.set('NEXT_NODE_ID', null);
-        func(nodeId);
-      } else {
-        core.exit();
-      }
-    };
-
-    // action
-    scope.oxcrt402c = () => {
-      player.set(CURRENT_NODE_VAR, 'oxcrt402c');
-      player.set(
-        'item',
-        engine.getRoomItems(player.get('PICKUP_NEXT_FILE_ID'))?.[1]
-      );
-      scope.hhmeympop();
-    };
-
-    // action
-    scope.u6lgm32kz = () => {
-      player.set(CURRENT_NODE_VAR, 'u6lgm32kz');
-      player.set(
-        'item',
-        engine.getRoomItems(player.get('PICKUP_NEXT_FILE_ID'))?.[2]
-      );
-      scope.hhmeympop();
-    };
-
-    // action
-    scope.bt82yswsq = () => {
-      player.set(CURRENT_NODE_VAR, 'bt82yswsq');
-      player.set(
-        'item',
-        engine.getRoomItems(player.get('PICKUP_NEXT_FILE_ID'))?.[3]
-      );
-      scope.hhmeympop();
-    };
-
-    // action
-    scope.mwqzobf5l = () => {
-      player.set(CURRENT_NODE_VAR, 'mwqzobf5l');
-      player.set(
-        'item',
-        engine.getRoomItems(player.get('PICKUP_NEXT_FILE_ID'))?.[4]
-      );
-      scope.hhmeympop();
-    };
-
-    // action
-    scope.r5b6aqgio = () => {
-      player.set(CURRENT_NODE_VAR, 'r5b6aqgio');
-      player.set(
-        'item',
-        engine.getRoomItems(player.get('PICKUP_NEXT_FILE_ID'))?.[5]
-      );
-      scope.hhmeympop();
-    };
-
-    // action
-    scope.n7ywzdf75 = () => {
-      player.set(CURRENT_NODE_VAR, 'n7ywzdf75');
-      player.set(
-        'item',
-        engine.getRoomItems(player.get('PICKUP_NEXT_FILE_ID'))?.[6]
-      );
-      scope.hhmeympop();
-    };
-
-    // action
-    scope.m9ocmmnk4 = () => {
-      player.set(CURRENT_NODE_VAR, 'm9ocmmnk4');
-      player.set(
-        'item',
-        engine.getRoomItems(player.get('PICKUP_NEXT_FILE_ID'))?.[7]
-      );
-      scope.hhmeympop();
-    };
-
-    if (id === undefined) {
-      scope.ed1wyr86w();
-    } else if (id) {
-      scope[id]();
-    }
-    return player.state;
-  };
-
-  files[`Caves_CaveChute1.json`] = function (id) {
-    player.set(CURRENT_FILE_VAR, 'Caves_CaveChute1.json');
-    // switch
-    scope.lnkezkxd4 = () => {
-      player.set(CURRENT_NODE_VAR, 'lnkezkxd4');
-      if (false) scope.si1q1rpai();
-      else if (true) scope.p1rd41fiq();
-    };
-    // action
-    scope.si1q1rpai = () => {
-      player.set(CURRENT_NODE_VAR, 'si1q1rpai');
-      player.set('itemsText', engine.getRoomItemsText());
-      scope.tztn6rawg();
-    };
-
-    // text
-    scope.tztn6rawg = () => {
-      player.set(CURRENT_NODE_VAR, 'tztn6rawg');
-      var text = `You are standing in a cave below a barred-window.
-
-${player.get('exitText')}
-
-${player.get('itemsText')}`;
-      core.say(text, scope.aqfa6foa0, 'tztn6rawg', 'aqfa6foa0');
-    };
-    scope['tztn6rawg'].isText = true;
-
-    // choice
-    scope.aqfa6foa0 = function () {
-      player.set(CURRENT_NODE_VAR, 'aqfa6foa0');
-      let text = ``;
-      core.choose(text, 'aqfa6foa0', [
-        {
-          t: `Pick up items.`,
-          id: 'eta9lg5xi',
-          cb: scope.eta9lg5xi,
-          c: function () {
-            return engine.getRoomItems().length > 0;
-          },
-        },
-        {
-          t: `Examine chute.`,
-          id: 'f4obgf8dq',
-          cb: scope.f4obgf8dq,
-          c: function () {
-            return true;
-          },
-        },
-        {
-          t: `Back.`,
-          id: 'p1rd41fiq',
-          cb: scope.p1rd41fiq,
-          c: function () {
-            return true;
-          },
-        },
-      ]);
-    };
-    scope['aqfa6foa0'].isChoice = true;
-
-    // action
-    scope.eta9lg5xi = () => {
-      player.set(CURRENT_NODE_VAR, 'eta9lg5xi');
-      player.set('PICKUP_NEXT_FILE_ID', player.get('curIN2f'));
-      player.set('PICKUP_NEXT_NODE_ID', 'si1q1rpai');
-      scope.k94zegcka();
-    };
-
-    // next_file
-    scope.k94zegcka = function () {
-      var key = `FUNC_PickUp.json`;
-      var func = files[key];
-      if (!func) {
-        func = files[player.get(key)];
-      }
-      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
-      var nodeId = player.get('NEXT_NODE_ID');
-      if (func) {
-        player.set('NEXT_NODE_ID', null);
-        func(nodeId);
-      } else {
-        core.exit();
-      }
-    };
-
-    // text
-    scope.f4obgf8dq = () => {
-      player.set(CURRENT_NODE_VAR, 'f4obgf8dq');
-      var text = `The chute zigs and zags its way down the cliff, but you cannot see where it ends.  It forms the shape of a "U" and is just wide enough for a person to slide down.`;
-      core.say(text, scope.aqfa6foa0, 'f4obgf8dq', 'aqfa6foa0');
-    };
-    scope['f4obgf8dq'].isText = true;
-
-    // action
-    scope.p1rd41fiq = () => {
-      player.set(CURRENT_NODE_VAR, 'p1rd41fiq');
-      engine.setBackground('Caves_CaveChute1');
-      engine.setHeading('s');
-
-      if (player.get('lasIN2f') !== 'Inventory.json') {
-        engine.playOneOfSound('step', [1, 2, 3]);
-      }
-      scope.ktbs0u5g5();
-    };
-
-    // text
-    scope.ktbs0u5g5 = () => {
-      player.set(CURRENT_NODE_VAR, 'ktbs0u5g5');
-      var text = `Chute.`;
-      core.say(text, scope.pimsqf4y0, 'ktbs0u5g5', 'pimsqf4y0');
-    };
-    scope['ktbs0u5g5'].isText = true;
-
-    // choice
-    scope.pimsqf4y0 = function () {
-      player.set(CURRENT_NODE_VAR, 'pimsqf4y0');
-      let text = ``;
-      core.choose(text, 'pimsqf4y0', [
-        {
-          t: `Examine surroundings.`,
-          id: 'k99swk371',
-          cb: scope.k99swk371,
-          c: function () {
-            return true;
-          },
-        },
-        {
-          t: `Inventory.`,
-          id: 'unsa0sgk2',
-          cb: scope.unsa0sgk2,
-          c: function () {
-            return true;
-          },
-        },
-        {
-          t: `Go NORTH.`,
-          id: 'l59rbflfn',
-          cb: scope.l59rbflfn,
-          c: function () {
-            return true;
-          },
-        },
-        {
-          t: `Go SOUTH (use chute).`,
-          id: 'aefcb72q8',
-          cb: scope.aefcb72q8,
-          c: function () {
-            return true;
-          },
-        },
-      ]);
-    };
-    scope['pimsqf4y0'].isChoice = true;
-
-    // action
-    scope.k99swk371 = () => {
-      player.set(CURRENT_NODE_VAR, 'k99swk371');
-      player.set('itemsText', engine.getRoomItemsText());
-      player.set('exitText', 'There are exits to the NORTH and SOUTH.');
-      scope.k7gg6fxtz();
-    };
-
-    // text
-    scope.k7gg6fxtz = () => {
-      player.set(CURRENT_NODE_VAR, 'k7gg6fxtz');
-      var text = `The cave sharply drops off of a cliff here, however there is a smooth chute that seems to have been carved out of the stone.
-
-${player.get('exitText')}
-
-${player.get('itemsText')}`;
-      core.say(text, scope.aqfa6foa0, 'k7gg6fxtz', 'aqfa6foa0');
-    };
-    scope['k7gg6fxtz'].isText = true;
-
-    // action
-    scope.unsa0sgk2 = () => {
-      player.set(CURRENT_NODE_VAR, 'unsa0sgk2');
-      player.set('INVENTORY_NEXT_NODE_ID', 'p1rd41fiq');
-      player.set('INVENTORY_NEXT_FILE_ID', player.get(CURRENT_FILE_VAR));
-      scope.t5ar70fdr();
-    };
-
-    // next_file
-    scope.t5ar70fdr = function () {
-      var key = `FUNC_Inventory.json`;
-      var func = files[key];
-      if (!func) {
-        func = files[player.get(key)];
-      }
-      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
-      var nodeId = player.get('NEXT_NODE_ID');
-      if (func) {
-        player.set('NEXT_NODE_ID', null);
-        func(nodeId);
-      } else {
-        core.exit();
-      }
-    };
-
-    // next_file
-    scope.l59rbflfn = function () {
-      var key = `Caves_RuinedElevator.json`;
-      var func = files[key];
-      if (!func) {
-        func = files[player.get(key)];
-      }
-      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
-      var nodeId = player.get('NEXT_NODE_ID');
-      if (func) {
-        player.set('NEXT_NODE_ID', null);
-        func(nodeId);
-      } else {
-        core.exit();
-      }
-    };
-
-    // action
-    scope.aefcb72q8 = () => {
-      player.set(CURRENT_NODE_VAR, 'aefcb72q8');
-      engine.playSound('slide');
-      scope.f9nf5yn50();
-    };
-
-    // text
-    scope.f9nf5yn50 = () => {
-      player.set(CURRENT_NODE_VAR, 'f9nf5yn50');
-      var text = `Step into the chute and push yourself down.  At first you are moving slowly but it doesn't take long for you to reach near-breakneck speeds.  You bump off hard stone with each bend, and in the darkness you completely lose track of where you are going...`;
-      core.say(text, scope.z8i7sagg0, 'f9nf5yn50', 'z8i7sagg0');
-    };
-    scope['f9nf5yn50'].isText = true;
-
-    // action
-    scope.z8i7sagg0 = () => {
-      player.set(CURRENT_NODE_VAR, 'z8i7sagg0');
-      engine.playSound('cave_drop_2');
-      scope.iunfdls6q();
-    };
-
-    // next_file
-    scope.iunfdls6q = function () {
-      var key = `Caves_CaveCliff1.json`;
-      var func = files[key];
-      if (!func) {
-        func = files[player.get(key)];
-      }
-      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
-      var nodeId = player.get('NEXT_NODE_ID');
-      if (func) {
-        player.set('NEXT_NODE_ID', null);
-        func(nodeId);
-      } else {
-        core.exit();
-      }
-    };
-
-    if (id === undefined) {
-      scope.lnkezkxd4();
-    } else if (id) {
-      scope[id]();
-    }
-    return player.state;
-  };
-
-  files[`Caves_BelowCellar.json`] = function (id) {
-    player.set(CURRENT_FILE_VAR, 'Caves_BelowCellar.json');
-    // switch
-    scope.stn1i8b6y = () => {
-      player.set(CURRENT_NODE_VAR, 'stn1i8b6y');
-      if (false) scope.tx53c2fax();
-      else if (true) scope.wy3qt48tg();
-    };
-    // action
-    scope.tx53c2fax = () => {
-      player.set(CURRENT_NODE_VAR, 'tx53c2fax');
-      player.set('itemsText', engine.getRoomItemsText());
-      scope.wbfgom4ga();
-    };
-
-    // text
-    scope.wbfgom4ga = () => {
-      player.set(CURRENT_NODE_VAR, 'wbfgom4ga');
-      var text = `You are standing in a cave below a barred-window.
-
-${player.get('exitText')}
-
-${player.get('itemsText')}`;
-      core.say(text, scope.mgw8el6ef, 'wbfgom4ga', 'mgw8el6ef');
-    };
-    scope['wbfgom4ga'].isText = true;
-
-    // choice
-    scope.mgw8el6ef = function () {
-      player.set(CURRENT_NODE_VAR, 'mgw8el6ef');
-      let text = ``;
-      core.choose(text, 'mgw8el6ef', [
-        {
-          t: `Pick up items.`,
-          id: 't7oct8zsr',
-          cb: scope.t7oct8zsr,
-          c: function () {
-            return engine.getRoomItems().length > 0;
-          },
-        },
-        {
-          t: `Examine barred window.`,
-          id: 'laiqpyaha',
-          cb: scope.laiqpyaha,
-          c: function () {
-            return true;
-          },
-        },
-        {
-          t: `Examine ground.`,
-          id: 'raxxmpnor',
-          cb: scope.raxxmpnor,
-          c: function () {
-            return true;
-          },
-        },
-        {
-          t: `Back.`,
-          id: 'n76pwim9d',
-          cb: scope.n76pwim9d,
-          c: function () {
-            return true;
-          },
-        },
-      ]);
-    };
-    scope['mgw8el6ef'].isChoice = true;
-
-    // action
-    scope.t7oct8zsr = () => {
-      player.set(CURRENT_NODE_VAR, 't7oct8zsr');
-      player.set('PICKUP_NEXT_FILE_ID', player.get('curIN2f'));
-      player.set('PICKUP_NEXT_NODE_ID', 'tx53c2fax');
-      scope.ycdxfm36o();
-    };
-
-    // next_file
-    scope.ycdxfm36o = function () {
-      var key = `FUNC_PickUp.json`;
-      var func = files[key];
-      if (!func) {
-        func = files[player.get(key)];
-      }
-      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
-      var nodeId = player.get('NEXT_NODE_ID');
-      if (func) {
-        player.set('NEXT_NODE_ID', null);
-        func(nodeId);
-      } else {
-        core.exit();
-      }
-    };
-
-    // action
-    scope.laiqpyaha = () => {
-      player.set(CURRENT_NODE_VAR, 'laiqpyaha');
-      engine.setBackground('Caves_BelowCellar_2');
-      scope.hee2gfgu0();
-    };
-
-    // text
-    scope.hee2gfgu0 = () => {
-      player.set(CURRENT_NODE_VAR, 'hee2gfgu0');
-      var text = `You climb up the rock shelf so that you can peer into the room beyond.  It is simple and small, containing a few crates and barrels stacked against the walls.  A closed wooden door stands opposite the room, above which is a small crystal lamp on the ceiling that emanates a cool, blue light.  A portrait is hung next to the door.`;
-      core.say(text, scope.bf1ch2e6l, 'hee2gfgu0', 'bf1ch2e6l');
-    };
-    scope['hee2gfgu0'].isText = true;
-
-    // pass_fail
-    scope.bf1ch2e6l = function () {
-      player.set(CURRENT_NODE_VAR, 'bf1ch2e6l');
-      var condition = (function () {
-        return player.get('vars.Caves_BelowCellar.isPryBarAvailable');
-      })();
-      if (condition) {
-        player.set(CURRENT_NODE_VAR, 'bgzktkhlp');
-        scope.rxngrz6ro();
-      }
-      if (!condition) {
-        player.set(CURRENT_NODE_VAR, 'qg51lly5k');
-        scope.o14wq23hl();
-      }
-    };
-    // text
-    scope.rxngrz6ro = () => {
-      player.set(CURRENT_NODE_VAR, 'rxngrz6ro');
-      var text = `Near the edge of the window is the handle of a small ${engine.getItemLabel(
-        'rusty_axe'
-      )}.  You might be able to reach it if you squeeze your arm through the bars.`;
-      core.say(text, scope.a57n01s27, 'rxngrz6ro', 'a57n01s27');
-    };
-    scope['rxngrz6ro'].isText = true;
-
-    // choice
-    scope.a57n01s27 = function () {
-      player.set(CURRENT_NODE_VAR, 'a57n01s27');
-      let text = ``;
-      core.choose(text, 'a57n01s27', [
-        {
-          t: `Attempt to grab the ${engine.getItemLabel('rusty_axe')}.`,
-          id: 'f4kwmr8wz',
-          cb: scope.f4kwmr8wz,
-          c: function () {
-            return player.get('vars.Caves_BelowCellar.isPryBarAvailable');
-          },
-        },
-        {
-          t: `Examine crates and barrels.`,
-          id: 'n5yc1uzex',
-          cb: scope.n5yc1uzex,
-          c: function () {
-            return true;
-          },
-        },
-        {
-          t: `Examine portrait.`,
-          id: 'b5biy1c3a',
-          cb: scope.b5biy1c3a,
-          c: function () {
-            return true;
-          },
-        },
-        {
-          t: `Shout for help.`,
-          id: 'fws8e25ag',
-          cb: scope.fws8e25ag,
-          c: function () {
-            return true;
-          },
-        },
-        {
-          t: `Back.`,
-          id: 'nfhugf7lf',
-          cb: scope.nfhugf7lf,
-          c: function () {
-            return true;
-          },
-        },
-      ]);
-    };
-    scope['a57n01s27'].isChoice = true;
-
-    // text
-    scope.f4kwmr8wz = () => {
-      player.set(CURRENT_NODE_VAR, 'f4kwmr8wz');
-      var text = `You budge up next to the window and stick your arm through up to your shoulder.  With some targeted flailing, you manage to budge the ${engine.getItemLabel(
-        'rusty_axe'
-      )} towards the window.`;
-      core.say(text, scope.crsq4amu9, 'f4kwmr8wz', 'crsq4amu9');
-    };
-    scope['f4kwmr8wz'].isText = true;
-
-    // action
-    scope.crsq4amu9 = () => {
-      player.set(CURRENT_NODE_VAR, 'crsq4amu9');
-      player.set('vars.Caves_BelowCellar.isPryBarAvailable', false);
-      engine.putDownRoomItem('rusty_axe');
-      scope.u8aoxkps2();
-    };
-
-    // action
-    scope.u8aoxkps2 = () => {
-      player.set(CURRENT_NODE_VAR, 'u8aoxkps2');
-      player.set('itemsText', engine.getRoomItemsText());
-      engine.playSound('clank');
-      scope.b5rlmyhlt();
-    };
-
-    // text
-    scope.b5rlmyhlt = () => {
-      player.set(CURRENT_NODE_VAR, 'b5rlmyhlt');
-      var text = `Eventually you are able to get it close enough to grab it, but when you pull it through, the edge catches on the bars and it clatters to the floor of the cave below you. `;
-      core.say(text, scope.a57n01s27, 'b5rlmyhlt', 'a57n01s27');
-    };
-    scope['b5rlmyhlt'].isText = true;
-
-    // text
-    scope.n5yc1uzex = () => {
-      player.set(CURRENT_NODE_VAR, 'n5yc1uzex');
-      var text = `From where you stand you can only assume they hold old food and drink.  Some spiderwebs span across the gaps between them.`;
-      core.say(text, scope.a57n01s27, 'n5yc1uzex', 'a57n01s27');
-    };
-    scope['n5yc1uzex'].isText = true;
-
-    // text
-    scope.b5biy1c3a = () => {
-      player.set(CURRENT_NODE_VAR, 'b5biy1c3a');
-      var text = `It appears to be the picture of an old wizard, complete with star-speckled blue hat and comfy-looking robes. `;
-      core.say(text, scope.a57n01s27, 'b5biy1c3a', 'a57n01s27');
-    };
-    scope['b5biy1c3a'].isText = true;
-
-    // text
-    scope.fws8e25ag = () => {
-      player.set(CURRENT_NODE_VAR, 'fws8e25ag');
-      var text = `You fill your lungs and open your mouth to yell, but all you can manage is a feeble croak.`;
-      core.say(text, scope.powctpndr, 'fws8e25ag', 'powctpndr');
-    };
-    scope['fws8e25ag'].isText = true;
-
-    // text
-    scope.powctpndr = () => {
-      player.set(CURRENT_NODE_VAR, 'powctpndr');
-      var text = `There is something wrong with your voice.`;
-      core.say(text, scope.a57n01s27, 'powctpndr', 'a57n01s27');
-    };
-    scope['powctpndr'].isText = true;
-
-    // action
-    scope.nfhugf7lf = () => {
-      player.set(CURRENT_NODE_VAR, 'nfhugf7lf');
-      engine.setBackground('Caves_BelowCellar');
-      engine.playOneOfSound('step', [1, 2, 3]);
-      scope.iftfphlu6();
-    };
-
-    // text
-    scope.iftfphlu6 = () => {
-      player.set(CURRENT_NODE_VAR, 'iftfphlu6');
-      var text = `You jump down from the rock shelf and away from the window.`;
-      core.say(text, scope.tx53c2fax, 'iftfphlu6', 'tx53c2fax');
-    };
-    scope['iftfphlu6'].isText = true;
-
-    // text
-    scope.o14wq23hl = () => {
-      player.set(CURRENT_NODE_VAR, 'o14wq23hl');
-      var text = `The room is silent and empty.`;
-      core.say(text, scope.a57n01s27, 'o14wq23hl', 'a57n01s27');
-    };
-    scope['o14wq23hl'].isText = true;
-
-    // text
-    scope.raxxmpnor = () => {
-      player.set(CURRENT_NODE_VAR, 'raxxmpnor');
-      var text = `You stoop down to examine a rotting sack of grain.  It smells truly terrible.  It looks like it may have been thrown down here from the barred window up above, although none of it is fresh. Anything worth eating has been long since taken away by rats or other cave-dwelling creatures.`;
-      core.say(text, scope.mgw8el6ef, 'raxxmpnor', 'mgw8el6ef');
-    };
-    scope['raxxmpnor'].isText = true;
-
-    // text
-    scope.n76pwim9d = () => {
-      player.set(CURRENT_NODE_VAR, 'n76pwim9d');
-      var text = `Cave Below Barred Window.`;
-      core.say(text, scope.nxeioz0bu, 'n76pwim9d', 'nxeioz0bu');
-    };
-    scope['n76pwim9d'].isText = true;
-
-    // choice
-    scope.nxeioz0bu = function () {
-      player.set(CURRENT_NODE_VAR, 'nxeioz0bu');
-      let text = ``;
-      core.choose(text, 'nxeioz0bu', [
-        {
-          t: `Examine surroundings.`,
-          id: 'x6i2prkso',
-          cb: scope.x6i2prkso,
-          c: function () {
-            return true;
-          },
-        },
-        {
-          t: `Inventory.`,
-          id: 'ns23e4gfu',
-          cb: scope.ns23e4gfu,
-          c: function () {
-            return true;
-          },
-        },
-        {
-          t: `Go EAST.`,
-          id: 'zlffwlb2s',
-          cb: scope.zlffwlb2s,
-          c: function () {
-            return true;
-          },
-        },
-      ]);
-    };
-    scope['nxeioz0bu'].isChoice = true;
-
-    // action
-    scope.x6i2prkso = () => {
-      player.set(CURRENT_NODE_VAR, 'x6i2prkso');
-      player.set('itemsText', engine.getRoomItemsText());
-      player.set('exitText', 'There is an exit to the EAST.');
-      scope.ian5ty261();
-    };
-
-    // text
-    scope.ian5ty261 = () => {
-      player.set(CURRENT_NODE_VAR, 'ian5ty261');
-      var text = `The path slopes sharply upward here and eventually stops at small rock shelf below a sheer cliff face, marking a dead end.  A dim, blue light shines from a barred window above this shelf.
-
-On the ground at your feet are several rotten-smelling, ripped-up sacks of what used to be grain or vegetables.  You also see a few animal bones and shattered glass.
-
-${player.get('exitText')}
-
-${player.get('itemsText')}`;
-      core.say(text, scope.mgw8el6ef, 'ian5ty261', 'mgw8el6ef');
-    };
-    scope['ian5ty261'].isText = true;
-
-    // action
-    scope.ns23e4gfu = () => {
-      player.set(CURRENT_NODE_VAR, 'ns23e4gfu');
-      player.set('INVENTORY_NEXT_NODE_ID', 'n76pwim9d');
-      player.set('INVENTORY_NEXT_FILE_ID', player.get(CURRENT_FILE_VAR));
-      scope.w8gi9fwlc();
-    };
-
-    // next_file
-    scope.w8gi9fwlc = function () {
-      var key = `FUNC_Inventory.json`;
-      var func = files[key];
-      if (!func) {
-        func = files[player.get(key)];
-      }
-      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
-      var nodeId = player.get('NEXT_NODE_ID');
-      if (func) {
-        player.set('NEXT_NODE_ID', null);
-        func(nodeId);
-      } else {
-        core.exit();
-      }
-    };
-
-    // next_file
-    scope.zlffwlb2s = function () {
-      var key = `Caves_Cave1.json`;
-      var func = files[key];
-      if (!func) {
-        func = files[player.get(key)];
-      }
-      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
-      var nodeId = player.get('NEXT_NODE_ID');
-      if (func) {
-        player.set('NEXT_NODE_ID', null);
-        func(nodeId);
-      } else {
-        core.exit();
-      }
-    };
-
-    // action
-    scope.wy3qt48tg = () => {
-      player.set(CURRENT_NODE_VAR, 'wy3qt48tg');
-      engine.setBackground('Caves_BelowCellar');
-      engine.setHeading('w');
-      player.setIfUnset('vars.Caves_BelowCellar.isPryBarAvailable', true);
-
-      if (player.get('lasIN2f') !== 'Inventory.json') {
-        engine.playOneOfSound('step', [1, 2, 3]);
-      }
-      scope.n76pwim9d();
-    };
-
-    if (id === undefined) {
-      scope.stn1i8b6y();
-    } else if (id) {
-      scope[id]();
-    }
-    return player.state;
+  // sub_root
+  scope.go79ng6cn = () => {
+    player.set(CURRENT_NODE_VAR, 'go79ng6cn');
+    scope.gpzg2yg3f();
   };
 
   files[`Caves_BelowDungeon.json`] = function (id) {
@@ -9401,8 +8811,8 @@ It is possible that you have fallen from up there, but your memory is too fuzzy 
       core.choose(text, 'zqfgke7yo', [
         {
           t: `Heave the boulder out of the way.`,
-          id: 'o1m3fkhyu',
-          cb: scope.o1m3fkhyu,
+          id: 'l3nl5syde',
+          cb: scope.l3nl5syde,
           c: function () {
             return true;
           },
@@ -9418,6 +8828,13 @@ It is possible that you have fallen from up there, but your memory is too fuzzy 
       ]);
     };
     scope['zqfgke7yo'].isChoice = true;
+
+    // action
+    scope.l3nl5syde = () => {
+      player.set(CURRENT_NODE_VAR, 'l3nl5syde');
+      engine.playSound('stone_lid_fall');
+      scope.o1m3fkhyu();
+    };
 
     // text
     scope.o1m3fkhyu = () => {
@@ -9489,6 +8906,658 @@ There is an exit to the NORTH where you hear the sound of rushing water.`;
 
     if (id === undefined) {
       scope.kxyfn5wgx();
+    } else if (id) {
+      scope[id]();
+    }
+    return player.state;
+  };
+
+  files[`Caves_Cave2.json`] = function (id) {
+    player.set(CURRENT_FILE_VAR, 'Caves_Cave2.json');
+    // switch
+    scope.e1b3a7gmf = () => {
+      player.set(CURRENT_NODE_VAR, 'e1b3a7gmf');
+      if (false) scope.q7x5xpisc();
+      else if (true) scope.xuu1sh4fk();
+    };
+    // action
+    scope.q7x5xpisc = () => {
+      player.set(CURRENT_NODE_VAR, 'q7x5xpisc');
+      player.set('itemsText', engine.getRoomItemsText());
+      scope.pk50gyrql();
+    };
+
+    // text
+    scope.pk50gyrql = () => {
+      player.set(CURRENT_NODE_VAR, 'pk50gyrql');
+      var text = `You are standing in a cave with a three-way fork.
+
+There are exits to the EAST, SOUTH, and WEST.  You hear the sound of rushing water to the WEST.
+
+${player.get('itemsText')}`;
+      core.say(text, scope.n5y8ff5t0, 'pk50gyrql', 'n5y8ff5t0');
+    };
+    scope['pk50gyrql'].isText = true;
+
+    // choice
+    scope.n5y8ff5t0 = function () {
+      player.set(CURRENT_NODE_VAR, 'n5y8ff5t0');
+      let text = ``;
+      core.choose(text, 'n5y8ff5t0', [
+        {
+          t: `Pick up items.`,
+          id: 'l75bpsac0',
+          cb: scope.l75bpsac0,
+          c: function () {
+            return engine.getRoomItems().length > 0;
+          },
+        },
+        {
+          t: `Back.`,
+          id: 'xuu1sh4fk',
+          cb: scope.xuu1sh4fk,
+          c: function () {
+            return true;
+          },
+        },
+      ]);
+    };
+    scope['n5y8ff5t0'].isChoice = true;
+
+    // action
+    scope.l75bpsac0 = () => {
+      player.set(CURRENT_NODE_VAR, 'l75bpsac0');
+      player.set('PICKUP_NEXT_FILE_ID', player.get('curIN2f'));
+      player.set('PICKUP_NEXT_NODE_ID', 'q7x5xpisc');
+      scope.smorqb5e1();
+    };
+
+    // next_file
+    scope.smorqb5e1 = function () {
+      var key = `FUNC_PickUp.json`;
+      var func = files[key];
+      if (!func) {
+        func = files[player.get(key)];
+      }
+      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
+      var nodeId = player.get('NEXT_NODE_ID');
+      if (func) {
+        player.set('NEXT_NODE_ID', null);
+        func(nodeId);
+      } else {
+        core.exit();
+      }
+    };
+
+    // action
+    scope.xuu1sh4fk = () => {
+      player.set(CURRENT_NODE_VAR, 'xuu1sh4fk');
+      engine.setBackground('Caves_Cave2');
+      engine.setHeading('e');
+      engine.playOneOfSound('step', [1, 2, 3]);
+      scope.x001o5kh5();
+    };
+
+    // text
+    scope.x001o5kh5 = () => {
+      player.set(CURRENT_NODE_VAR, 'x001o5kh5');
+      var text = `Quiet Cave.`;
+      core.say(text, scope.y6xhkrbcm, 'x001o5kh5', 'y6xhkrbcm');
+    };
+    scope['x001o5kh5'].isText = true;
+
+    // choice
+    scope.y6xhkrbcm = function () {
+      player.set(CURRENT_NODE_VAR, 'y6xhkrbcm');
+      let text = ``;
+      core.choose(text, 'y6xhkrbcm', [
+        {
+          t: `Examine surroundings.`,
+          id: 'tqco035l1',
+          cb: scope.tqco035l1,
+          c: function () {
+            return true;
+          },
+        },
+        {
+          t: `Inventory.`,
+          id: 'xdtn93ct3',
+          cb: scope.xdtn93ct3,
+          c: function () {
+            return true;
+          },
+        },
+        {
+          t: `Go EAST.`,
+          id: 'tzzgwg87g',
+          cb: scope.tzzgwg87g,
+          c: function () {
+            return true;
+          },
+        },
+        {
+          t: `Go SOUTH.`,
+          id: 'g8dcb6ds7',
+          cb: scope.g8dcb6ds7,
+          c: function () {
+            return true;
+          },
+        },
+        {
+          t: `Go WEST.`,
+          id: 'gfkoxzg9h',
+          cb: scope.gfkoxzg9h,
+          c: function () {
+            return true;
+          },
+        },
+      ]);
+    };
+    scope['y6xhkrbcm'].isChoice = true;
+
+    // action
+    scope.tqco035l1 = () => {
+      player.set(CURRENT_NODE_VAR, 'tqco035l1');
+      player.set('itemsText', engine.getRoomItemsText());
+      scope.cdk331gsg();
+    };
+
+    // text
+    scope.cdk331gsg = () => {
+      player.set(CURRENT_NODE_VAR, 'cdk331gsg');
+      var text = `The cave splits into a three-way fork here.  The path leads downwards to the SOUTH and the path EAST leads up.
+
+There are exits to the EAST, SOUTH, and WEST.  You hear the sound of rushing water to the WEST.
+
+${player.get('itemsText')}`;
+      core.say(text, scope.n5y8ff5t0, 'cdk331gsg', 'n5y8ff5t0');
+    };
+    scope['cdk331gsg'].isText = true;
+
+    // action
+    scope.xdtn93ct3 = () => {
+      player.set(CURRENT_NODE_VAR, 'xdtn93ct3');
+      player.set('INVENTORY_NEXT_NODE_ID', 'xuu1sh4fk');
+      player.set('INVENTORY_NEXT_FILE_ID', player.get(CURRENT_FILE_VAR));
+      scope.g4wgnzef1();
+    };
+
+    // next_file
+    scope.g4wgnzef1 = function () {
+      var key = `FUNC_Inventory.json`;
+      var func = files[key];
+      if (!func) {
+        func = files[player.get(key)];
+      }
+      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
+      var nodeId = player.get('NEXT_NODE_ID');
+      if (func) {
+        player.set('NEXT_NODE_ID', null);
+        func(nodeId);
+      } else {
+        core.exit();
+      }
+    };
+
+    // next_file
+    scope.tzzgwg87g = function () {
+      var key = `Caves_CaveCliff1.json`;
+      var func = files[key];
+      if (!func) {
+        func = files[player.get(key)];
+      }
+      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
+      var nodeId = player.get('NEXT_NODE_ID');
+      if (func) {
+        player.set('NEXT_NODE_ID', null);
+        func(nodeId);
+      } else {
+        core.exit();
+      }
+    };
+
+    // next_file
+    scope.g8dcb6ds7 = function () {
+      var key = `Caves_ClearLake.json`;
+      var func = files[key];
+      if (!func) {
+        func = files[player.get(key)];
+      }
+      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
+      var nodeId = player.get('NEXT_NODE_ID');
+      if (func) {
+        player.set('NEXT_NODE_ID', null);
+        func(nodeId);
+      } else {
+        core.exit();
+      }
+    };
+
+    // next_file
+    scope.gfkoxzg9h = function () {
+      var key = `Caves_Waterfall.json`;
+      var func = files[key];
+      if (!func) {
+        func = files[player.get(key)];
+      }
+      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
+      var nodeId = player.get('NEXT_NODE_ID');
+      if (func) {
+        player.set('NEXT_NODE_ID', null);
+        func(nodeId);
+      } else {
+        core.exit();
+      }
+    };
+
+    if (id === undefined) {
+      scope.e1b3a7gmf();
+    } else if (id) {
+      scope[id]();
+    }
+    return player.state;
+  };
+
+  files[`Caves_BelowCellar.json`] = function (id) {
+    player.set(CURRENT_FILE_VAR, 'Caves_BelowCellar.json');
+    // switch
+    scope.stn1i8b6y = () => {
+      player.set(CURRENT_NODE_VAR, 'stn1i8b6y');
+      if (false) scope.tx53c2fax();
+      else if (true) scope.wy3qt48tg();
+    };
+    // action
+    scope.tx53c2fax = () => {
+      player.set(CURRENT_NODE_VAR, 'tx53c2fax');
+      player.set('itemsText', engine.getRoomItemsText());
+      scope.wbfgom4ga();
+    };
+
+    // text
+    scope.wbfgom4ga = () => {
+      player.set(CURRENT_NODE_VAR, 'wbfgom4ga');
+      var text = `You are standing in a cave below a barred-window.
+
+${player.get('exitText')}
+
+${player.get('itemsText')}`;
+      core.say(text, scope.mgw8el6ef, 'wbfgom4ga', 'mgw8el6ef');
+    };
+    scope['wbfgom4ga'].isText = true;
+
+    // choice
+    scope.mgw8el6ef = function () {
+      player.set(CURRENT_NODE_VAR, 'mgw8el6ef');
+      let text = ``;
+      core.choose(text, 'mgw8el6ef', [
+        {
+          t: `Pick up items.`,
+          id: 't7oct8zsr',
+          cb: scope.t7oct8zsr,
+          c: function () {
+            return engine.getRoomItems().length > 0;
+          },
+        },
+        {
+          t: `Examine barred window.`,
+          id: 'laiqpyaha',
+          cb: scope.laiqpyaha,
+          c: function () {
+            return true;
+          },
+        },
+        {
+          t: `Examine ground.`,
+          id: 'raxxmpnor',
+          cb: scope.raxxmpnor,
+          c: function () {
+            return true;
+          },
+        },
+        {
+          t: `Back.`,
+          id: 'n76pwim9d',
+          cb: scope.n76pwim9d,
+          c: function () {
+            return true;
+          },
+        },
+      ]);
+    };
+    scope['mgw8el6ef'].isChoice = true;
+
+    // action
+    scope.t7oct8zsr = () => {
+      player.set(CURRENT_NODE_VAR, 't7oct8zsr');
+      player.set('PICKUP_NEXT_FILE_ID', player.get('curIN2f'));
+      player.set('PICKUP_NEXT_NODE_ID', 'tx53c2fax');
+      scope.ycdxfm36o();
+    };
+
+    // next_file
+    scope.ycdxfm36o = function () {
+      var key = `FUNC_PickUp.json`;
+      var func = files[key];
+      if (!func) {
+        func = files[player.get(key)];
+      }
+      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
+      var nodeId = player.get('NEXT_NODE_ID');
+      if (func) {
+        player.set('NEXT_NODE_ID', null);
+        func(nodeId);
+      } else {
+        core.exit();
+      }
+    };
+
+    // action
+    scope.laiqpyaha = () => {
+      player.set(CURRENT_NODE_VAR, 'laiqpyaha');
+      engine.setBackground('Caves_BelowCellar_2');
+      scope.hee2gfgu0();
+    };
+
+    // text
+    scope.hee2gfgu0 = () => {
+      player.set(CURRENT_NODE_VAR, 'hee2gfgu0');
+      var text = `You climb up the rock shelf so that you can peer into the room beyond.  It is simple and small, containing a few crates and barrels stacked against the walls.  A closed wooden door stands opposite the room, above which is a small crystal lamp on the ceiling that emanates a cool, blue light.  A portrait is hung next to the door.`;
+      core.say(text, scope.bf1ch2e6l, 'hee2gfgu0', 'bf1ch2e6l');
+    };
+    scope['hee2gfgu0'].isText = true;
+
+    // pass_fail
+    scope.bf1ch2e6l = function () {
+      player.set(CURRENT_NODE_VAR, 'bf1ch2e6l');
+      var condition = (function () {
+        return player.get('vars.Caves_BelowCellar.isPryBarAvailable');
+      })();
+      if (condition) {
+        player.set(CURRENT_NODE_VAR, 'bgzktkhlp');
+        scope.rxngrz6ro();
+      }
+      if (!condition) {
+        player.set(CURRENT_NODE_VAR, 'qg51lly5k');
+        scope.o14wq23hl();
+      }
+    };
+    // text
+    scope.rxngrz6ro = () => {
+      player.set(CURRENT_NODE_VAR, 'rxngrz6ro');
+      var text = `Near the edge of the window is the handle of a small ${engine.getItemLabel(
+        'rusty_axe'
+      )}.  You might be able to reach it if you squeeze your arm through the bars.`;
+      core.say(text, scope.a57n01s27, 'rxngrz6ro', 'a57n01s27');
+    };
+    scope['rxngrz6ro'].isText = true;
+
+    // choice
+    scope.a57n01s27 = function () {
+      player.set(CURRENT_NODE_VAR, 'a57n01s27');
+      let text = ``;
+      core.choose(text, 'a57n01s27', [
+        {
+          t: `Attempt to grab the ${engine.getItemLabel('rusty_axe')}.`,
+          id: 'f4kwmr8wz',
+          cb: scope.f4kwmr8wz,
+          c: function () {
+            return player.get('vars.Caves_BelowCellar.isPryBarAvailable');
+          },
+        },
+        {
+          t: `Examine crates and barrels.`,
+          id: 'n5yc1uzex',
+          cb: scope.n5yc1uzex,
+          c: function () {
+            return true;
+          },
+        },
+        {
+          t: `Examine portrait.`,
+          id: 'b5biy1c3a',
+          cb: scope.b5biy1c3a,
+          c: function () {
+            return true;
+          },
+        },
+        {
+          t: `Shout for help.`,
+          id: 'fws8e25ag',
+          cb: scope.fws8e25ag,
+          c: function () {
+            return true;
+          },
+        },
+        {
+          t: `Back.`,
+          id: 'nfhugf7lf',
+          cb: scope.nfhugf7lf,
+          c: function () {
+            return true;
+          },
+        },
+      ]);
+    };
+    scope['a57n01s27'].isChoice = true;
+
+    // text
+    scope.f4kwmr8wz = () => {
+      player.set(CURRENT_NODE_VAR, 'f4kwmr8wz');
+      var text = `You budge up next to the window and stick your arm through up to your shoulder.  With some targeted flailing, you manage to nudge the ${engine.getItemLabel(
+        'rusty_axe'
+      )} towards the window.`;
+      core.say(text, scope.crsq4amu9, 'f4kwmr8wz', 'crsq4amu9');
+    };
+    scope['f4kwmr8wz'].isText = true;
+
+    // action
+    scope.crsq4amu9 = () => {
+      player.set(CURRENT_NODE_VAR, 'crsq4amu9');
+      player.set('vars.Caves_BelowCellar.isPryBarAvailable', false);
+      engine.putDownRoomItem('rusty_axe');
+      scope.u8aoxkps2();
+    };
+
+    // action
+    scope.u8aoxkps2 = () => {
+      player.set(CURRENT_NODE_VAR, 'u8aoxkps2');
+      player.set('itemsText', engine.getRoomItemsText());
+      engine.playSound('clank');
+      scope.b5rlmyhlt();
+    };
+
+    // text
+    scope.b5rlmyhlt = () => {
+      player.set(CURRENT_NODE_VAR, 'b5rlmyhlt');
+      var text = `Eventually you are able to get it close enough to grab it, but when you pull it through, the edge catches on the bars and it clatters to the floor of the cave below you. `;
+      core.say(text, scope.a57n01s27, 'b5rlmyhlt', 'a57n01s27');
+    };
+    scope['b5rlmyhlt'].isText = true;
+
+    // text
+    scope.n5yc1uzex = () => {
+      player.set(CURRENT_NODE_VAR, 'n5yc1uzex');
+      var text = `From where you stand you can only assume they hold old food and drink.  Some spiderwebs span across the gaps between them.`;
+      core.say(text, scope.a57n01s27, 'n5yc1uzex', 'a57n01s27');
+    };
+    scope['n5yc1uzex'].isText = true;
+
+    // text
+    scope.b5biy1c3a = () => {
+      player.set(CURRENT_NODE_VAR, 'b5biy1c3a');
+      var text = `It appears to be the picture of an old wizard, complete with star-speckled blue hat and comfy-looking robes. `;
+      core.say(text, scope.a57n01s27, 'b5biy1c3a', 'a57n01s27');
+    };
+    scope['b5biy1c3a'].isText = true;
+
+    // text
+    scope.fws8e25ag = () => {
+      player.set(CURRENT_NODE_VAR, 'fws8e25ag');
+      var text = `You fill your lungs and open your mouth to yell, but all you can manage is a feeble croak.`;
+      core.say(text, scope.powctpndr, 'fws8e25ag', 'powctpndr');
+    };
+    scope['fws8e25ag'].isText = true;
+
+    // text
+    scope.powctpndr = () => {
+      player.set(CURRENT_NODE_VAR, 'powctpndr');
+      var text = `There is something wrong with your voice.`;
+      core.say(text, scope.a57n01s27, 'powctpndr', 'a57n01s27');
+    };
+    scope['powctpndr'].isText = true;
+
+    // action
+    scope.nfhugf7lf = () => {
+      player.set(CURRENT_NODE_VAR, 'nfhugf7lf');
+      engine.setBackground('Caves_BelowCellar');
+      engine.playOneOfSound('step', [1, 2, 3]);
+      scope.iftfphlu6();
+    };
+
+    // text
+    scope.iftfphlu6 = () => {
+      player.set(CURRENT_NODE_VAR, 'iftfphlu6');
+      var text = `You jump down from the rock shelf and away from the window.`;
+      core.say(text, scope.tx53c2fax, 'iftfphlu6', 'tx53c2fax');
+    };
+    scope['iftfphlu6'].isText = true;
+
+    // text
+    scope.o14wq23hl = () => {
+      player.set(CURRENT_NODE_VAR, 'o14wq23hl');
+      var text = `The room is silent and empty.`;
+      core.say(text, scope.a57n01s27, 'o14wq23hl', 'a57n01s27');
+    };
+    scope['o14wq23hl'].isText = true;
+
+    // text
+    scope.raxxmpnor = () => {
+      player.set(CURRENT_NODE_VAR, 'raxxmpnor');
+      var text = `You stoop down to examine a rotting sack of grain.  It smells truly terrible.  It looks like it may have been thrown down here from the barred window up above, although none of it is fresh. Anything worth eating has been long since taken away by rats or other cave-dwelling creatures.`;
+      core.say(text, scope.mgw8el6ef, 'raxxmpnor', 'mgw8el6ef');
+    };
+    scope['raxxmpnor'].isText = true;
+
+    // text
+    scope.n76pwim9d = () => {
+      player.set(CURRENT_NODE_VAR, 'n76pwim9d');
+      var text = `Cave Below Barred Window.`;
+      core.say(text, scope.nxeioz0bu, 'n76pwim9d', 'nxeioz0bu');
+    };
+    scope['n76pwim9d'].isText = true;
+
+    // choice
+    scope.nxeioz0bu = function () {
+      player.set(CURRENT_NODE_VAR, 'nxeioz0bu');
+      let text = ``;
+      core.choose(text, 'nxeioz0bu', [
+        {
+          t: `Examine surroundings.`,
+          id: 'x6i2prkso',
+          cb: scope.x6i2prkso,
+          c: function () {
+            return true;
+          },
+        },
+        {
+          t: `Inventory.`,
+          id: 'ns23e4gfu',
+          cb: scope.ns23e4gfu,
+          c: function () {
+            return true;
+          },
+        },
+        {
+          t: `Go EAST.`,
+          id: 'zlffwlb2s',
+          cb: scope.zlffwlb2s,
+          c: function () {
+            return true;
+          },
+        },
+      ]);
+    };
+    scope['nxeioz0bu'].isChoice = true;
+
+    // action
+    scope.x6i2prkso = () => {
+      player.set(CURRENT_NODE_VAR, 'x6i2prkso');
+      player.set('itemsText', engine.getRoomItemsText());
+      player.set('exitText', 'There is an exit to the EAST.');
+      scope.ian5ty261();
+    };
+
+    // text
+    scope.ian5ty261 = () => {
+      player.set(CURRENT_NODE_VAR, 'ian5ty261');
+      var text = `The path slopes sharply upward here and eventually stops at small rock shelf below a sheer cliff face, marking a dead end.  A dim, blue light shines from a barred window above this shelf.
+
+On the ground at your feet are several rotten-smelling, ripped-up sacks of what used to be grain or vegetables.  You also see a few animal bones and shattered glass.
+
+${player.get('exitText')}
+
+${player.get('itemsText')}`;
+      core.say(text, scope.mgw8el6ef, 'ian5ty261', 'mgw8el6ef');
+    };
+    scope['ian5ty261'].isText = true;
+
+    // action
+    scope.ns23e4gfu = () => {
+      player.set(CURRENT_NODE_VAR, 'ns23e4gfu');
+      player.set('INVENTORY_NEXT_NODE_ID', 'n76pwim9d');
+      player.set('INVENTORY_NEXT_FILE_ID', player.get(CURRENT_FILE_VAR));
+      scope.w8gi9fwlc();
+    };
+
+    // next_file
+    scope.w8gi9fwlc = function () {
+      var key = `FUNC_Inventory.json`;
+      var func = files[key];
+      if (!func) {
+        func = files[player.get(key)];
+      }
+      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
+      var nodeId = player.get('NEXT_NODE_ID');
+      if (func) {
+        player.set('NEXT_NODE_ID', null);
+        func(nodeId);
+      } else {
+        core.exit();
+      }
+    };
+
+    // next_file
+    scope.zlffwlb2s = function () {
+      var key = `Caves_Cave1.json`;
+      var func = files[key];
+      if (!func) {
+        func = files[player.get(key)];
+      }
+      player.set(LAST_FILE_VAR, player.get(CURRENT_FILE_VAR));
+      var nodeId = player.get('NEXT_NODE_ID');
+      if (func) {
+        player.set('NEXT_NODE_ID', null);
+        func(nodeId);
+      } else {
+        core.exit();
+      }
+    };
+
+    // action
+    scope.wy3qt48tg = () => {
+      player.set(CURRENT_NODE_VAR, 'wy3qt48tg');
+      engine.setBackground('Caves_BelowCellar');
+      engine.setHeading('w');
+      player.setIfUnset('vars.Caves_BelowCellar.isPryBarAvailable', true);
+
+      if (player.get('lasIN2f') !== 'Inventory.json') {
+        engine.playOneOfSound('step', [1, 2, 3]);
+      }
+      scope.n76pwim9d();
+    };
+
+    if (id === undefined) {
+      scope.stn1i8b6y();
     } else if (id) {
       scope[id]();
     }

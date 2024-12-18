@@ -6,6 +6,7 @@ import dialog from '../dialog/index';
 import MonacoEditor from 'react-monaco-editor';
 import { useKeyboardEventListener } from 'hooks';
 import utils from 'utils';
+import DeclList from 'decl-list';
 
 const ActionNodeInputDialog = ({
   node,
@@ -144,51 +145,7 @@ const ActionNodeInputDialog = ({
             {expose.get_state('main').current_file.name.slice(0, -5)}/{node.id}
           </span>
         </div>
-        {declarations?.length ? (
-          <div>
-            <div
-              style={{
-                margin: '6px 0',
-                background: 'rgba(0, 0, 0, 0.5)',
-              }}
-            >
-              Decl: <span>{declValue?.variable}</span> ={' '}
-              <span>{declValue?.value}</span>
-            </div>
-            <div
-              style={{
-                display: 'flex',
-                flexWrap: 'wrap',
-                margin: '6px 0',
-              }}
-            >
-              {declarations
-                .sort((a, b) => {
-                  return a.variable.localeCompare(b.variable);
-                })
-                .map(({ variable, value }) => {
-                  return (
-                    <div
-                      key={variable}
-                      style={{
-                        background: 'rgb(131 108 40)',
-                        cursor: 'pointer',
-                        padding: '6px',
-                        borderRadius: '32px',
-                        margin: '2px',
-                      }}
-                      onClick={() => handleDeclClick({ variable, value })}
-                      onMouseOver={() => setDeclValue({ variable, value })}
-                    >
-                      <span style={{ color: 'white', userSelect: 'none' }}>
-                        {variable}
-                      </span>
-                    </div>
-                  );
-                })}
-            </div>
-          </div>
-        ) : null}
+        <DeclList declarations={declarations} />
         <div
           style={{
             display: 'flex',

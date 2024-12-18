@@ -110,7 +110,7 @@ const PlumbDiagram = ({
     }
   });
 
-  console.log('render plumb diagram');
+  // console.log('render plumb diagram');
 
   return (
     <div id="diagram" ref={diagram} className={'no-drag ' + classes.diagram}>

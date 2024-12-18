@@ -93,7 +93,7 @@ const createCore = () => {
   // let lastChooseNodesSelected = [];
   let isKeypressDisabled = false;
   // eslint-disable-next-line no-unused-vars
-  const DEFAULT_EVENT = ev => {};
+  const DEFAULT_EVENT = (ev, err) => {};
   let eventCallback = DEFAULT_EVENT;
 
   const setEventCallback = cb => {
@@ -105,14 +105,16 @@ const createCore = () => {
     return window.getLabels();
   };
 
-  const onKeyOrMouseEvent = ev => {
+  const onKeyOrMouseEvent = (ev, err) => {
     const lib = getLib();
     if (lib?.isEscapeKey(ev.key) || ev.key === 'Escape') {
       getDraw().showConfirm({
         text: localGetLabels().CONFIRM_LEAVE,
         onConfirm: () => {
           if (lib) {
-            lib.notifyGameCancelled();
+            core.exit();
+            //@ts-ignore
+            window?.reset();
           } else {
             window.location.reload();
           }
@@ -126,12 +128,9 @@ const createCore = () => {
     ) {
       return;
     }
-    eventCallback(ev);
+    eventCallback(ev, err);
     return false;
   };
-
-  window.addEventListener('keydown', onKeyOrMouseEvent);
-  window.addEventListener('mousedown', onKeyOrMouseEvent);
 
   const isChoiceNode = id => {
     const scope = _player.get('scope');
@@ -146,10 +145,18 @@ const createCore = () => {
    * @type {Core}
    */
   const core = {
-    init() {},
+    init() {
+      window.addEventListener('keydown', onKeyOrMouseEvent);
+      window.addEventListener('mousedown', onKeyOrMouseEvent);
+    },
     async say(text, cb, id, childId) {
-      return new Promise(resolve => {
-        setEventCallback(() => {
+      return new Promise((resolve, reject) => {
+        console.log('COSE SAY', text);
+        setEventCallback((_, err) => {
+          if (err) {
+            reject(err);
+            return;
+          }
           getDraw().hidePressAnyKey();
           setEventCallback(DEFAULT_EVENT);
           cb && cb();
@@ -171,14 +178,18 @@ const createCore = () => {
       });
     },
     async choose(text, id, choices) {
-      return new Promise(resolve => {
+      return new Promise((resolve, reject) => {
         _player.dontTriggerOnce = true;
         const availableChoices = choices.filter(choice => {
           return choice.c();
         });
         _player.dontTriggerOnce = false;
 
-        setEventCallback(ev => {
+        setEventCallback((ev, err) => {
+          if (err) {
+            reject(err);
+            return;
+          }
           const number = Number(String.fromCharCode(ev.which));
           const choice = availableChoices[number - 1];
           if (choice) {
@@ -214,7 +225,13 @@ const createCore = () => {
         );
       });
     },
-    exit() {},
+    exit() {
+      window.removeEventListener('keydown', onKeyOrMouseEvent);
+      window.removeEventListener('mousedown', onKeyOrMouseEvent);
+      getDraw().clear();
+      onKeyOrMouseEvent({ key: ' ' }, new Error('Core exited.'));
+      setEventCallback(DEFAULT_EVENT);
+    },
   };
 
   return core;
@@ -342,9 +359,25 @@ const load = (window.load = async function () {
 });
 
 /** @ts-ignore */
-window.main = async function () {
+window.main = async function (vars, once, nodes, files) {
   _core.init();
   _player.init();
+  if (!vars) {
+    vars = {};
+  }
+  if (!once) {
+    once = {};
+  }
+  if (!nodes) {
+    nodes = {};
+  }
+  if (!files) {
+    files = {};
+  }
+  _player.set('vars', vars);
+  _player.set('once', once);
+  _player.set('nodes', nodes);
+  _player.set('files', files);
   await load();
   getEngine().init();
 

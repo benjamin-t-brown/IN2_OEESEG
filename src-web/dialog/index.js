@@ -1,6 +1,7 @@
 import TextNodeInputDialog from './text-node-input-dialog';
 import ActionNodeInputDialog from './action-node-input-dialog';
 import TemplateCreateDialog from './template-create-dialog';
+import CombinedChoiceConditionDialog from './combined-choice-condition-dialog';
 
 const React = require('react');
 const ReactDOM = require('react-dom');
@@ -137,6 +138,25 @@ exp.showActionNodeInput = function ({
       onConfirm={onConfirm}
       declarations={declarations}
       hide={exp.hide}
+    />,
+    document.getElementById('dialog')
+  );
+};
+
+exp.showCombinedChoiceNodeInput = function ({
+  node,
+  onConfirm,
+  onCancel,
+  declarations,
+}) {
+  show();
+  ReactDOM.render(
+    <CombinedChoiceConditionDialog
+      node={node}
+      onCancel={onCancel}
+      onConfirm={onConfirm}
+      hide={exp.hide}
+      declarations={declarations}
     />,
     document.getElementById('dialog')
   );

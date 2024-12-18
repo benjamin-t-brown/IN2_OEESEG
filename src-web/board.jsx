@@ -10,7 +10,7 @@ import PlumbDiagram from 'plumb-diagram';
 import * as jsPlumb from '@jsplumb/browser-ui';
 const $ = (window.$ = require('jquery'));
 
-const BOARD_SIZE_PIXELS = 6400;
+export const BOARD_SIZE_PIXELS = 6400;
 
 export const getNodeId = () => {
   let id;
@@ -27,9 +27,29 @@ const waitMs = ms => {
 };
 
 /**
+ * @typedef CombinedConditionalChoiceSubNode
+ * @property {string} id
+ * @property {string} actionId
+ * @property {string} conditionContent
+ * @property {string} prefixText
+ * @property {boolean} showTextOnFailedCondition
+ * @property {string} failedConditionText
+ * @property {boolean} doActionOnChoose
+ * @property {string} onChooseActionContent
+ */
+
+/**
+ * @typedef BoardNode
+ * @property {string} type
+ * @property {string} id
+ * @property {string} content
+ * @property {CombinedConditionalChoiceSubNode} combinedConditionalChoice
+ */
+
+/**
  * @param {Object} file
  * @param {String} id
- * @returns {Object}
+ * @returns {BoardNode}
  */
 export const getNode = (file, id) => {
   if (file) {
@@ -243,7 +263,6 @@ class Board extends expose.Component {
       };
 
       if (div) {
-        console.log('EV MOUSE UP', ev);
         if (!ev.shiftKey) {
           this.dragSet = [];
           getPlumb()?.clearDragSelection();
@@ -379,6 +398,52 @@ class Board extends expose.Component {
           onConfirm: content => {
             dialog.set_shift_req(false);
             this.setNodeContent(file_node, content);
+            file_node.rel = null;
+            this.scheduleRebuild();
+            this.saveFile();
+          },
+          onCancel: () => {
+            dialog.set_shift_req(false);
+          },
+        });
+      } else if (file_node.type === 'combined_conditional_choice') {
+        dialog.set_shift_req(true);
+        dialog.showCombinedChoiceNodeInput({
+          node: file_node,
+          declarations: !['declaration'].includes(file_node.type)
+            ? utils.getDeclsForFile(this.file)
+            : [],
+          onConfirm: ({
+            conditionContent,
+            prefixText,
+            failedConditionText,
+            showTextOnFailedCondition,
+            doActionOnChoose,
+            actionContent,
+            value,
+          }) => {
+            console.log('CONFIRM', {
+              conditionContent,
+              prefixText,
+              failedConditionText,
+              showTextOnFailedCondition,
+              doActionOnChoose,
+              actionContent,
+              value,
+            });
+            dialog.set_shift_req(false);
+            file_node.combinedConditionalChoice.conditionContent =
+              conditionContent;
+            file_node.combinedConditionalChoice.prefixText = prefixText;
+            file_node.combinedConditionalChoice.failedConditionText =
+              failedConditionText;
+            file_node.combinedConditionalChoice.showTextOnFailedCondition =
+              showTextOnFailedCondition;
+            file_node.combinedConditionalChoice.doActionOnChoose =
+              doActionOnChoose;
+            file_node.combinedConditionalChoice.onChooseActionContent =
+              actionContent;
+            this.setNodeContent(file_node, value);
             file_node.rel = null;
             this.scheduleRebuild();
             this.saveFile();
@@ -638,6 +703,12 @@ class Board extends expose.Component {
         const newNodes = copySet.nodes.map((node, i) => {
           const newId = getNodeId();
           const newNode = Object.assign({}, node);
+          if (node.combinedConditionalChoice) {
+            newNode.combinedConditionalChoice = Object.assign(
+              {},
+              node.combinedConditionalChoice
+            );
+          }
           if (nodeIdContentReplaceRefs?.includes(node.id)) {
             idRefObj[node.id] = newId;
           }
@@ -714,6 +785,13 @@ class Board extends expose.Component {
     };
     state.removeAllExtraClasses = this.removeAllExtraClasses;
 
+    /**
+     *
+     * @param {*} parent
+     * @param {*} type
+     * @param {*} defaultText
+     * @returns {BoardNode}
+     */
     state.addNode = (parent, type, defaultText) => {
       return this.addNode(parent, type, defaultText);
     };
@@ -841,7 +919,7 @@ class Board extends expose.Component {
 
   setNodeContent(node, content) {
     node.content = content;
-    document.getElementById(node.id).children[1].innerHTML = content;
+    // document.getElementById(node.id).children[1].innerHTML = content;
     this.renderAtOffset();
     getPlumb().setZoom(this.zoom);
   }
@@ -1016,11 +1094,7 @@ class Board extends expose.Component {
   }
 
   addPassFailNode(parent) {
-    let node = this.addNode(
-      parent,
-      'pass_fail',
-      'player.once() ? true : false'
-    );
+    let node = this.addNode(parent, 'pass_fail', 'player.once()');
     let idPass = getNodeId();
     let idFail = getNodeId();
     let parentElem = document.getElementById(parent.id);

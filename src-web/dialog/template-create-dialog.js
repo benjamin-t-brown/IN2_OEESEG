@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import css from 'css';
 import BasicOEESEGRoom from 'templates/BasicOEESEGRoom';
 import FUNCSelectItem from 'templates/FUNCSelectItem';
+import BasicCarcerDialogue from 'templates/BasicCarcerDialogue';
 
 const TemplateCreateDialog = ({ node, type, onConfirm, onCancel, hide }) => {
   const handleCancelClick = (window.current_cancel = () => {
@@ -28,6 +29,15 @@ const TemplateCreateDialog = ({ node, type, onConfirm, onCancel, hide }) => {
       case 'FUNCSelectItem': {
         return (
           <FUNCSelectItem
+            handleSubmit={handleSubmit}
+            handleCancelClick={handleCancelClick}
+            rootNode={node}
+          />
+        );
+      }
+      case 'BasicCarcerDialogue': {
+        return (
+          <BasicCarcerDialogue
             handleSubmit={handleSubmit}
             handleCancelClick={handleCancelClick}
             rootNode={node}

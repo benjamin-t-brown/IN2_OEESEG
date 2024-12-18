@@ -166,15 +166,21 @@ http_server.get('compile', (obj, resp) => {
             )
             .toString();
         }
+        http_server.reply(resp, {
+          err: err,
+          data: ret,
+        });
+        console.log('babelify');
         execAsync(
           'ls'
-          //`cd ${COMPILER_DIR}/../ && babel ${COMPILER_OUT}/${obj.event_args[0]}.compiled.${extension} --out-file ${COMPILER_OUT}/${obj.event_args[0]}.compiled.es5.${extension} --source-type script --presets @babel/preset-env --plugins remove-use-strict`
-        ).then(() => {
-          http_server.reply(resp, {
-            err: err,
-            data: ret,
+          // `cd ${COMPILER_DIR}/../ && babel ${COMPILER_OUT}/${obj.event_args[0]}.compiled.${extension} --out-file ${COMPILER_OUT}/${obj.event_args[0]}.compiled.es5.${extension} --source-type script --presets @babel/preset-env --plugins remove-use-strict`
+        )
+          .then(() => {
+            console.log('babel completed');
+          })
+          .catch(e => {
+            console.error('Failed to babelify', e);
           });
-        });
       })
     );
   } else {

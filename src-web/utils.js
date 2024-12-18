@@ -51,6 +51,7 @@ module.exports = {
     on_delete = cb;
   },
   random_id: function (len) {
+    len = len || 9;
     let text = '';
     const possible = 'abcdefghigklmnopqrstufwxyz1234567890';
     for (let i = 0; i < len; i++) {

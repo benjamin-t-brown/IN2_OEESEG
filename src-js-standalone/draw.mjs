@@ -13,6 +13,7 @@
  * @property {(args: ConfirmArgs) => void} showConfirm
  * @property {() => void} hideConfirm
  * @property {() => boolean} isConfirmVisible
+ * @property {() => void} clear
  */
 /**
  * @typedef DrawLineChoice
@@ -112,7 +113,7 @@ const createDraw = () => {
       ctx.font = `${fontSize}px courier new, serif`;
       ctx.fillStyle = 'black';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = 'white';
+      ctx.fillStyle = '#dadada';
       let ctr = 0;
       for (const line of text.split('\n')) {
         ctx.fillText(line, xOffset, yOffset + lineHeight * (ctr + 1));
@@ -169,11 +170,13 @@ const createDraw = () => {
     }
 
     if (lib?.isUpKey(key) || key === 'ArrowUp') {
+      e.preventDefault();
       selectedChoiceIndex--;
       if (selectedChoiceIndex < 0) {
         selectedChoiceIndex = numChoices - 1;
       }
     } else if (lib?.isDownKey(key) || key === 'ArrowDown') {
+      e.preventDefault();
       selectedChoiceIndex++;
       if (selectedChoiceIndex >= numChoices) {
         selectedChoiceIndex = 0;
@@ -184,6 +187,7 @@ const createDraw = () => {
       key === 'x' ||
       key === ' '
     ) {
+      e.preventDefault();
       isSelecting = true;
       setTimeout(() => {
         isSelecting = false;
@@ -423,6 +427,7 @@ const createDraw = () => {
         cancelButton.onclick = () => {
           draw.hideConfirm();
         };
+        cancelButton.classList.add('confirm-window-button');
 
         const confirmButton = document.createElement('button');
         confirmButton.innerText =
@@ -433,23 +438,24 @@ const createDraw = () => {
           draw.hideConfirm();
           onConfirm();
         };
+        confirmButton.classList.add('confirm-window-button');
 
         confirmKeyListener = ev => {
           if (
             lib?.isEscapeKey(ev.key) ||
-            lib?.isCancelKey() ||
+            lib?.isCancelKey(ev.key) ||
             ev.key === 'Escape'
           ) {
             cancelButton.click();
-          } else if (lib?.isConfirmKey() || ev.key === 'x') {
+          } else if (lib?.isConfirmKey() || ev.key === 'x' || ev.key === ' ') {
             confirmButton.click();
           }
         };
         window.addEventListener('keydown', confirmKeyListener);
 
         confirmWindowButtons.innerHTML = '';
-        confirmWindowButtons.appendChild(cancelButton);
         confirmWindowButtons.appendChild(confirmButton);
+        confirmWindowButtons.appendChild(cancelButton);
         confirmWindow.style.display = 'flex';
         isKeypressDisabledFromConfirmWindow = true;
       }
@@ -464,6 +470,17 @@ const createDraw = () => {
     },
     isConfirmVisible() {
       return isKeypressDisabledFromConfirmWindow;
+    },
+    clear() {
+      draw.hideButtons();
+      if (ctx) {
+        ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+      }
+      const textArea = getDocument().getElementById('text-zone');
+      if (textArea) {
+        textArea.innerHTML = '';
+      }
+      lines = [];
     },
   };
   return draw;

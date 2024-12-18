@@ -1,6 +1,7 @@
 /**
  * @typedef Engine
  * @property {() => void} init
+ * @property {(visible: boolean) => void} setCanvasAreaVisible
  * @property {(pictureName: string) => void} setBackground
  * @property {(soundName: string) => void} playSound
  * @property {(soundName: string, postfixes: string[]) => void} playOneOfSound
@@ -102,6 +103,14 @@ const createEngine = () => {
       };
       globalWindow.addEventListener('resize', globalWindow.onResizeHandler);
       globalWindow.onResizeHandler();
+    },
+    setCanvasAreaVisible(visible) {
+      /** @type {any} */
+      const canvasArea = document.getElementsByClassName('left-zone')?.[0];
+
+      if (canvasArea) {
+        canvasArea.style.display = visible ? 'flex' : 'none';
+      }
     },
     setBackground(pictureName) {
       if (getPlayer().get('background') === pictureName) {

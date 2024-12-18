@@ -100,6 +100,8 @@ const addTextLine = args => {
 /**
  * @interface Choice
  * @property {string} t
+ * @property {string | null} ft
+ * @property {boolean} failed
  * @property {string} id
  * @property {function} cb
  * @property {function} c
@@ -111,19 +113,21 @@ const addTextLine = args => {
  * @param {function} eventCallback
  */
 const addChoiceLines = (choices, eventCallback) => {
-  getDraw().showButtons(
-    choices.map((c, i) => {
-      return {
-        text: i + 1 + '.) ' + c.t,
-        // color: c.chosen ? '#1b839b' : undefined,
-        onClick: () => {
-          eventCallback({
-            which: `${i + 1}`.charCodeAt(0),
-          });
-        },
-      };
-    })
-  );
+  const buttons = choices.map((c, i) => {
+    return {
+      text: i + 1 + '.) ' + (c.failed ? c.ft : c.t),
+      color: c.failed ? '#a44' : undefined,
+      onClick: () => {
+        if (c.failed) {
+          return true;
+        }
+        eventCallback({
+          which: `${i + 1}`.charCodeAt(0),
+        });
+      },
+    };
+  });
+  getDraw().showButtons(buttons);
 };
 
 const createCore = () => {
@@ -181,6 +185,9 @@ const createCore = () => {
     getEventCallback() {
       return eventCallback;
     },
+    setNextSayPrefix(prefix) {
+      _player.set('nextSayPrefix', prefix);
+    },
     async say(text, cb, id, childId) {
       return new Promise(resolve => {
         setEventCallback(() => {
@@ -190,6 +197,11 @@ const createCore = () => {
           resolve(undefined);
         });
         if (text) {
+          const nextSayPrefix = _player.get('nextSayPrefix');
+          if (nextSayPrefix) {
+            text = nextSayPrefix + ' ' + text;
+            _player.set('nextSayPrefix', '');
+          }
           addTextLine({
             text: text,
             paragraph: true,
@@ -209,7 +221,13 @@ const createCore = () => {
       return new Promise(resolve => {
         _player.dontTriggerOnce = true;
         const availableChoices = choices.filter(choice => {
-          return choice.c();
+          const condition = choice.c();
+          if (condition || choice.ft) {
+            if (!condition) {
+              choice.failed = true;
+            }
+            return true;
+          }
         });
         _player.dontTriggerOnce = false;
 
@@ -242,16 +260,24 @@ const createCore = () => {
         centerAtActiveNode();
         addChoiceLines(
           availableChoices.map(c => {
-            return {
-              ...c,
-              chosen: hasPickedChoice(c.id),
-            };
+            if (c.failed) {
+              return {
+                ...c,
+                chosen: false,
+              };
+            } else {
+              return {
+                ...c,
+                chosen: hasPickedChoice(c.id),
+              };
+            }
           }),
           eventCallback
         );
       });
     },
     exit() {},
+    reset() {},
   };
 };
 
@@ -324,6 +350,14 @@ const createPlayer = () => {
       }
     },
 
+    increment(path, val) {
+      let current = this.get(path);
+      if (isNaN(current) || current === null) {
+        current = 0;
+      }
+      this.set(path, current + val);
+    },
+
     once(arg) {
       const nodeId = arg ?? this.get('curIN2n');
       const key = 'once.' + nodeId;
@@ -386,7 +420,7 @@ window.core = {...window._core};
 `;
 
 let standalone = '';
-exports.runFile = async function (file) {
+exports.runFile = async function (file, fileId, nodeId) {
   _console_log('Success!');
   _console_log('');
   console.log('Now evaluating...');
@@ -421,7 +455,15 @@ async function main() {
   player.state = {..._player.state, ...JSON.parse(saveData)};
   console.log('player state data', player.state);
   // console.log('Run!', core);
-  run();
+  const nodeId = '${nodeId}';
+  const fileName = '${fileId}';
+  if (nodeId && nodeId !== 'undefined' && nodeId !== 'null') {
+    const scopeObj = run(true);
+    console.log('SCOPE', scopeObj, fileName, nodeId);
+    scopeObj.files[fileName](nodeId);
+  } else {
+    run();
+  }
 }
 main();
 } catch (e) {

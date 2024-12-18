@@ -107,6 +107,9 @@ canvas {
   margin-top: 16px;
   width: 100%;
 }
+.confirm-window-button {
+  width: 33%;
+}
 @media (min-width: 1475px) {
   .confirm-window-root {
     font-size: 1.3rem;

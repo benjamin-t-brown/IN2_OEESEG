@@ -138,6 +138,23 @@ module.exports = class PlayerArea extends expose.Component {
       });
     };
 
+    this.get_choice_clicks_to_remove = () => {
+      const self = this;
+      return $('.choice-in2').map(
+        () =>
+          function () {
+            this.onclick = '';
+            self.state.text.forEach(t => {
+              if (typeof t === 'object') {
+                // t.id = undefined;
+                t.color = undefined;
+                t.isChoice = false;
+              }
+            });
+          }
+      );
+    };
+
     this.remove_line = id => {
       // eslint-disable-next-line no-undef
       const arr = globalLines;
@@ -150,7 +167,7 @@ module.exports = class PlayerArea extends expose.Component {
       }
     };
 
-    this.compile = filename => {
+    this.compile = (filename, nodeId) => {
       if (this.state.visible) {
         return;
       }
@@ -164,7 +181,7 @@ module.exports = class PlayerArea extends expose.Component {
 
       const _on_compile = resp => {
         if (resp.data.success) {
-          core.runFile(resp.data.file);
+          core.runFile(resp.data.file, filename, nodeId);
         } else {
           this.add_line('Failure!');
           this.setState({
@@ -202,9 +219,12 @@ module.exports = class PlayerArea extends expose.Component {
     };
 
     window.on_choice_click = id => {
-      // console.log('on choice click', id);
-      this.remove_choice_clicks();
-      this.choiceClicks[id]();
+      // const clicksToRemove = this.get_choice_clicks_to_remove();
+      const keepChoiceClicks = this.choiceClicks[id]();
+      // console.log('ON CHOICE CLICk', id, keepChoiceClicks);
+      // if (!keepChoiceClicks) {
+      //   clicksToRemove.forEach(c => c());
+      // }
     };
 
     this.state = {

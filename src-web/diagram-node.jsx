@@ -20,7 +20,16 @@ import React, { createRef } from 'react';
 //         node.type === 'choice' || node.type === 'switch' ? 'right:10' : ''
 //       }"><span class="no-select">X</span></div>`) +
 
-const DiagramNode = ({ node }) => {
+/**
+ * @typedef {import('./board.jsx').BoardNode} BoardNode
+ */
+/**
+ * @typedef {import('./board.jsx').CombinedConditionalChoiceSubNode} CombinedConditionalChoiceSubNode
+ */
+
+const DiagramNode = props => {
+  /** @type {BoardNode} */
+  const node = props.node;
   const style = {
     left: node.left || null,
     top: node.top || null,
@@ -37,6 +46,13 @@ const DiagramNode = ({ node }) => {
     contentStyle.textOverflow = 'ellipsis';
   }
   const className = 'item item-' + node.type;
+
+  const getPrefix = () => {
+    if (node.combinedConditionalChoice?.prefixText) {
+      return '[' + node.combinedConditionalChoice.prefixText + '] ';
+    }
+    return '';
+  };
 
   return (
     <div
@@ -61,6 +77,23 @@ const DiagramNode = ({ node }) => {
         window.on_node_mouseout(document.getElementById(node.id))
       }
     >
+      {node.type === 'combined_conditional_choice' ? (
+        <div
+          style={{
+            position: 'absolute',
+            top: -28,
+            background: 'rgba(153, 0, 77, 0.5)',
+            padding: '5px',
+            borderBottomLeftRadius: '5px',
+            borderBottomRightRadius: '5px',
+            width: '80%',
+            maxHeight: '18px',
+            overflow: 'hidden',
+          }}
+        >
+          {node.combinedConditionalChoice.conditionContent}
+        </div>
+      ) : null}
       <div className="node-id">
         {node.id}
         {node.rel ? (
@@ -78,8 +111,30 @@ const DiagramNode = ({ node }) => {
         )}
       </div>
       <div className="item-content" style={contentStyle}>
-        <span className="no-select">{node.content}</span>
+        <span className="no-select">
+          {getPrefix()}
+          {node.content}
+        </span>
       </div>
+      {node.type === 'combined_conditional_choice' &&
+      node.combinedConditionalChoice?.doActionOnChoose ? (
+        <div
+          style={{
+            position: 'absolute',
+            // top: 58,
+            marginTop: '10px',
+            background: 'rgba(78, 136, 97, 0.5)',
+            padding: '5px',
+            borderBottomLeftRadius: '5px',
+            borderBottomRightRadius: '5px',
+            width: '80%',
+            // maxHeight: 'px',
+            overflow: 'hidden',
+          }}
+        >
+          {node.combinedConditionalChoice.onChooseActionContent}
+        </div>
+      ) : null}
       <div className="anchor-to" id={node.id + '_to'}></div>
       <div className="anchor-from" id={node.id + '_from'}></div>
       {node.type === 'root' ||

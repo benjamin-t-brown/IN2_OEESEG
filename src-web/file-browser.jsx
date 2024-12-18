@@ -1,5 +1,7 @@
+import { BOARD_SIZE_PIXELS } from 'board';
 import dialog from './dialog';
 import { notify } from './notifications';
+import ButtonWithDropDown from 'elements/ButtonWithDropdown';
 
 const React = require('react');
 const css = require('./css');
@@ -80,6 +82,8 @@ class FileBrowser extends expose.Component {
       checked_files: {},
       check_all: false,
       check_primary: false,
+      run_sub_node: false,
+      run_sub_node_id: '',
     };
 
     this.onFileClick = function (filename) {
@@ -154,7 +158,12 @@ class FileBrowser extends expose.Component {
     };
 
     this.onCompileFileClick = () => {
-      expose.get_state('player-area').compile(this.props.current_file_name);
+      expose
+        .get_state('player-area')
+        .compile(
+          this.props.current_file_name,
+          this.state.run_sub_node ? this.state.run_sub_node_id : undefined
+        );
     };
 
     this.getCheckedFiles = () => {
@@ -172,11 +181,21 @@ class FileBrowser extends expose.Component {
     };
 
     this.onCompileSelectedClick = () => {
-      expose.get_state('player-area').compile(this.getCheckedFiles());
+      expose
+        .get_state('player-area')
+        .compile(
+          this.getCheckedFiles(),
+          this.state.run_sub_node ? this.state.run_sub_node_id : undefined
+        );
     };
 
     this.onCompileAllClick = () => {
-      expose.get_state('player-area').compile();
+      expose
+        .get_state('player-area')
+        .compile(
+          undefined,
+          this.state.run_sub_node ? this.state.run_sub_node_id : undefined
+        );
     };
 
     this.onFileDoubleClick = function (filename) {
@@ -379,7 +398,7 @@ class FileBrowser extends expose.Component {
           type: 'root',
           content: 'Root',
           top: '20px',
-          left: '20px',
+          left: BOARD_SIZE_PIXELS / 2 + 'px',
         },
       ],
       links: [],
@@ -607,6 +626,48 @@ class FileBrowser extends expose.Component {
               )
             )
           ),
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'flex-start',
+              color: css.colors.TEXT_LIGHT,
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                width: '100px',
+              }}
+            >
+              <input
+                type="checkbox"
+                id="run_sub_node"
+                checked={this.state.run_sub_node}
+                onChange={ev => {
+                  this.setState({ run_sub_node: ev.target.checked });
+                }}
+              ></input>
+              <label htmlFor="run_sub_node">Run Node</label>
+            </div>
+            <div
+              style={{
+                width: '178px',
+              }}
+            >
+              <input
+                type="text"
+                style={{
+                  width: '100%',
+                }}
+                value={this.state.run_sub_node_id}
+                onChange={ev => {
+                  this.setState({ run_sub_node_id: ev.target.value });
+                }}
+                id="run_sub_node_id"
+              ></input>
+            </div>
+          </div>,
           React.createElement(
             'div',
             {

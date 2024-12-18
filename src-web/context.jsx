@@ -2,18 +2,28 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import expose from './expose';
 import css from './css';
-import utils from 'utils';
+import utils, { random_id } from 'utils';
 import dialog from 'dialog';
 import { notify } from 'notifications';
 import { getNode } from 'board';
 import { getClassCheckForkTemplate } from 'templates/ClassCheckFork';
+import { getPersonalityTestTemplate } from 'templates/PersonalityTest';
 
 const exp = {};
+
+/**
+ * @typedef {import('./board.jsx').BoardNode} BoardNode
+ */
+/**
+ * @typedef {import('./board.jsx').CombinedConditionalChoiceSubNode} CombinedConditionalChoiceSubNode
+ */
 
 const templates = [
   'createBasicOeesegRoom',
   'createFuncSelectItem',
   'createClassPassFail',
+  'createPersonalityTest',
+  'createBasicCarcerDialogue',
 ];
 
 class Context extends expose.Component {
@@ -34,6 +44,7 @@ class Context extends expose.Component {
       case 'Create Choice Node': {
         return 'choose';
       }
+      case 'Create Combined Conditional Choice Node':
       case 'Create Conditional Choice Node': {
         return 'passfail';
       }
@@ -64,6 +75,8 @@ class Context extends expose.Component {
       case 'Create Sub Root': {
         return 'root';
       }
+      case 'Create Basic Carcer Dialogue':
+      case 'Create Personality Test':
       case 'Create Func Select Item':
       case 'Create Class Pass Fail':
       case 'Create Basic Oeeseg Room': {
@@ -205,9 +218,9 @@ exp.show_context_menu = function (board, elem) {
     elem,
     utils.getDeclsForFile(board.file)
   );
-  const file_node = getNode(board.file, elem?.id) ?? {};
-  if (file_node.type !== 'next_file' && board.nodeCanHaveChild(file_node)) {
-    if (file_node.type === 'choice') {
+  const fileNode = getNode(board.file, elem?.id) ?? {};
+  if (fileNode.type !== 'next_file' && board.nodeCanHaveChild(fileNode)) {
+    if (fileNode.type === 'choice') {
       cbs.linkNode = function (parent) {
         this.enterLinkMode(parent);
       }.bind(board);
@@ -219,14 +232,37 @@ exp.show_context_menu = function (board, elem) {
         this.addNode(parent, 'choice_text');
       }.bind(board);
       cbs.createConditionalChoiceNode = function (parent) {
-        const added_node = this.addNode(
+        const addedNode = this.addNode(
           parent,
           'choice_conditional',
           'player.once()'
         );
-        this.addNode(added_node, 'choice_text');
+        this.addNode(addedNode, 'choice_text');
       }.bind(board);
-    } else if (file_node.type === 'choice_conditional') {
+      cbs.createCombinedConditionalChoiceNode = function (parent) {
+        /** @type {BoardNode} */
+        const addedNode = this.addNode(
+          parent,
+          'combined_conditional_choice',
+          'This node has no actual content.'
+        );
+        /** @type {CombinedConditionalChoiceSubNode} */
+        const c = {
+          id: random_id(9),
+          actionId: random_id(9),
+          conditionContent: 'true',
+          prefixText: '',
+          showTextOnFailedCondition: false,
+          failedConditionText: 'Not available.',
+          doActionOnChoose: false,
+          onChooseActionContent:
+            "player.set('amazing', true);" +
+            '\n' +
+            "core.setNextSayPrefix('{Your choice had some kind of effect.}\\n\\n');",
+        };
+        addedNode.combinedConditionalChoice = c;
+      }.bind(board);
+    } else if (fileNode.type === 'choice_conditional') {
       cbs.linkNode = function (parent) {
         this.enterLinkMode(parent);
       }.bind(board);
@@ -240,7 +276,7 @@ exp.show_context_menu = function (board, elem) {
       cbs.createTextChoiceNode = function (parent) {
         this.addNode(parent, 'choice_text');
       }.bind(board);
-    } else if (file_node.type === 'switch') {
+    } else if (fileNode.type === 'switch') {
       cbs.linkNode = function (parent) {
         this.enterLinkMode(parent);
       }.bind(board);
@@ -293,7 +329,7 @@ exp.show_context_menu = function (board, elem) {
         );
       }.bind(board);
     }
-  } else if (file_node.type === 'choice_conditional') {
+  } else if (fileNode.type === 'choice_conditional') {
     cbs.copyNodeId = function (parent) {
       navigator.clipboard.writeText(parent.id);
       notify('Copied node ID to clipboard.', 'info');
@@ -328,6 +364,19 @@ exp.show_context_menu = function (board, elem) {
         onCancel: () => {},
       });
     }.bind(board);
+    cbs.createBasicCarcerDialogue = function () {
+      dialog.showTemplateCreateDialog({
+        node: null,
+        type: 'BasicCarcerDialogue',
+        onConfirm: (content, location, replaceNodeIds) => {
+          expose
+            .get_state('board')
+            .pasteSelection(content, location, replaceNodeIds);
+          this.saveFile();
+        },
+        onCancel: () => {},
+      });
+    }.bind(board);
     cbs.createFuncSelectItem = function () {
       dialog.showTemplateCreateDialog({
         node: null,
@@ -349,9 +398,17 @@ exp.show_context_menu = function (board, elem) {
         .pasteSelection(template, location, replaceNodeIds);
       this.saveFile();
     }.bind(board);
+    cbs.createPersonalityTest = function () {
+      const { template, location, replaceNodeIds } =
+        getPersonalityTestTemplate();
+      expose
+        .get_state('board')
+        .pasteSelection(template, location, replaceNodeIds);
+      this.saveFile();
+    }.bind(board);
   }
 
-  exp.show(x, y, file_node, board.file, cbs);
+  exp.show(x, y, fileNode, board.file, cbs);
 };
 
 export default exp;
